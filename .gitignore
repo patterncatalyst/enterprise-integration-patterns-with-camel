@@ -1,0 +1,47 @@
+# Jekyll
+_site/
+.jekyll-cache/
+.jekyll-metadata
+.sass-cache/
+vendor/
+
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Quarkus
+.quarkus/
+
+# Node (pptxgenjs build tooling)
+node_modules/
+package-lock.json
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Podman / Docker
+*.pid
+
+# Secrets / local overrides
+*.local.md
+.env
+.env.*
+!.env.example
