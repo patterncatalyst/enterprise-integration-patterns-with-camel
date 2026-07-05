@@ -1,0 +1,77 @@
+# ────────────────────────────────────────────────────────────────────────────
+# Enterprise Integration Patterns with Apache Camel
+# ────────────────────────────────────────────────────────────────────────────
+
+title: "Enterprise Integration Patterns with Apache Camel"
+description: "A comprehensive guide to the 65 Enterprise Integration Patterns — implemented with Apache Camel, Quarkus, Kafka, Pulsar, and Redis, with runnable examples on Podman."
+brand_emoji: "🔀"
+
+github_username: "patterncatalyst"
+github_repo: "enterprise-integration-patterns-with-camel"
+
+baseurl: "/enterprise-integration-patterns-with-camel"
+url: ""
+
+license: "Apache 2.0"
+
+# ────────────────────────────────────────────────────────────────────────────
+# Build configuration
+# ────────────────────────────────────────────────────────────────────────────
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+permalink: pretty
+
+collections:
+  docs:
+    output: true
+    permalink: /docs/:name/
+  plans:
+    output: false
+  example_pages:
+    output: true
+    permalink: /examples/:name/
+  parts:
+    output: true
+    permalink: /parts/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: docs
+    values:
+      layout: tutorial
+      sectionid: docs
+  - scope:
+      path: ""
+      type: plans
+    values:
+      layout: plan
+  - scope:
+      path: ""
+      type: example_pages
+    values:
+      layout: tutorial
+      sectionid: examples
+  - scope:
+      path: ""
+      type: parts
+    values:
+      layout: part_index
+      sectionid: docs
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+  - node_modules/
+  - examples/
+  - scripts/
+  - README.md
+  - LICENSE
+  - PRD.md
+  - CONTRIBUTING.md
+  - presentation/

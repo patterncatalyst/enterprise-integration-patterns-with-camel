@@ -1,0 +1,66 @@
+---
+layout: default
+title: Home
+---
+
+<section class="hero">
+  <div class="container">
+    <span class="hero__eyebrow">Camel · Quarkus · Kafka · Pulsar · Redis</span>
+    <h1 class="hero__title">{{ site.title }}</h1>
+    <p class="hero__lead">{{ site.description }}</p>
+    <div class="hero__cta">
+      <a class="btn btn--primary"
+         href="{{ '/docs/00-prerequisites/' | relative_url }}">Start the tutorial →</a>
+      <a class="btn btn--secondary"
+         href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}"
+         rel="noopener">View on GitHub ↗</a>
+    </div>
+  </div>
+</section>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="stats">
+      <div class="stat"><span class="stat__value">65</span><span class="stat__label">Enterprise Integration Patterns from the Hohpe &amp; Woolf book</span></div>
+      <div class="stat"><span class="stat__value">8</span><span class="stat__label">Pattern categories with rich visual explanations</span></div>
+      <div class="stat"><span class="stat__value">3</span><span class="stat__label">DSL views — Java, YAML, and XML side-by-side</span></div>
+      <div class="stat"><span class="stat__value">🐪</span><span class="stat__label">Runnable examples on Podman with Kafka, Pulsar &amp; Redis</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-heading">The pattern catalog</h2>
+    <p class="section-sub">
+      A chaptered guide to designing enterprise integrations with Apache Camel
+      on Quarkus. Each pattern from Gregor Hohpe and Bobby Woolf's
+      <em>Enterprise Integration Patterns</em> is explained with diagrams,
+      implemented in three Camel DSLs (Java, YAML, XML), and demonstrated with
+      a runnable shipping-domain example against a local Podman stack running
+      Kafka, Pulsar, and Redis.
+    </p>
+
+    <div class="cards">
+      {% assign parts_sorted = site.parts | sort: "order" %}
+      {% for part in parts_sorted %}
+      {% assign part_docs = site.docs | where: "part", part.part_name %}
+      <a class="card" href="{{ part.url | relative_url }}">
+        <div class="card__eyebrow">Part {{ part.order }}</div>
+        <h3 class="card__title">{{ part.title }}</h3>
+        {% if part.blurb %}
+        <p class="card__desc">{{ part.blurb }}</p>
+        {% endif %}
+        <div class="card__meta">
+          {% if part_docs.size > 0 %}
+            <span>{{ part_docs.size }} chapter{% if part_docs.size != 1 %}s{% endif %}</span>
+          {% else %}
+            <span>Coming soon</span>
+          {% endif %}
+          <span>Explore →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>

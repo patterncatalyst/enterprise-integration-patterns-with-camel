@@ -1,0 +1,31 @@
+<footer class="site-footer" role="contentinfo">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>{{ site.title | default: "Tutorial" }}</h4>
+        <p>{{ site.description | default: "A technical tutorial." }}</p>
+      </div>
+      <div class="footer-col">
+        <h4>The Book</h4>
+        <ul>
+          <li><a href="https://www.enterpriseintegrationpatterns.com/" rel="noopener">EIP Website ↗</a></li>
+          <li><a href="https://camel.apache.org/" rel="noopener">Apache Camel ↗</a></li>
+          <li><a href="https://camel.apache.org/camel-quarkus/latest/" rel="noopener">Camel Quarkus ↗</a></li>
+          <li><a href="https://quarkus.io/" rel="noopener">Quarkus ↗</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <ul>
+          <li><a href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}" rel="noopener">View on GitHub ↗</a></li>
+          <li><a href="https://github.com/{{ site.github_username }}/{{ site.github_repo }}/issues" rel="noopener">Issues ↗</a></li>
+          <li><a href="https://github.com/{{ site.github_username }}" rel="noopener">patterncatalyst ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-meta">
+      <span>Open source · {{ site.license | default: "Apache 2.0" }}</span>
+      <span>Last built {{ site.time | date: "%Y-%m-%d" }}</span>
+    </div>
+  </div>
+</footer>
