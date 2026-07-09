@@ -1,0 +1,155 @@
+services:
+  # ── Kafka (KRaft, single broker) ──────────────────────────────────────────
+  kafka:
+    image: docker.io/apache/kafka:latest
+    container_name: eip-kafka
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,DOCKER://0.0.0.0:9094
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092,DOCKER://kafka:9094
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_NUM_PARTITIONS=3
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=1
+      - KAFKA_MIN_INSYNC_REPLICAS=1
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - CLUSTER_ID=RUlQQ2FtZWxQYXR0ZXJucw
+    volumes:
+      - kafka-data:/var/lib/kafka/data:Z
+    devices:
+      - "/dev/null:/dev/null:rwm"
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - eip-net
+
+  kafka-ui:
+    image: docker.io/provectuslabs/kafka-ui:latest
+    container_name: eip-kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=eip-local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9094
+      - DYNAMIC_CONFIG_ENABLED=true
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - eip-net
+
+  # ── Pulsar (standalone) ──────────────────────────────────────────────────
+  pulsar:
+    image: docker.io/apachepulsar/pulsar:latest
+    container_name: eip-pulsar
+    command: bin/pulsar standalone
+    ports:
+      - "6650:6650"
+      - "8080:8080"
+    volumes:
+      - pulsar-data:/pulsar/data:Z
+    devices:
+      - "/dev/null:/dev/null:rwm"
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD-SHELL", "bin/pulsar-admin brokers healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+    networks:
+      - eip-net
+
+  # ── Redis ────────────────────────────────────────────────────────────────
+  redis:
+    image: docker.io/library/redis:7-alpine
+    container_name: eip-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data:Z
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    networks:
+      - eip-net
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: eip-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=eipdb
+      - POSTGRES_USER=eipuser
+      - POSTGRES_PASSWORD=eippass
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
+    volumes:
+      - postgres-data:/var/lib/postgresql/data:Z
+      - ./postgres/init-schemas.sql:/docker-entrypoint-initdb.d/01-init-schemas.sql:Z
+    devices:
+      - "/dev/null:/dev/null:rwm"
+    mem_limit: 1g
+    command:
+      - "postgres"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "shared_buffers=128MB"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eipuser -d eipdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    networks:
+      - eip-net
+
+  # ── Apicurio Schema Registry ────────────────────────────────────────────
+  apicurio:
+    image: docker.io/apicurio/apicurio-registry:latest
+    container_name: eip-apicurio
+    ports:
+      - "8081:8080"
+    environment:
+      - QUARKUS_HTTP_PORT=8080
+      - APICURIO_STORAGE_KIND=mem
+    mem_limit: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+    networks:
+      - eip-net
+
+volumes:
+  kafka-data:
+  pulsar-data:
+  redis-data:
+  postgres-data:
+
+networks:
+  eip-net:
+    name: eip-net
