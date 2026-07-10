@@ -756,22 +756,3 @@ table :is(th, td) code {
 .status--unverified { background: #fff8ef; border-color: #f0c98a; color: #8a5a00; }
 .status--verified   { background: #f1f8f2; border-color: #9cc79f; color: #2e7d32; }
 
-/* ---- 16. Code tabs ----------------------------------------- */
-
-.codetabs-wrap{ margin:var(--space-5) 0; border:1px solid var(--border-strong);
-  border-radius:var(--radius); overflow:hidden; }
-.codetabs-bar{ display:flex; flex-wrap:wrap; background:var(--bg-soft);
-  border-bottom:1px solid var(--border-strong); }
-.codetabs-tab{ appearance:none; border:0; background:transparent; cursor:pointer;
-  font-family:var(--font-body); font-size:.82rem; font-weight:600;
-  color:var(--ink-muted); padding:.55rem .9rem;
-  border-bottom:2px solid transparent; transition:var(--transition); }
-.codetabs-tab:hover{ color:var(--ink); background:var(--accent-soft); }
-.codetabs-tab.is-active{ color:var(--ink); background:var(--bg-card);
-  border-bottom-color:var(--accent); }
-.codetabs-tab:focus-visible{ outline:2px solid var(--accent); outline-offset:-2px; }
-.codetabs-panel{ margin:0; }
-.codetabs-panel[hidden]{ display:none; }
-.codetabs-panel .highlighter-rouge,
-.codetabs-panel .highlight{ margin:0 !important; border-radius:0 !important; }
-.no-js .codetabs{ display:none; }
