@@ -17,8 +17,10 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 |-----------|---------|
 | Apache Camel | 4.20.0 |
 | Camel Quarkus | 3.36.0 |
+| Camel CLI (JBang) | 4.20.0 |
 | Quarkus | 3.36.x |
 | Java | 21 (LTS) |
+| JBang | latest |
 | Podman | 5.x |
 
 ## Quick start
@@ -28,7 +30,14 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 gh repo clone patterncatalyst/enterprise-integration-patterns-with-camel
 cd enterprise-integration-patterns-with-camel
 
-# Start the local stack
+# Install JBang + Camel CLI (if you haven't already)
+curl -Ls https://sh.jbang.dev | bash -s - app setup
+jbang app install camel@apache/camel
+
+# Run a pattern example directly — no Maven project needed
+camel run examples/patterns/content-based-router.yaml --dev
+
+# Start the local stack (for examples that need Kafka, Redis, etc.)
 ./scripts/setup-stack.sh
 
 # Start with observability (Grafana, Loki, Tempo, Mimir)

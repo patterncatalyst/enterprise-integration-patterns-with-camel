@@ -113,6 +113,15 @@ from("file:data/orders/outbound?noop=true&include=.*\\.csv")
 </route>
 ```
 
+You can run any of these directly with the Camel CLI — no Maven project needed:
+
+```bash
+# Save the YAML route to a file and run it
+camel run file-transfer-export.yaml --dev
+```
+
+The `--dev` flag gives you live reload: edit the route, save, and Camel restarts automatically. This is how you'll prototype every pattern in this tutorial.
+
 **What this route does:**
 
 1. **Polls** `data/orders/outbound/` for CSV files. The `noop=true` option means files are read but not moved or deleted — useful for testing; in production you'd use `move=.done` to prevent reprocessing.

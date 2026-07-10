@@ -241,11 +241,28 @@ Apicurio Registry stores and versions Avro schemas. Kafka producers serialize ev
 When you run the examples in later chapters, you'll follow a consistent pattern:
 
 1. **Start the stack** — `./scripts/setup-stack.sh` (or `--lgtm` for observability).
-2. **Start the example service** — `mvn quarkus:dev` in the example directory. Quarkus dev mode gives you live reload and continuous testing.
-3. **Produce a trigger** — Send an HTTP request to order-service, or publish a message directly to a Kafka topic using the Kafka UI at `http://localhost:8090`.
-4. **Observe the flow** — Watch the logs, check the database, browse Kafka topics in the UI, or (with the LGTM stack) trace the message flow across services in Grafana.
+2. **Run the route** — Most pattern examples are single route files that you run directly with the Camel CLI:
 
-Every pattern chapter follows this loop: understand the pattern, see how Camel implements it, run it against the shipping domain, and observe what happens. The domain is simple enough that the patterns stay in focus, but rich enough that the examples feel real.
+   ```bash
+   camel run content-based-router.yaml --dev
+   ```
+
+   The `--dev` flag enables live reload — edit the route file and Camel restarts automatically. No Maven project, no build step, no waiting. For examples that need additional dependencies (like `camel-kafka` or `camel-sql`), the CLI resolves them automatically from the route file's imports.
+
+3. **Inspect the route** — Use `camel get` to see active routes and endpoints, `camel trace` to watch messages flow through, or `camel top` for live throughput metrics.
+4. **Produce a trigger** — Send an HTTP request, publish a message to a Kafka topic using the Kafka UI at `http://localhost:8090`, or drop a file into a watched directory.
+5. **Observe the flow** — Watch the Camel logs, check the database, browse Kafka topics in the UI, or (with the LGTM stack) trace the message flow across services in Grafana.
+
+For the full-stack case studies and multi-service examples, you'll use the promoted Quarkus projects in `examples/`:
+
+```bash
+cd examples/patterns/03-message-routing/content-based-router
+mvn quarkus:dev
+```
+
+The Camel CLI's `camel export --runtime=quarkus` command is how these promoted projects were created — a single route file becomes a full Quarkus application with CDI, configuration, container packaging, and all the production concerns that a prototype doesn't need.
+
+Every pattern chapter follows this loop: understand the pattern, see how Camel implements it, run it with `camel run`, and observe what happens. The domain is simple enough that the patterns stay in focus, but rich enough that the examples feel real.
 
 ## What you learned
 

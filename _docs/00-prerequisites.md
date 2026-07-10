@@ -2,11 +2,11 @@
 title: "Prerequisites & Setup"
 order: 0
 part: getting-started
-description: "Install Java 21, Maven, Podman, and the tools you need to run every example locally."
+description: "Install Java 21, JBang, the Camel CLI, Maven, Podman, and the tools you need to run every example locally."
 duration: "30 minutes"
 ---
 
-Before you write a single route, you need a working development environment. This chapter walks you through every tool — Java, Maven, Podman, an IDE — and finishes with a smoke test that proves the whole stack is healthy. If you already have these tools installed, skim the version checks and jump to the stack verification at the end.
+Before you write a single route, you need a working development environment. This chapter walks you through every tool — Java, JBang, the Camel CLI, Maven, Podman, an IDE — and finishes with a smoke test that proves the whole stack is healthy. If you already have these tools installed, skim the version checks and jump to the stack verification at the end.
 
 ## Java 21
 
@@ -40,9 +40,82 @@ java -version
 
 Java 22 and later work fine with Camel 4.20, but we pin to 21 because it's the LTS — the version you'll use in production. Quarkus *does* support GraalVM native compilation, and several Camel components have native support, but native builds add compilation time and reduce the set of components available at runtime. We'll use JVM mode throughout this tutorial and note where native is an option.
 
+## JBang & the Camel CLI
+
+**JBang** lets you run Java source files directly — no project scaffolding, no `pom.xml`, no build step. The **Camel CLI** (`camel`), installed through JBang, is the fastest way to run, test, and explore Camel routes. Most pattern examples in this tutorial are single route files that you run with `camel run` — no Maven project required. When you're ready to promote a prototype into a full Quarkus application, `camel export` generates the project for you.
+
+### Installing JBang
+
+```bash
+curl -Ls https://sh.jbang.dev | bash -s - app setup
+```
+
+Or via SDKMAN:
+
+```bash
+sdk install jbang
+```
+
+Verify:
+
+```bash
+jbang --version
+# 0.123.x
+```
+
+### Installing the Camel CLI
+
+```bash
+jbang app install camel@apache/camel
+```
+
+This installs the `camel` command globally. Verify:
+
+```bash
+camel version
+# Apache Camel CLI (JBang) 4.20.0
+```
+
+### What the Camel CLI gives you
+
+The Camel CLI is how you'll interact with most examples in this tutorial:
+
+| Command | Purpose |
+|---------|---------|
+| `camel run route.yaml` | Run a route file (Java, YAML, or XML DSL) |
+| `camel run --dev route.yaml` | Run with live reload — edit the file, Camel restarts automatically |
+| `camel init hello.yaml` | Scaffold a new route file from a template |
+| `camel export --runtime=quarkus` | Export route files to a full Quarkus Maven project |
+| `camel get` | Inspect running routes (endpoints, statistics) |
+| `camel trace` | Trace messages flowing through routes |
+| `camel top` | Live performance view of running routes |
+| `camel doc kafka` | Show documentation for a component or kamelet |
+| `camel search --component file` | Search the component catalog |
+
+### Quick smoke test
+
+Create a one-line route and run it to confirm everything is wired up:
+
+```bash
+camel init hello.yaml
+camel run hello.yaml
+```
+
+You should see Camel start up, log a greeting, and keep running. Press `Ctrl+C` to stop.
+
+### The tutorial workflow
+
+The development loop for most chapters looks like this:
+
+1. **Prototype with `camel run`** — Write a route in a single file (YAML, Java, or XML DSL) and run it directly. No project, no POM, no build. Use `--dev` for live reload while you iterate.
+2. **Inspect with `camel get` / `camel trace`** — See what routes are active, trace messages through them, monitor throughput.
+3. **Promote with `camel export`** — When a route is ready for the full stack (CDI injection, Quarkus config, database integration, container packaging), export it to a Quarkus project.
+
+This keeps the feedback loop tight — seconds, not minutes — while you're learning patterns. The full Quarkus projects in `examples/` are the promoted versions of these prototypes.
+
 ## Apache Maven
 
-Maven 3.9+ is the build tool for every Quarkus project in this tutorial. Quarkus also supports Gradle, but the Camel Quarkus extensions and BOMs are most thoroughly tested against Maven, and every example in the EIP book's reference implementations uses Maven.
+Maven 3.9+ is the build tool for the full Quarkus projects in this tutorial. You won't need Maven for most pattern examples (those run directly with `camel run`), but you'll need it when you work with the promoted Quarkus projects in `examples/` and for the case study implementations.
 
 ### Installing with SDKMAN
 
@@ -66,16 +139,17 @@ export JAVA_HOME=$(sdk home java 21.0.7-tem)
 
 ### Maven settings for this tutorial
 
-No special `settings.xml` is needed. All dependencies come from Maven Central, and the Quarkus BOM manages version alignment. Each example project inherits from a parent POM that locks these versions:
+No special `settings.xml` is needed. All dependencies come from Maven Central, and the Quarkus BOM manages version alignment. The promoted Quarkus projects inherit from a parent POM that locks these versions:
 
 | Dependency | Version |
 |-----------|---------|
 | Apache Camel | 4.20.0 |
 | Camel Quarkus | 3.36.0 |
 | Quarkus | 3.36.x |
+| Camel CLI (JBang) | 4.20.0 |
 | Drools | 10.2.0 |
 
-You'll see these in the `<dependencyManagement>` section of every `pom.xml`. When a new Camel Quarkus release ships, upgrading is a single BOM version bump.
+You'll see these in the `<dependencyManagement>` section of every `pom.xml`. When a new Camel release ships, upgrading is a BOM version bump in Maven and `camel version set 4.x.x` for the CLI.
 
 ## Podman & podman-compose
 
@@ -284,6 +358,8 @@ podman-compose -f examples/_infra/compose.yaml down -v
 ## What you learned
 
 - Java 21 via SDKMAN, Maven 3.9+, and how to ensure they're wired together.
+- JBang and the Camel CLI — the fastest way to run, inspect, and prototype Camel routes from single files.
+- The tutorial workflow: prototype with `camel run --dev`, inspect with `camel get` / `camel trace`, promote with `camel export --runtime=quarkus`.
 - Podman and podman-compose for rootless container management.
 - The two-tier local stack: base infrastructure and optional LGTM observability.
 - How to verify that every service is healthy and ready.
