@@ -38,8 +38,6 @@ We'll explore these in depth in Part 3 (Messaging Channels).
 
 In Camel, a channel is a **component endpoint URI**. The component (`kafka:`, `pulsar:`, `jms:`, `file:`, `direct:`) determines the transport; the path determines the specific channel:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Sending to a channel
 from("direct:order-placed")
@@ -48,43 +46,6 @@ from("direct:order-placed")
 // Receiving from a channel
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     .to("direct:process-order");
-```
-
-```yaml
-# Sending to a channel
-- route:
-    from:
-      uri: "direct:order-placed"
-    steps:
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-
-# Receiving from a channel
-- route:
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - to:
-          uri: "direct:process-order"
-```
-
-```xml
-<!-- Sending to a channel -->
-<route>
-  <from uri="direct:order-placed"/>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-</route>
-
-<!-- Receiving from a channel -->
-<route>
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <to uri="direct:process-order"/>
-</route>
 ```
 
 The `from()` and `to()` calls are how Camel connects to channels. Every route starts by consuming from one channel (`from`) and ends by producing to one or more channels (`to`). The channel abstraction means you can swap Kafka for Pulsar, JMS, or even a file directory by changing the URI — the route logic stays the same.
@@ -121,8 +82,6 @@ In Camel, a message is represented by the `Exchange` object, which contains:
 - **`Exchange.getMessage()`** — The current message (preferred in Camel 4.x; the `getIn()`/`getOut()` distinction is deprecated).
 - **`Exchange.getProperties()`** — Exchange-level properties (not transmitted to the channel; used for route-internal state).
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     .routeId("message-anatomy")
@@ -136,44 +95,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     // Setting a header for downstream routing
     .setHeader("orderPriority", simple("${body[amount]} > 1000 ? 'HIGH' : 'STANDARD'"))
     .log("Priority: ${header.orderPriority}");
-```
-
-```yaml
-- route:
-    id: message-anatomy
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - log:
-          message: "Kafka key: ${header.kafka.KEY}"
-      - log:
-          message: "Kafka partition: ${header.kafka.PARTITION}"
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Order ${body[order_id]} for customer ${body[customer_id]}"
-      - setHeader:
-          name: orderPriority
-          simple: "${body[amount]} > 1000 ? 'HIGH' : 'STANDARD'"
-      - log:
-          message: "Priority: ${header.orderPriority}"
-```
-
-```xml
-<route id="message-anatomy">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <log message="Kafka key: ${header.kafka.KEY}"/>
-  <log message="Kafka partition: ${header.kafka.PARTITION}"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Order ${body[order_id]} for customer ${body[customer_id]}"/>
-  <setHeader name="orderPriority">
-    <simple>${body[amount]} > 1000 ? 'HIGH' : 'STANDARD'</simple>
-  </setHeader>
-  <log message="Priority: ${header.orderPriority}"/>
-</route>
 ```
 
 Notice how Kafka metadata (key, partition, offset, topic, timestamp) arrives as Camel headers prefixed with `kafka.`. Every Camel component populates component-specific headers — the `file` component sets `CamelFileName`, the `http` component sets `CamelHttpResponseCode`, and so on. These headers are the mechanism by which transport-layer metadata flows into route logic.
@@ -206,8 +127,6 @@ The power of pipes and filters is composability:
 
 Every Camel route is a pipes-and-filters pipeline. The DSL's method chaining (Java), step lists (YAML), or nested elements (XML) define the sequence of filters:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-pipeline")
     .routeId("pipes-and-filters")
@@ -226,42 +145,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-pipeline")
     .marshal().json()
     // Pipe to the next channel
     .to("kafka:eip.orders.enriched?brokers=localhost:9092");
-```
-
-```yaml
-- route:
-    id: pipes-and-filters
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-pipeline"
-    steps:
-      - unmarshal:
-          json: {}
-      - filter:
-          simple: "${body[amount]} > 0 && ${body[quantity]} > 0"
-      - process:
-          ref: "#enrichWithTier"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.enriched"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<route id="pipes-and-filters">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=order-pipeline"/>
-  <unmarshal><json/></unmarshal>
-  <filter>
-    <simple>${body[amount]} > 0 &amp;&amp; ${body[quantity]} > 0</simple>
-  </filter>
-  <process ref="#enrichWithTier"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.enriched?brokers=localhost:9092"/>
-</route>
 ```
 
 Each step in the chain is a filter. Camel manages the pipes between them — the internal in-memory handoff from one step to the next. When the final `to()` sends the message to a Kafka topic, that's an external pipe connecting this pipeline to whatever consumes `eip.orders.enriched` next.
@@ -283,8 +166,6 @@ When an order arrives, the system needs to route it based on the order amount:
 
 Camel's **Choice** EIP is the core message router. It evaluates predicates in order and routes to the first match:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=router-demo")
     .routeId("message-router")
@@ -300,62 +181,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=router-demo")
             .log("Standard order ${body[order_id]}: $${body[amount]}")
             .to("direct:standard-processing")
     .end();
-```
-
-```yaml
-- route:
-    id: message-router
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "router-demo"
-    steps:
-      - unmarshal:
-          json: {}
-      - choice:
-          when:
-            - simple: "${body[amount]} > 1000"
-              steps:
-                - log:
-                    message: "Priority order ${body[order_id]}: $${body[amount]}"
-                - to:
-                    uri: "direct:priority-processing"
-            - simple: "${body[amount]} < 50"
-              steps:
-                - log:
-                    message: "Small order ${body[order_id]}: $${body[amount]}"
-                - to:
-                    uri: "direct:batch-processing"
-          otherwise:
-            steps:
-              - log:
-                  message: "Standard order ${body[order_id]}: $${body[amount]}"
-              - to:
-                  uri: "direct:standard-processing"
-```
-
-```xml
-<route id="message-router">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=router-demo"/>
-  <unmarshal><json/></unmarshal>
-  <choice>
-    <when>
-      <simple>${body[amount]} > 1000</simple>
-      <log message="Priority order ${body[order_id]}: $${body[amount]}"/>
-      <to uri="direct:priority-processing"/>
-    </when>
-    <when>
-      <simple>${body[amount]} &lt; 50</simple>
-      <log message="Small order ${body[order_id]}: $${body[amount]}"/>
-      <to uri="direct:batch-processing"/>
-    </when>
-    <otherwise>
-      <log message="Standard order ${body[order_id]}: $${body[amount]}"/>
-      <to uri="direct:standard-processing"/>
-    </otherwise>
-  </choice>
-</route>
 ```
 
 The `choice()` is just the simplest form. Part 5 covers the full family of routing patterns: Content-Based Router (this one), Message Filter, Dynamic Router, Recipient List, Splitter, Aggregator, Scatter-Gather, Routing Slip, and Process Manager. Each one is a specialized message router.
@@ -378,8 +203,6 @@ Camel provides translation at multiple levels:
 - **Expression-based transformation** — `transform()` with Simple, JSONPath, XPath, or any Camel expression language.
 - **Processor-based transformation** — Custom Java code in a `process()` block for complex transformations.
 - **Bean method invocation** — `bean()` to delegate transformation to a POJO method.
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 from("direct:translate-order-to-xml")
@@ -406,29 +229,6 @@ from("direct:translate-order-to-xml")
     .to("direct:accounting-xml-inbound");
 ```
 
-```yaml
-- route:
-    id: message-translator
-    from:
-      uri: "direct:translate-order-to-xml"
-    steps:
-      - unmarshal:
-          json: {}
-      - process:
-          ref: "#orderToXmlTranslator"
-      - to:
-          uri: "direct:accounting-xml-inbound"
-```
-
-```xml
-<route id="message-translator">
-  <from uri="direct:translate-order-to-xml"/>
-  <unmarshal><json/></unmarshal>
-  <process ref="#orderToXmlTranslator"/>
-  <to uri="direct:accounting-xml-inbound"/>
-</route>
-```
-
 In practice, Camel's built-in data formats handle most translations without custom code. Converting JSON to XML is as simple as chaining `unmarshal().json()` followed by `marshal().jacksonXml()`. Part 6 covers the full family of transformation patterns: Message Translator, Envelope Wrapper, Content Enricher, Content Filter, Claim Check, Normalizer, and Canonical Data Model.
 
 ## Pattern 6: Message Endpoint
@@ -453,8 +253,6 @@ Every service in the shipping domain has at least one message endpoint:
 
 This is where Camel shines. Every Camel component is a factory for message endpoints. The component handles all the protocol-specific details; you just provide a URI:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Consumer endpoint — connects inventory-service to the orders channel
 from("kafka:eip.orders.placed"
@@ -473,52 +271,6 @@ from("direct:inventory-reserved")
         + "?brokers=localhost:9092"
         + "&key=${header.orderId}"
         + "&valueSerializer=org.apache.kafka.common.serialization.StringSerializer");
-```
-
-```yaml
-# Consumer endpoint
-- route:
-    id: message-endpoint-consumer
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-        autoOffsetReset: earliest
-        valueDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-    steps:
-      - log:
-          message: "Received order: ${body}"
-      - to:
-          uri: "direct:process-inventory-check"
-
-# Producer endpoint
-- route:
-    id: message-endpoint-producer
-    from:
-      uri: "direct:inventory-reserved"
-    steps:
-      - to:
-          uri: "kafka:eip.inventory.reserved"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-            valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
-```
-
-```xml
-<!-- Consumer endpoint -->
-<route id="message-endpoint-consumer">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service&amp;autoOffsetReset=earliest&amp;valueDeserializer=org.apache.kafka.common.serialization.StringDeserializer"/>
-  <log message="Received order: ${body}"/>
-  <to uri="direct:process-inventory-check"/>
-</route>
-
-<!-- Producer endpoint -->
-<route id="message-endpoint-producer">
-  <from uri="direct:inventory-reserved"/>
-  <to uri="kafka:eip.inventory.reserved?brokers=localhost:9092&amp;key=${header.orderId}&amp;valueSerializer=org.apache.kafka.common.serialization.StringSerializer"/>
-</route>
 ```
 
 Camel has over **400 components** — each one is a message endpoint connector. `kafka:`, `pulsar:`, `jms:`, `http:`, `file:`, `sql:`, `redis:`, `grpc:`, `aws2-s3:`, `slack:` — every one of these turns an external system into a message endpoint that can participate in a Camel route. This is Camel's core value proposition: you don't write integration plumbing, you configure endpoints.
@@ -542,8 +294,6 @@ camel catalog component
 
 Every Camel route is a composition of these six building blocks. Here's a complete route from the shipping domain with each building block labeled:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Message Endpoint (consumer) — connects to a Message Channel
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-processor")
@@ -566,64 +316,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-processor")
     .marshal().json()                           // Message Translator
     // Message Endpoint (producer) — sends to a Message Channel
     .to("kafka:eip.orders.processed?brokers=localhost:9092");
-```
-
-```yaml
-- route:
-    id: six-patterns-composed
-    from:  # Message Endpoint (consumer) → Message Channel
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-processor"
-    steps:
-      - unmarshal:  # Message Translator
-          json: {}
-      - log:  # Pipes and Filters — each step is a filter
-          message: "Processing order ${body[order_id]}"
-      - choice:  # Message Router
-          when:
-            - simple: "${body[amount]} > 1000"
-              steps:
-                - setHeader:
-                    name: processingTier
-                    constant: "PRIORITY"
-          otherwise:
-            steps:
-              - setHeader:
-                  name: processingTier
-                  constant: "STANDARD"
-      - marshal:  # Message Translator
-          json: {}
-      - to:  # Message Endpoint (producer) → Message Channel
-          uri: "kafka:eip.orders.processed"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<route id="six-patterns-composed">
-  <!-- Message Endpoint (consumer) → Message Channel -->
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=order-processor"/>
-  <!-- Message Translator -->
-  <unmarshal><json/></unmarshal>
-  <!-- Pipes and Filters -->
-  <log message="Processing order ${body[order_id]}"/>
-  <!-- Message Router -->
-  <choice>
-    <when>
-      <simple>${body[amount]} > 1000</simple>
-      <setHeader name="processingTier"><constant>PRIORITY</constant></setHeader>
-    </when>
-    <otherwise>
-      <setHeader name="processingTier"><constant>STANDARD</constant></setHeader>
-    </otherwise>
-  </choice>
-  <!-- Message Translator -->
-  <marshal><json/></marshal>
-  <!-- Message Endpoint (producer) → Message Channel -->
-  <to uri="kafka:eip.orders.processed?brokers=localhost:9092"/>
-</route>
 ```
 
 Thirteen lines of route DSL. Six patterns. One pipeline. This is why the EIP book starts with these building blocks — they're the atoms from which every integration molecule is constructed.

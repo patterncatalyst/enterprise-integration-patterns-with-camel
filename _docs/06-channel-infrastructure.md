@@ -35,8 +35,6 @@ Every Camel component is, in essence, a channel adapter factory. The `platform-h
 
 Here's the inbound adapter that bridges HTTP to Kafka — the front door of the shipping domain:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Inbound adapter: HTTP → Kafka
 rest("/api/orders")
@@ -69,91 +67,6 @@ from("kafka:eip.shipping.scheduled?brokers=localhost:9092&groupId=carrier-adapte
     .marshal().json()
     .to("http://carrier-api.example.com/shipments?connectTimeout=5000")
     .log("Carrier notified for shipment ${body[shipment_id]}");
-```
-
-```yaml
-# Inbound adapter: HTTP → Kafka
-- rest:
-    path: "/api/orders"
-    post:
-      - consumes: "application/json"
-        produces: "application/json"
-        to: "direct:create-order"
-
-- route:
-    id: channel-adapter-inbound
-    from:
-      uri: "direct:create-order"
-    steps:
-      - log:
-          message: "Received order from HTTP: ${body}"
-      - to:
-          uri: "sql:INSERT INTO orders.orders (customer_id, item_sku, quantity, amount, status) VALUES (:#customer_id, :#item_sku, :#quantity, :#amount, 'PLACED')"
-          parameters:
-            dataSource: "#orderDataSource"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-      - log:
-          message: "Order published to Kafka"
-
-# Outbound adapter: Kafka → HTTP
-- route:
-    id: channel-adapter-outbound
-    from:
-      uri: "kafka:eip.shipping.scheduled"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "carrier-adapter"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Notifying carrier for shipment ${body[shipment_id]}"
-      - setHeader:
-          name: CamelHttpMethod
-          constant: "POST"
-      - marshal:
-          json: {}
-      - to:
-          uri: "http://carrier-api.example.com/shipments"
-          parameters:
-            connectTimeout: 5000
-      - log:
-          message: "Carrier notified"
-```
-
-```xml
-<!-- Inbound adapter: HTTP → Kafka -->
-<rest path="/api/orders">
-  <post consumes="application/json" produces="application/json">
-    <to uri="direct:create-order"/>
-  </post>
-</rest>
-
-<route id="channel-adapter-inbound">
-  <from uri="direct:create-order"/>
-  <log message="Received order from HTTP: ${body}"/>
-  <to uri="sql:INSERT INTO orders.orders (customer_id, item_sku, quantity, amount, status) VALUES (:#customer_id, :#item_sku, :#quantity, :#amount, 'PLACED')?dataSource=#orderDataSource"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;key=${header.orderId}"/>
-  <log message="Order published to Kafka"/>
-</route>
-
-<!-- Outbound adapter: Kafka → HTTP -->
-<route id="channel-adapter-outbound">
-  <from uri="kafka:eip.shipping.scheduled?brokers=localhost:9092&amp;groupId=carrier-adapter"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Notifying carrier for shipment ${body[shipment_id]}"/>
-  <setHeader name="CamelHttpMethod"><constant>POST</constant></setHeader>
-  <marshal><json/></marshal>
-  <to uri="http://carrier-api.example.com/shipments?connectTimeout=5000"/>
-  <log message="Carrier notified"/>
-</route>
 ```
 
 The REST endpoint (`platform-http`) is the inbound channel adapter — it translates HTTP requests into Camel exchanges that flow into the Kafka-based messaging system. The HTTP client (`http:`) on the outbound side is the outbound channel adapter — it translates Kafka messages into HTTP requests to an external API.
@@ -193,8 +106,6 @@ A bridge handles:
 
 A Camel messaging bridge is just a route with a messaging `from()` and a messaging `to()`:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Bridge: Pulsar → Kafka
 from("pulsar:persistent://public/default/partner.orders.placed"
@@ -217,61 +128,6 @@ from("kafka:eip.shipping.scheduled"
     .log("Bridging shipment event from Kafka to Pulsar")
     .to("pulsar:persistent://public/default/eip.shipping.scheduled"
         + "?producerName=kafka-bridge");
-```
-
-```yaml
-# Bridge: Pulsar → Kafka
-- route:
-    id: messaging-bridge-pulsar-to-kafka
-    from:
-      uri: "pulsar:persistent://public/default/partner.orders.placed"
-      parameters:
-        subscriptionName: "kafka-bridge"
-        subscriptionType: "Exclusive"
-    steps:
-      - log:
-          message: "Bridging partner order from Pulsar to Kafka"
-      - setHeader:
-          name: bridgeSource
-          constant: "pulsar"
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            requestRequiredAcks: "all"
-
-# Bridge: Kafka → Pulsar
-- route:
-    id: messaging-bridge-kafka-to-pulsar
-    from:
-      uri: "kafka:eip.shipping.scheduled"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "pulsar-bridge"
-    steps:
-      - log:
-          message: "Bridging shipment event from Kafka to Pulsar"
-      - to:
-          uri: "pulsar:persistent://public/default/eip.shipping.scheduled"
-          parameters:
-            producerName: "kafka-bridge"
-```
-
-```xml
-<!-- Bridge: Pulsar → Kafka -->
-<route id="messaging-bridge-pulsar-to-kafka">
-  <from uri="pulsar:persistent://public/default/partner.orders.placed?subscriptionName=kafka-bridge&amp;subscriptionType=Exclusive"/>
-  <log message="Bridging partner order from Pulsar to Kafka"/>
-  <setHeader name="bridgeSource"><constant>pulsar</constant></setHeader>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;requestRequiredAcks=all"/>
-</route>
-
-<!-- Bridge: Kafka → Pulsar -->
-<route id="messaging-bridge-kafka-to-pulsar">
-  <from uri="kafka:eip.shipping.scheduled?brokers=localhost:9092&amp;groupId=pulsar-bridge"/>
-  <log message="Bridging shipment event from Kafka to Pulsar"/>
-  <to uri="pulsar:persistent://public/default/eip.shipping.scheduled?producerName=kafka-bridge"/>
-</route>
 ```
 
 The bridge route looks deceptively simple. The complexity is in the reliability: the Pulsar consumer must not acknowledge a message until the Kafka producer confirms receipt (and vice versa). Camel handles this when you use synchronous producers (`requestRequiredAcks=all` for Kafka, the default synchronous send for Pulsar) — the `to()` call blocks until the destination confirms, and only then does the `from()` consumer acknowledge.
@@ -299,8 +155,6 @@ In our shipping domain, the message bus is the combination of:
 
 The message bus concept manifests as shared Camel configuration. Instead of repeating Kafka broker addresses, serializer classes, and registry URLs in every route, you define them once in `application.properties` and reference them through Camel's property resolution:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // With shared configuration in application.properties:
 //   camel.component.kafka.brokers=localhost:9092
@@ -325,57 +179,6 @@ from("kafka:eip.payments.processed?groupId=fraud-detection")
     .unmarshal().json(Map.class)
     .log("Payment fraud check for order ${body[order_id]}")
     .to("direct:payment-fraud-check");
-```
-
-```yaml
-# application.properties handles the bus-level config:
-#   camel.component.kafka.brokers=localhost:9092
-#   camel.component.kafka.value-deserializer=...StringDeserializer
-
-- route:
-    id: message-bus-fraud
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        groupId: "fraud-detection"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Fraud check for order ${body[order_id]}"
-      - to:
-          uri: "direct:fraud-check"
-
-- route:
-    id: message-bus-loyalty
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        groupId: "loyalty-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Loyalty points for order ${body[order_id]}"
-      - to:
-          uri: "direct:award-points"
-```
-
-```xml
-<!-- Bus config in application.properties; routes just name the channel -->
-<route id="message-bus-fraud">
-  <from uri="kafka:eip.orders.placed?groupId=fraud-detection"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Fraud check for order ${body[order_id]}"/>
-  <to uri="direct:fraud-check"/>
-</route>
-
-<route id="message-bus-loyalty">
-  <from uri="kafka:eip.orders.placed?groupId=loyalty-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Loyalty points for order ${body[order_id]}"/>
-  <to uri="direct:award-points"/>
-</route>
 ```
 
 When Kafka component-level properties are set in `application.properties`, every route that uses `kafka:` inherits them automatically. A new service joining the bus just needs to know the topic name and its consumer group — everything else is standardized.

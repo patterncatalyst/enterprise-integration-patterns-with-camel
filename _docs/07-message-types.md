@@ -41,8 +41,6 @@ This tells payment-service exactly what to do. Payment-service doesn't decide *w
 
 Commands typically flow through **point-to-point channels** (a Kafka topic with a single consumer group) because you want exactly one receiver to execute the command:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Sending a command
 from("direct:send-payment-command")
@@ -60,68 +58,6 @@ from("kafka:eip.payments.commands?brokers=localhost:9092&groupId=payment-service
     .to("direct:execute-payment")
     // Send result back (request-reply — covered next chapter)
     .to("kafka:eip.payments.results?brokers=localhost:9092");
-```
-
-```yaml
-# Sending a command
-- route:
-    id: command-message-sender
-    from:
-      uri: "direct:send-payment-command"
-    steps:
-      - setHeader:
-          name: messageType
-          constant: "COMMAND"
-      - setHeader:
-          name: commandName
-          constant: "ProcessPayment"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.payments.commands"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-
-# Receiving and executing
-- route:
-    id: command-message-receiver
-    from:
-      uri: "kafka:eip.payments.commands"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "payment-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Executing command: ${body[command]} for order ${body[order_id]}"
-      - to:
-          uri: "direct:execute-payment"
-      - to:
-          uri: "kafka:eip.payments.results"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<!-- Sending a command -->
-<route id="command-message-sender">
-  <from uri="direct:send-payment-command"/>
-  <setHeader name="messageType"><constant>COMMAND</constant></setHeader>
-  <setHeader name="commandName"><constant>ProcessPayment</constant></setHeader>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.payments.commands?brokers=localhost:9092&amp;key=${header.orderId}"/>
-</route>
-
-<!-- Receiving and executing -->
-<route id="command-message-receiver">
-  <from uri="kafka:eip.payments.commands?brokers=localhost:9092&amp;groupId=payment-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Executing command: ${body[command]} for order ${body[order_id]}"/>
-  <to uri="direct:execute-payment"/>
-  <to uri="kafka:eip.payments.results?brokers=localhost:9092"/>
-</route>
 ```
 
 ### Trade-offs of command messages
@@ -164,8 +100,6 @@ The accounting system decides what to do: reconcile revenue, update the ledger, 
 
 Document messages often involve data format transformation — the sender's internal format rarely matches what the receiver needs:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Send a batch of order documents to the accounting channel
 from("timer:accounting-export?period=86400000")
@@ -180,48 +114,6 @@ from("timer:accounting-export?period=86400000")
         .to("kafka:eip.accounting.orders?brokers=localhost:9092")
     .end()
     .log("Exported ${header.CamelSplitSize} order documents to accounting");
-```
-
-```yaml
-- route:
-    id: document-message
-    from:
-      uri: "timer:accounting-export"
-      parameters:
-        period: 86400000
-    steps:
-      - to:
-          uri: "sql:SELECT * FROM orders.orders WHERE status IN ('SHIPPED','DELIVERED') AND created_at > CURRENT_DATE - INTERVAL '1 day'"
-          parameters:
-            dataSource: "#orderDataSource"
-      - split:
-          simple: "${body}"
-          steps:
-            - marshal:
-                json: {}
-            - setHeader:
-                name: messageType
-                constant: "DOCUMENT"
-            - to:
-                uri: "kafka:eip.accounting.orders"
-                parameters:
-                  brokers: "localhost:9092"
-      - log:
-          message: "Exported order documents to accounting"
-```
-
-```xml
-<route id="document-message">
-  <from uri="timer:accounting-export?period=86400000"/>
-  <to uri="sql:SELECT * FROM orders.orders WHERE status IN ('SHIPPED','DELIVERED') AND created_at > CURRENT_DATE - INTERVAL '1 day'?dataSource=#orderDataSource"/>
-  <split>
-    <simple>${body}</simple>
-    <marshal><json/></marshal>
-    <setHeader name="messageType"><constant>DOCUMENT</constant></setHeader>
-    <to uri="kafka:eip.accounting.orders?brokers=localhost:9092"/>
-  </split>
-  <log message="Exported order documents to accounting"/>
-</route>
 ```
 
 ## Pattern: Event Message
@@ -255,8 +147,6 @@ The event style is more decoupled:
 
 The `OrderPlaced` event from Chapter 02 is the canonical example. Here it is with explicit event metadata:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("direct:emit-order-placed")
     .routeId("event-message")
@@ -274,39 +164,6 @@ from("direct:emit-order-placed")
     .marshal().json()
     .to("kafka:eip.orders.placed?brokers=localhost:9092&key=${header.orderId}")
     .log("Event emitted: OrderPlaced for order ${header.orderId}");
-```
-
-```yaml
-- route:
-    id: event-message
-    from:
-      uri: "direct:emit-order-placed"
-    steps:
-      - process:
-          ref: "#wrapAsEvent"
-      - setHeader:
-          name: messageType
-          constant: "EVENT"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-      - log:
-          message: "Event emitted: OrderPlaced for order ${header.orderId}"
-```
-
-```xml
-<route id="event-message">
-  <from uri="direct:emit-order-placed"/>
-  <process ref="#wrapAsEvent"/>
-  <setHeader name="messageType"><constant>EVENT</constant></setHeader>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;key=${header.orderId}"/>
-  <log message="Event emitted: OrderPlaced for order ${header.orderId}"/>
-</route>
 ```
 
 The event envelope includes metadata that helps consumers process and debug:

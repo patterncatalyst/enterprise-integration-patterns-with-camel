@@ -22,8 +22,6 @@ A **Messaging Gateway** hides the messaging system behind a domain-specific inte
 
 Camel's `ProducerTemplate` and `FluentProducerTemplate` are the building blocks. Wrap them in a CDI bean that exposes domain methods:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // The Messaging Gateway: domain-specific interface over messaging
 @ApplicationScoped
@@ -76,50 +74,6 @@ from("direct:publish-payment-processed")
         + "&key=${header.orderId}");
 ```
 
-```yaml
-# Routes behind the gateway
-- route:
-    id: gateway-publish-order
-    from:
-      uri: "direct:publish-order-placed"
-    steps:
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-            requestRequiredAcks: "all"
-
-- route:
-    id: gateway-publish-payment
-    from:
-      uri: "direct:publish-payment-processed"
-    steps:
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.payments.processed"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-```
-
-```xml
-<route id="gateway-publish-order">
-  <from uri="direct:publish-order-placed"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;key=${header.orderId}&amp;requestRequiredAcks=all"/>
-</route>
-
-<route id="gateway-publish-payment">
-  <from uri="direct:publish-payment-processed"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.payments.processed?brokers=localhost:9092&amp;key=${header.orderId}"/>
-</route>
-```
-
 ### Benefits
 
 - **Testability** — Mock `OrderMessagingGateway` in unit tests. No need to start Kafka.
@@ -147,8 +101,6 @@ A **Selective Consumer** filters messages *at the transport level* — before de
 
 Camel doesn't support transport-level filtering for Kafka (the Kafka client protocol doesn't support server-side filtering). But you can optimize by filtering on headers before body deserialization:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Selective consumer: filter on Kafka header before unmarshaling body
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=hazmat-service")
@@ -174,39 +126,6 @@ from("direct:publish-order")
     })
     .marshal().json()
     .to("kafka:eip.orders.placed?brokers=localhost:9092");
-```
-
-```yaml
-# Selective consumer on headers
-- route:
-    id: selective-consumer
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "hazmat-service"
-    steps:
-      - filter:
-          simple: "${header.containsHazmat} == 'true'"
-          steps:
-            - unmarshal:
-                json: {}
-            - log:
-                message: "Processing hazmat order ${body[order_id]}"
-            - to:
-                uri: "direct:hazmat-processing"
-```
-
-```xml
-<route id="selective-consumer">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=hazmat-service"/>
-  <filter>
-    <simple>${header.containsHazmat} == 'true'</simple>
-    <unmarshal><json/></unmarshal>
-    <log message="Processing hazmat order ${body[order_id]}"/>
-    <to uri="direct:hazmat-processing"/>
-  </filter>
-</route>
 ```
 
 ### The key insight: promote filter criteria to headers
@@ -258,8 +177,6 @@ kafka-delete-records.sh --bootstrap-server localhost:9092 \
 
 In Camel, a purge route can selectively discard messages:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Purge route: consume and discard messages before a cutoff time
 from("kafka:eip.orders.placed?brokers=localhost:9092"
@@ -277,48 +194,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
     .end();
 ```
 
-```yaml
-- route:
-    id: channel-purger
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "purger-temp"
-        autoOffsetReset: earliest
-    steps:
-      - unmarshal:
-          json: {}
-      - choice:
-          when:
-            - simple: "${body[event_time]} < '2026-07-10T00:00:00Z'"
-              steps:
-                - log:
-                    message: "Purging: ${body[event_type]}"
-          otherwise:
-            steps:
-              - to:
-                  uri: "kafka:eip.orders.placed.clean"
-                  parameters:
-                    brokers: "localhost:9092"
-```
-
-```xml
-<route id="channel-purger">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=purger-temp&amp;autoOffsetReset=earliest"/>
-  <unmarshal><json/></unmarshal>
-  <choice>
-    <when>
-      <simple>${body[event_time]} &lt; '2026-07-10T00:00:00Z'</simple>
-      <log message="Purging: ${body[event_type]}"/>
-    </when>
-    <otherwise>
-      <to uri="kafka:eip.orders.placed.clean?brokers=localhost:9092"/>
-    </otherwise>
-  </choice>
-</route>
-```
-
 ## Pattern: Messaging Mapper
 
 ### The problem
@@ -334,8 +209,6 @@ A **Messaging Mapper** handles the conversion between domain objects and message
 3. **Bean binding** — Camel automatically converts message bodies to method parameter types.
 
 ### How Camel models it
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Typed mapping: unmarshal directly to domain objects
@@ -367,39 +240,6 @@ public class OrderService {
         return new OrderResult(order.getOrderId(), "PROCESSED");
     }
 }
-```
-
-```yaml
-- route:
-    id: messaging-mapper
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "typed-consumer"
-    steps:
-      - unmarshal:
-          json:
-            unmarshalType: "com.example.Order"
-      - bean:
-          ref: "#orderService"
-          method: "processOrder"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.processed"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<route id="messaging-mapper">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=typed-consumer"/>
-  <unmarshal><json unmarshalType="com.example.Order"/></unmarshal>
-  <bean ref="#orderService" method="processOrder"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.processed?brokers=localhost:9092"/>
-</route>
 ```
 
 ### Jackson annotations for mapping control

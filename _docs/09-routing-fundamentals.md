@@ -31,8 +31,6 @@ Camel implements this with the `choice()` EIP, which is arguably the most-used p
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=shipping-router")
     .routeId("content-based-router")
@@ -53,84 +51,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=shipping-router")
             .log("Routing to standard fulfillment")
             .to("kafka:eip.shipping.standard?brokers=localhost:9092")
     .end();
-```
-
-```yaml
-- route:
-    id: content-based-router
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "shipping-router"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Routing order ${body[order_id]}"
-      - choice:
-          when:
-            - simple: "${body[contains_hazmat]} == true"
-              steps:
-                - log:
-                    message: "Routing to hazmat handler"
-                - to:
-                    uri: "kafka:eip.shipping.hazmat"
-                    parameters:
-                      brokers: "localhost:9092"
-            - simple: "${body[shipping_priority]} == 'EXPRESS'"
-              steps:
-                - log:
-                    message: "Routing to express fulfillment"
-                - to:
-                    uri: "kafka:eip.shipping.express"
-                    parameters:
-                      brokers: "localhost:9092"
-            - simple: "${body[destination_country]} != 'US'"
-              steps:
-                - log:
-                    message: "Routing to international logistics"
-                - to:
-                    uri: "kafka:eip.shipping.international"
-                    parameters:
-                      brokers: "localhost:9092"
-          otherwise:
-            steps:
-              - log:
-                  message: "Routing to standard fulfillment"
-              - to:
-                  uri: "kafka:eip.shipping.standard"
-                  parameters:
-                    brokers: "localhost:9092"
-```
-
-```xml
-<route id="content-based-router">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=shipping-router"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Routing order ${body[order_id]}"/>
-  <choice>
-    <when>
-      <simple>${body[contains_hazmat]} == true</simple>
-      <log message="Routing to hazmat handler"/>
-      <to uri="kafka:eip.shipping.hazmat?brokers=localhost:9092"/>
-    </when>
-    <when>
-      <simple>${body[shipping_priority]} == 'EXPRESS'</simple>
-      <log message="Routing to express fulfillment"/>
-      <to uri="kafka:eip.shipping.express?brokers=localhost:9092"/>
-    </when>
-    <when>
-      <simple>${body[destination_country]} != 'US'</simple>
-      <log message="Routing to international logistics"/>
-      <to uri="kafka:eip.shipping.international?brokers=localhost:9092"/>
-    </when>
-    <otherwise>
-      <log message="Routing to standard fulfillment"/>
-      <to uri="kafka:eip.shipping.standard?brokers=localhost:9092"/>
-    </otherwise>
-  </choice>
-</route>
 ```
 
 ### Evaluation order matters
@@ -177,8 +97,6 @@ A **Message Filter** is a router with two outputs: messages that match the predi
 
 Camel's `filter()` EIP passes messages that match and drops the rest:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Only process orders above $50
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=notification-filter")
@@ -189,38 +107,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=notification-filter
         .to("direct:send-confirmation-email")
     .end()
     .log("Filter passed ${header.CamelFilterMatched} for order");
-```
-
-```yaml
-- route:
-    id: message-filter
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-filter"
-    steps:
-      - unmarshal:
-          json: {}
-      - filter:
-          simple: "${body[amount]} >= 50"
-          steps:
-            - log:
-                message: "Processing high-value order ${body[order_id]}: $${body[amount]}"
-            - to:
-                uri: "direct:send-confirmation-email"
-```
-
-```xml
-<route id="message-filter">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=notification-filter"/>
-  <unmarshal><json/></unmarshal>
-  <filter>
-    <simple>${body[amount]} >= 50</simple>
-    <log message="Processing high-value order ${body[order_id]}"/>
-    <to uri="direct:send-confirmation-email"/>
-  </filter>
-</route>
 ```
 
 ### Filter vs. choice
@@ -276,8 +162,6 @@ A **Recipient List** evaluates the message and sends copies to multiple channels
 
 Camel's `recipientList()` EIP takes an expression that resolves to a comma-separated list of endpoint URIs:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Static recipient list: always send high-value orders to these destinations
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=high-value-router")
@@ -318,68 +202,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=dynamic-router")
         .stopOnException();
 ```
 
-```yaml
-# Static recipient list
-- route:
-    id: recipient-list-static
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "high-value-router"
-    steps:
-      - unmarshal:
-          json: {}
-      - filter:
-          simple: "${body[amount]} >= 1000"
-          steps:
-            - recipientList:
-                constant: "direct:fulfillment,direct:fraud-detection,direct:vip-service,direct:executive-reporting"
-                parallelProcessing: true
-
-# Dynamic recipient list
-- route:
-    id: recipient-list-dynamic
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "dynamic-router"
-    steps:
-      - unmarshal:
-          json: {}
-      - process:
-          ref: "#determineRecipients"
-      - recipientList:
-          header: "routingTargets"
-          parallelProcessing: true
-          stopOnException: true
-```
-
-```xml
-<!-- Static recipient list -->
-<route id="recipient-list-static">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=high-value-router"/>
-  <unmarshal><json/></unmarshal>
-  <filter>
-    <simple>${body[amount]} >= 1000</simple>
-    <recipientList parallelProcessing="true">
-      <constant>direct:fulfillment,direct:fraud-detection,direct:vip-service,direct:executive-reporting</constant>
-    </recipientList>
-  </filter>
-</route>
-
-<!-- Dynamic recipient list -->
-<route id="recipient-list-dynamic">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=dynamic-router"/>
-  <unmarshal><json/></unmarshal>
-  <process ref="#determineRecipients"/>
-  <recipientList parallelProcessing="true" stopOnException="true">
-    <header>routingTargets</header>
-  </recipientList>
-</route>
-```
-
 ### Key options
 
 - **`parallelProcessing()`** — Sends to all recipients concurrently. Without this, recipients are called sequentially (each waits for the previous to complete).
@@ -413,8 +235,6 @@ We saw the Splitter briefly in Chapter 08 (Message Sequence). Here, we explore i
 
 Camel's `split()` EIP breaks a message based on an expression — a JSONPath, XPath, tokenizer, or custom logic:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Split a bulk order into individual line items
 from("kafka:eip.orders.bulk?brokers=localhost:9092&groupId=order-splitter")
@@ -436,78 +256,6 @@ from("kafka:eip.orders.bulk?brokers=localhost:9092&groupId=order-splitter")
         .end()
     .end()
     .log("All items from order ${header.originalOrderId} dispatched");
-```
-
-```yaml
-- route:
-    id: splitter
-    from:
-      uri: "kafka:eip.orders.bulk"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-splitter"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Received bulk order ${body[order_id]}"
-      - setHeader:
-          name: originalOrderId
-          simple: "${body[order_id]}"
-      - split:
-          jsonpath: "$.line_items"
-          steps:
-            - log:
-                message: "Processing item ${header.CamelSplitIndex} of ${header.CamelSplitSize}"
-            - choice:
-                when:
-                  - simple: "${body[warehouse]} == 'EAST'"
-                    steps:
-                      - to:
-                          uri: "kafka:eip.fulfillment.east"
-                          parameters:
-                            brokers: "localhost:9092"
-                  - simple: "${body[warehouse]} == 'WEST'"
-                    steps:
-                      - to:
-                          uri: "kafka:eip.fulfillment.west"
-                          parameters:
-                            brokers: "localhost:9092"
-                otherwise:
-                  steps:
-                    - to:
-                        uri: "kafka:eip.fulfillment.default"
-                        parameters:
-                          brokers: "localhost:9092"
-      - log:
-          message: "All items dispatched"
-```
-
-```xml
-<route id="splitter">
-  <from uri="kafka:eip.orders.bulk?brokers=localhost:9092&amp;groupId=order-splitter"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Received bulk order ${body[order_id]}"/>
-  <setHeader name="originalOrderId"><simple>${body[order_id]}</simple></setHeader>
-  <split>
-    <jsonpath>$.line_items</jsonpath>
-    <log message="Processing item ${header.CamelSplitIndex} of ${header.CamelSplitSize}"/>
-    <choice>
-      <when>
-        <simple>${body[warehouse]} == 'EAST'</simple>
-        <to uri="kafka:eip.fulfillment.east?brokers=localhost:9092"/>
-      </when>
-      <when>
-        <simple>${body[warehouse]} == 'WEST'</simple>
-        <to uri="kafka:eip.fulfillment.west?brokers=localhost:9092"/>
-      </when>
-      <otherwise>
-        <to uri="kafka:eip.fulfillment.default?brokers=localhost:9092"/>
-      </otherwise>
-    </choice>
-  </split>
-  <log message="All items dispatched"/>
-</route>
 ```
 
 ### Split options

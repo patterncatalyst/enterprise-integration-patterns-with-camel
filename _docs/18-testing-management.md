@@ -27,8 +27,6 @@ Test messages are:
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Test message injector: send a synthetic order every 5 minutes
 from("timer:test-message?period=300000")
@@ -85,91 +83,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     .end();
 ```
 
-```yaml
-# Test message injector
-- route:
-    id: test-message-injector
-    from:
-      uri: "timer:test-message"
-      parameters:
-        period: 300000
-    steps:
-      - process:
-          ref: "#createTestOrder"
-      - setHeader:
-          name: isTestMessage
-          constant: "true"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-      - log:
-          message: "Test message injected"
-
-# Verifier
-- route:
-    id: test-message-verifier
-    from:
-      uri: "kafka:eip.orders.processed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "test-verifier"
-    steps:
-      - unmarshal:
-          json: {}
-      - filter:
-          simple: "${body[test_message]} == true"
-          steps:
-            - process:
-                ref: "#verifyTestResult"
-            - choice:
-                when:
-                  - simple: "${header.testPassed} == true"
-                    steps:
-                      - log:
-                          message: "Test PASSED"
-                otherwise:
-                  steps:
-                    - log:
-                        message: "Test FAILED"
-                    - to:
-                        uri: "direct:alert-test-failure"
-```
-
-```xml
-<!-- Injector -->
-<route id="test-message-injector">
-  <from uri="timer:test-message?period=300000"/>
-  <process ref="#createTestOrder"/>
-  <setHeader name="isTestMessage"><constant>true</constant></setHeader>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-  <log message="Test message injected"/>
-</route>
-
-<!-- Verifier -->
-<route id="test-message-verifier">
-  <from uri="kafka:eip.orders.processed?brokers=localhost:9092&amp;groupId=test-verifier"/>
-  <unmarshal><json/></unmarshal>
-  <filter>
-    <simple>${body[test_message]} == true</simple>
-    <process ref="#verifyTestResult"/>
-    <choice>
-      <when>
-        <simple>${header.testPassed} == true</simple>
-        <log message="Test PASSED"/>
-      </when>
-      <otherwise>
-        <log message="Test FAILED"/>
-        <to uri="direct:alert-test-failure"/>
-      </otherwise>
-    </choice>
-  </filter>
-</route>
-```
-
 ### Test messages vs. Camel test framework
 
 Test messages are *runtime* health checks — they verify the system works in production. The Camel test framework (`camel-test`, `camel-quarkus-junit5`) verifies the system works in development:
@@ -216,8 +129,6 @@ A **Detour** is a conditional bypass in a route. When enabled, messages skip one
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Detour: bypass enrichment based on a configuration flag
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=detour-example")
@@ -232,54 +143,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=detour-example")
             .log("Enrichment DETOURED — skipping")
     .end()
     .to("direct:process-order");
-```
-
-```yaml
-- route:
-    id: detour
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "detour-example"
-    steps:
-      - unmarshal:
-          json: {}
-      - to:
-          uri: "direct:validate"
-      - choice:
-          when:
-            - simple: "{{feature.enrichment.enabled:true}}"
-              steps:
-                - log:
-                    message: "Enrichment enabled"
-                - to:
-                    uri: "direct:enrich-order"
-          otherwise:
-            steps:
-              - log:
-                  message: "Enrichment DETOURED"
-      - to:
-          uri: "direct:process-order"
-```
-
-```xml
-<route id="detour">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=detour-example"/>
-  <unmarshal><json/></unmarshal>
-  <to uri="direct:validate"/>
-  <choice>
-    <when>
-      <simple>{{feature.enrichment.enabled:true}}</simple>
-      <log message="Enrichment enabled"/>
-      <to uri="direct:enrich-order"/>
-    </when>
-    <otherwise>
-      <log message="Enrichment DETOURED"/>
-    </otherwise>
-  </choice>
-  <to uri="direct:process-order"/>
-</route>
 ```
 
 ### Feature flags with Quarkus
@@ -316,8 +179,6 @@ A **Smart Proxy** sits between the caller and the target service. It can:
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Smart proxy: route to real or mock payment gateway
 from("direct:payment-gateway")
@@ -351,72 +212,6 @@ from("direct:payment-gateway")
     // Log the response
     .wireTap("direct:log-payment-response")
     .log("Payment result: ${body[status]} (txn: ${body[transaction_id]})");
-```
-
-```yaml
-- route:
-    id: smart-proxy
-    from:
-      uri: "direct:payment-gateway"
-    steps:
-      - log:
-          message: "Payment request: $${body[amount]}"
-      - wireTap:
-          uri: "direct:log-payment-request"
-      - choice:
-          when:
-            - simple: "{{payment.gateway.mode:production}} == 'mock'"
-              steps:
-                - process:
-                    ref: "#mockPaymentResponse"
-            - simple: "{{payment.gateway.mode:production}} == 'sandbox'"
-              steps:
-                - marshal:
-                    json: {}
-                - to:
-                    uri: "http://sandbox.payment-gateway.example.com/charge"
-                    parameters:
-                      httpMethod: "POST"
-                - unmarshal:
-                    json: {}
-          otherwise:
-            steps:
-              - marshal:
-                  json: {}
-              - to:
-                  uri: "http://api.payment-gateway.example.com/charge"
-                  parameters:
-                    httpMethod: "POST"
-              - unmarshal:
-                  json: {}
-      - wireTap:
-          uri: "direct:log-payment-response"
-```
-
-```xml
-<route id="smart-proxy">
-  <from uri="direct:payment-gateway"/>
-  <log message="Payment request: $${body[amount]}"/>
-  <wireTap uri="direct:log-payment-request"/>
-  <choice>
-    <when>
-      <simple>{{payment.gateway.mode:production}} == 'mock'</simple>
-      <process ref="#mockPaymentResponse"/>
-    </when>
-    <when>
-      <simple>{{payment.gateway.mode:production}} == 'sandbox'</simple>
-      <marshal><json/></marshal>
-      <to uri="http://sandbox.payment-gateway.example.com/charge?httpMethod=POST"/>
-      <unmarshal><json/></unmarshal>
-    </when>
-    <otherwise>
-      <marshal><json/></marshal>
-      <to uri="http://api.payment-gateway.example.com/charge?httpMethod=POST"/>
-      <unmarshal><json/></unmarshal>
-    </otherwise>
-  </choice>
-  <wireTap uri="direct:log-payment-response"/>
-</route>
 ```
 
 ### Smart proxy and Quarkus profiles
@@ -453,8 +248,6 @@ Managing channel adapters is about combining several patterns we've already cove
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Managed channel adapter: carrier API with circuit breaker, retries, and monitoring
 from("kafka:eip.shipping.scheduled?brokers=localhost:9092&groupId=carrier-adapter")
@@ -488,66 +281,6 @@ from("direct:adapter-metrics")
         .when(header("CamelCircuitBreakerState").isNotNull())
             .to("micrometer:counter:adapter.circuit?tags=state=${header.CamelCircuitBreakerState}")
     .end();
-```
-
-```yaml
-- route:
-    id: managed-adapter-carrier
-    from:
-      uri: "kafka:eip.shipping.scheduled"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "carrier-adapter"
-    steps:
-      - unmarshal:
-          json: {}
-      - wireTap:
-          uri: "direct:adapter-metrics"
-      - circuitBreaker:
-          resilience4jConfiguration:
-            slidingWindowSize: 10
-            failureRateThreshold: 50
-            waitDurationInOpenState: 30
-          steps:
-            - marshal:
-                json: {}
-            - to:
-                uri: "http://carrier-api.example.com/shipments"
-                parameters:
-                  httpMethod: "POST"
-                  connectTimeout: 5000
-            - unmarshal:
-                json: {}
-          onFallback:
-            steps:
-              - log:
-                  message: "Circuit OPEN — routing to DLQ"
-              - marshal:
-                  json: {}
-              - to:
-                  uri: "kafka:eip.shipping.carrier-failures"
-                  parameters:
-                    brokers: "localhost:9092"
-```
-
-```xml
-<route id="managed-adapter-carrier">
-  <from uri="kafka:eip.shipping.scheduled?brokers=localhost:9092&amp;groupId=carrier-adapter"/>
-  <unmarshal><json/></unmarshal>
-  <wireTap uri="direct:adapter-metrics"/>
-  <circuitBreaker>
-    <resilience4jConfiguration slidingWindowSize="10"
-        failureRateThreshold="50" waitDurationInOpenState="30"/>
-    <marshal><json/></marshal>
-    <to uri="http://carrier-api.example.com/shipments?httpMethod=POST&amp;connectTimeout=5000"/>
-    <unmarshal><json/></unmarshal>
-    <onFallback>
-      <log message="Circuit OPEN — routing to DLQ"/>
-      <marshal><json/></marshal>
-      <to uri="kafka:eip.shipping.carrier-failures?brokers=localhost:9092"/>
-    </onFallback>
-  </circuitBreaker>
-</route>
 ```
 
 ## Common pitfalls

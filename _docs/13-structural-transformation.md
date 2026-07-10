@@ -28,8 +28,6 @@ An **Aggregator** collects related messages (by a correlation key) and combines 
 
 Camel's `aggregate()` EIP is one of the most powerful and configurable patterns in the framework:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Aggregate order lifecycle events into a complete status
 from("kafka:eip.orders.status-updates?brokers=localhost:9092&groupId=order-aggregator")
@@ -70,48 +68,6 @@ public class OrderLifecycleAggregation implements AggregationStrategy {
         aggregated.put("stages_complete", complete);
     }
 }
-```
-
-```yaml
-- route:
-    id: aggregator
-    from:
-      uri: "kafka:eip.orders.status-updates"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-aggregator"
-    steps:
-      - unmarshal:
-          json: {}
-      - aggregate:
-          correlationExpression:
-            simple: "${body[order_id]}"
-          aggregationStrategy: "#orderLifecycleAggregation"
-          completionPredicate:
-            simple: "${body[stages_complete]} == true"
-          completionTimeout: 300000
-          steps:
-            - log:
-                message: "Order ${body[order_id]} aggregated"
-            - to:
-                uri: "direct:update-order-status"
-```
-
-```xml
-<route id="aggregator">
-  <from uri="kafka:eip.orders.status-updates?brokers=localhost:9092&amp;groupId=order-aggregator"/>
-  <unmarshal><json/></unmarshal>
-  <aggregate aggregationStrategyRef="#orderLifecycleAggregation" completionTimeout="300000">
-    <correlationExpression>
-      <simple>${body[order_id]}</simple>
-    </correlationExpression>
-    <completionPredicate>
-      <simple>${body[stages_complete]} == true</simple>
-    </completionPredicate>
-    <log message="Order ${body[order_id]} aggregated"/>
-    <to uri="direct:update-order-status"/>
-  </aggregate>
-</route>
 ```
 
 ### Completion conditions
@@ -170,8 +126,6 @@ A **Normalizer** detects the incoming message format and translates it into a si
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Normalizer: detect format, translate to canonical form
 from("kafka:eip.orders.raw?brokers=localhost:9092&groupId=normalizer")
@@ -225,59 +179,6 @@ from("direct:translate-xml-order")
     });
 ```
 
-```yaml
-- route:
-    id: normalizer
-    from:
-      uri: "kafka:eip.orders.raw"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "normalizer"
-    steps:
-      - choice:
-          when:
-            - simple: "${header.contentType} == 'application/xml'"
-              steps:
-                - unmarshal:
-                    jacksonXml: {}
-                - to:
-                    uri: "direct:translate-xml-order"
-            - simple: "${header.source} == 'mobile-app'"
-              steps:
-                - unmarshal:
-                    json: {}
-                - to:
-                    uri: "direct:translate-mobile-order"
-          otherwise:
-            steps:
-              - unmarshal:
-                  json: {}
-      - to:
-          uri: "direct:process-normalized-order"
-```
-
-```xml
-<route id="normalizer">
-  <from uri="kafka:eip.orders.raw?brokers=localhost:9092&amp;groupId=normalizer"/>
-  <choice>
-    <when>
-      <simple>${header.contentType} == 'application/xml'</simple>
-      <unmarshal><jacksonXml/></unmarshal>
-      <to uri="direct:translate-xml-order"/>
-    </when>
-    <when>
-      <simple>${header.source} == 'mobile-app'</simple>
-      <unmarshal><json/></unmarshal>
-      <to uri="direct:translate-mobile-order"/>
-    </when>
-    <otherwise>
-      <unmarshal><json/></unmarshal>
-    </otherwise>
-  </choice>
-  <to uri="direct:process-normalized-order"/>
-</route>
-```
-
 ## Pattern: Canonical Data Model
 
 ### The problem
@@ -312,8 +213,6 @@ In our shipping domain, the canonical model is defined as Avro schemas in the Ap
 
 ### How it works with Camel and Apicurio
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Producer: serialize to the canonical Avro schema
 from("direct:publish-canonical-order")
@@ -331,54 +230,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
     .routeId("canonical-consumer")
     .log("Canonical order: ${body}")
     .to("direct:process-order");
-```
-
-```yaml
-# Canonical Avro producer
-- route:
-    id: canonical-producer
-    from:
-      uri: "direct:publish-canonical-order"
-    steps:
-      - marshal:
-          avro:
-            instanceClassName: "eip.order.v1.OrderPlaced"
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            valueSerializer: "io.apicurio.registry.serde.avro.AvroKafkaSerializer"
-
-# Canonical Avro consumer
-- route:
-    id: canonical-consumer
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "canonical-consumer"
-        valueDeserializer: "io.apicurio.registry.serde.avro.AvroKafkaDeserializer"
-    steps:
-      - log:
-          message: "Canonical order: ${body}"
-      - to:
-          uri: "direct:process-order"
-```
-
-```xml
-<!-- Canonical Avro producer -->
-<route id="canonical-producer">
-  <from uri="direct:publish-canonical-order"/>
-  <marshal><avro instanceClassName="eip.order.v1.OrderPlaced"/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;valueSerializer=io.apicurio.registry.serde.avro.AvroKafkaSerializer"/>
-</route>
-
-<!-- Canonical Avro consumer -->
-<route id="canonical-consumer">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=canonical-consumer&amp;valueDeserializer=io.apicurio.registry.serde.avro.AvroKafkaDeserializer"/>
-  <log message="Canonical order: ${body}"/>
-  <to uri="direct:process-order"/>
-</route>
 ```
 
 ### Benefits of a canonical data model

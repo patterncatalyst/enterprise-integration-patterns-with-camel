@@ -44,8 +44,6 @@ Camel's `file` and `ftp`/`sftp` components make file-based integration trivial. 
 
 Here's a route that reads completed orders from a CSV file, transforms each row, and sends it to the accounting system's input directory:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("file:data/orders/outbound?noop=true&include=.*\\.csv")
     .routeId("file-transfer-export")
@@ -67,50 +65,6 @@ from("file:data/orders/outbound?noop=true&include=.*\\.csv")
         .marshal().json()
         .to("file:data/accounting/inbound?fileName=${date:now:yyyyMMdd}-${header.CamelSplitIndex}.json")
     .end();
-```
-
-```yaml
-- route:
-    id: file-transfer-export
-    from:
-      uri: "file:data/orders/outbound"
-      parameters:
-        noop: true
-        include: ".*\\.csv"
-    steps:
-      - log:
-          message: "Processing order file: ${header.CamelFileName}"
-      - split:
-          tokenize: "\n"
-          streaming: true
-          steps:
-            - filter:
-                simple: "${body} != '' && !${body.startsWith('order_id')}"
-                steps:
-                  - unmarshal:
-                      csv: {}
-                  - marshal:
-                      json: {}
-                  - to:
-                      uri: "file:data/accounting/inbound"
-                      parameters:
-                        fileName: "${date:now:yyyyMMdd}-${header.CamelSplitIndex}.json"
-```
-
-```xml
-<route id="file-transfer-export">
-  <from uri="file:data/orders/outbound?noop=true&amp;include=.*\\.csv"/>
-  <log message="Processing order file: ${header.CamelFileName}"/>
-  <split streaming="true">
-    <tokenize token="\n"/>
-    <filter>
-      <simple>${body} != '' &amp;&amp; !${body.startsWith('order_id')}</simple>
-      <unmarshal><csv/></unmarshal>
-      <marshal><json/></marshal>
-      <to uri="file:data/accounting/inbound?fileName=${date:now:yyyyMMdd}-${header.CamelSplitIndex}.json"/>
-    </filter>
-  </split>
-</route>
 ```
 
 You can run any of these directly with the Camel CLI — no Maven project needed:
@@ -170,8 +124,6 @@ The problems are equally well-known:
 
 Even though shared database is generally an anti-pattern in microservices architecture, Camel makes it straightforward when you need it — and it's a common reality in brownfield systems. Here's a route where order-service checks inventory directly via SQL before accepting an order:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("direct:check-inventory")
     .routeId("shared-db-inventory-check")
@@ -187,58 +139,6 @@ from("direct:check-inventory")
             .log("Insufficient stock for ${header.itemSku}")
             .setBody(constant(false))
     .end();
-```
-
-```yaml
-- route:
-    id: shared-db-inventory-check
-    from:
-      uri: "direct:check-inventory"
-    steps:
-      - setHeader:
-          name: itemSku
-          simple: "${body[item_sku]}"
-      - setHeader:
-          name: requestedQty
-          simple: "${body[quantity]}"
-      - to:
-          uri: "sql:SELECT quantity_on_hand FROM inventory.stock WHERE sku = :#itemSku"
-          parameters:
-            dataSource: "#inventoryDataSource"
-      - choice:
-          when:
-            - simple: "${body[0][quantity_on_hand]} >= ${header.requestedQty}"
-              steps:
-                - log:
-                    message: "Stock available: ${header.itemSku} has ${body[0][quantity_on_hand]} units"
-                - setBody:
-                    constant: true
-          otherwise:
-            steps:
-              - log:
-                  message: "Insufficient stock for ${header.itemSku}"
-              - setBody:
-                  constant: false
-```
-
-```xml
-<route id="shared-db-inventory-check">
-  <from uri="direct:check-inventory"/>
-  <setHeader name="itemSku"><simple>${body[item_sku]}</simple></setHeader>
-  <setHeader name="requestedQty"><simple>${body[quantity]}</simple></setHeader>
-  <to uri="sql:SELECT quantity_on_hand FROM inventory.stock WHERE sku = :#itemSku?dataSource=#inventoryDataSource"/>
-  <choice>
-    <when>
-      <simple>${body[0][quantity_on_hand]} >= ${header.requestedQty}</simple>
-      <log message="Stock available: ${header.itemSku} has ${body[0][quantity_on_hand]} units"/>
-      <setBody><constant>true</constant></setBody>
-    </when>
-    <otherwise>
-      <log message="Insufficient stock for ${header.itemSku}"/>
-      <setBody><constant>false</constant></setBody>
-    </otherwise>
-  </choice>
-</route>
 ```
 
 **What this route does:**
@@ -295,8 +195,6 @@ Camel supports both sides of RPI: making outbound HTTP calls with the `http` or 
 
 Here's a route where order-service calls shipping-service's REST API to get a shipping estimate:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("direct:get-shipping-estimate")
     .routeId("rpi-shipping-estimate")
@@ -318,67 +216,6 @@ from("direct:get-shipping-estimate")
         .log("Shipping service unavailable — using flat rate fallback")
         .setBody(constant(Map.of("carrier", "STANDARD", "cost", 9.99, "fallback", true)))
     .end();
-```
-
-```yaml
-- route:
-    id: rpi-shipping-estimate
-    from:
-      uri: "direct:get-shipping-estimate"
-    steps:
-      - setHeader:
-          name: CamelHttpMethod
-          constant: "POST"
-      - setHeader:
-          name: Content-Type
-          constant: "application/json"
-      - marshal:
-          json: {}
-      - circuitBreaker:
-          resilience4jConfiguration:
-            failureRateThreshold: 50
-            waitDurationInOpenState: 10000
-            slidingWindowSize: 5
-          steps:
-            - to:
-                uri: "http://localhost:8084/api/shipping/estimate"
-                parameters:
-                  httpMethod: POST
-                  connectTimeout: 2000
-                  socketTimeout: 5000
-            - unmarshal:
-                json: {}
-          onFallback:
-            steps:
-              - log:
-                  message: "Shipping service unavailable — using flat rate fallback"
-              - setBody:
-                  constant:
-                    carrier: "STANDARD"
-                    cost: 9.99
-                    fallback: true
-```
-
-```xml
-<route id="rpi-shipping-estimate">
-  <from uri="direct:get-shipping-estimate"/>
-  <setHeader name="CamelHttpMethod"><constant>POST</constant></setHeader>
-  <setHeader name="Content-Type"><constant>application/json</constant></setHeader>
-  <marshal><json/></marshal>
-  <circuitBreaker>
-    <resilience4jConfiguration failureRateThreshold="50"
-                               waitDurationInOpenState="10000"
-                               slidingWindowSize="5"/>
-    <to uri="http://localhost:8084/api/shipping/estimate?httpMethod=POST&amp;connectTimeout=2000&amp;socketTimeout=5000"/>
-    <unmarshal><json/></unmarshal>
-    <onFallback>
-      <log message="Shipping service unavailable — using flat rate fallback"/>
-      <setBody>
-        <constant>{"carrier":"STANDARD","cost":9.99,"fallback":true}</constant>
-      </setBody>
-    </onFallback>
-  </circuitBreaker>
-</route>
 ```
 
 **What this route does:**
@@ -435,8 +272,6 @@ The trade-offs:
 
 Here's the route that sits at the heart of our shipping domain: order-service publishes an `OrderPlaced` event to Kafka.
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("direct:place-order")
     .routeId("messaging-order-placed")
@@ -468,64 +303,6 @@ from("direct:place-order")
     .log("Order ${header.orderId} published to eip.orders.placed");
 ```
 
-```yaml
-- route:
-    id: messaging-order-placed
-    from:
-      uri: "direct:place-order"
-    steps:
-      - log:
-          message: "Placing order for customer ${body[customer_id]}, SKU ${body[item_sku]}"
-      - to:
-          uri: "sql:INSERT INTO orders.orders (customer_id, item_sku, quantity, amount, status) VALUES (:#customer_id, :#item_sku, :#quantity, :#amount, 'PLACED')"
-          parameters:
-            dataSource: "#orderDataSource"
-      - to:
-          uri: "sql:SELECT currval('orders.orders_id_seq') AS order_id"
-          parameters:
-            dataSource: "#orderDataSource"
-      - setBody:
-          simple: |
-            {
-              "order_id": ${header.orderId},
-              "customer_id": "${body[customer_id]}",
-              "item_sku": "${body[item_sku]}",
-              "quantity": ${body[quantity]},
-              "amount": ${body[amount]},
-              "status": "PLACED"
-            }
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            key: "${header.orderId}"
-            serializerClass: "org.apache.kafka.common.serialization.StringSerializer"
-            valueSerializer: "org.apache.kafka.common.serialization.StringSerializer"
-      - log:
-          message: "Order ${header.orderId} published to eip.orders.placed"
-```
-
-```xml
-<route id="messaging-order-placed">
-  <from uri="direct:place-order"/>
-  <log message="Placing order for customer ${body[customer_id]}, SKU ${body[item_sku]}"/>
-  <to uri="sql:INSERT INTO orders.orders (customer_id, item_sku, quantity, amount, status) VALUES (:#customer_id, :#item_sku, :#quantity, :#amount, 'PLACED')?dataSource=#orderDataSource"/>
-  <to uri="sql:SELECT currval('orders.orders_id_seq') AS order_id?dataSource=#orderDataSource"/>
-  <setBody>
-    <simple>{
-      "order_id": ${header.orderId},
-      "customer_id": "${body[customer_id]}",
-      "item_sku": "${body[item_sku]}",
-      "quantity": ${body[quantity]},
-      "amount": ${body[amount]},
-      "status": "PLACED"
-    }</simple>
-  </setBody>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;key=${header.orderId}&amp;serializerClass=org.apache.kafka.common.serialization.StringSerializer&amp;valueSerializer=org.apache.kafka.common.serialization.StringSerializer"/>
-  <log message="Order ${header.orderId} published to eip.orders.placed"/>
-</route>
-```
-
 **What this route does:**
 
 1. Receives an order on the `direct:place-order` endpoint.
@@ -538,8 +315,6 @@ from("direct:place-order")
 Notice what's *not* here: there's no call to inventory-service, no call to payment-service, no knowledge of who's listening. Order-service's job is done. The downstream services each have their own Camel routes that consume from the `eip.orders.placed` topic and act independently.
 
 Here's the consumer side — inventory-service listening for order events:
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 from("kafka:eip.orders.placed"
@@ -564,70 +339,6 @@ from("kafka:eip.orders.placed"
             .to("kafka:eip.inventory.insufficient?brokers=localhost:9092")
             .log("Insufficient inventory for order ${header.orderId}")
     .end();
-```
-
-```yaml
-- route:
-    id: messaging-inventory-consumer
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-        autoOffsetReset: earliest
-        valueDeserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Checking inventory for order ${body[order_id]}, SKU ${body[item_sku]}"
-      - choice:
-          when:
-            - simple: "${body[quantity_on_hand]} >= ${body[quantity]}"
-              steps:
-                - setBody:
-                    simple: '{ "order_id": ${body[order_id]}, "sku": "${body[item_sku]}", "status": "RESERVED" }'
-                - to:
-                    uri: "kafka:eip.inventory.reserved"
-                    parameters:
-                      brokers: "localhost:9092"
-                - log:
-                    message: "Inventory reserved for order ${body[order_id]}"
-          otherwise:
-            steps:
-              - setBody:
-                  simple: '{ "order_id": ${body[order_id]}, "sku": "${body[item_sku]}", "status": "INSUFFICIENT" }'
-              - to:
-                  uri: "kafka:eip.inventory.insufficient"
-                  parameters:
-                    brokers: "localhost:9092"
-              - log:
-                  message: "Insufficient inventory for order ${body[order_id]}"
-```
-
-```xml
-<route id="messaging-inventory-consumer">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service&amp;autoOffsetReset=earliest&amp;valueDeserializer=org.apache.kafka.common.serialization.StringDeserializer"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Checking inventory for order ${body[order_id]}, SKU ${body[item_sku]}"/>
-  <choice>
-    <when>
-      <simple>${body[quantity_on_hand]} >= ${body[quantity]}</simple>
-      <setBody>
-        <simple>{ "order_id": ${body[order_id]}, "sku": "${body[item_sku]}", "status": "RESERVED" }</simple>
-      </setBody>
-      <to uri="kafka:eip.inventory.reserved?brokers=localhost:9092"/>
-      <log message="Inventory reserved for order ${body[order_id]}"/>
-    </when>
-    <otherwise>
-      <setBody>
-        <simple>{ "order_id": ${body[order_id]}, "sku": "${body[item_sku]}", "status": "INSUFFICIENT" }</simple>
-      </setBody>
-      <to uri="kafka:eip.inventory.insufficient?brokers=localhost:9092"/>
-      <log message="Insufficient inventory for order ${body[order_id]}"/>
-    </otherwise>
-  </choice>
-</route>
 ```
 
 **What this route does:**
@@ -695,4 +406,4 @@ Next, we enter the world of messaging systems — the six building blocks (chann
 ---
 
 *Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: all Java DSL routes compile against Camel 4.20 APIs; SQL component named parameter syntax is correct; Kafka component URI options are valid for camel-kafka 4.20; Resilience4j circuit breaker configuration properties match the Camel integration; codetabs include renders correctly with three code blocks.*
+Confirm: all Java DSL routes compile against Camel 4.20 APIs; SQL component named parameter syntax is correct; Kafka component URI options are valid for camel-kafka 4.20; Resilience4j circuit breaker configuration properties match the Camel integration.*

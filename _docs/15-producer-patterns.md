@@ -22,8 +22,6 @@ In Kafka, every consumer group is a durable subscriber by default. Kafka stores 
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Kafka durable subscriber: the consumer group persists offsets automatically
 from("kafka:eip.orders.placed?brokers=localhost:9092"
@@ -53,66 +51,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
             .commit();
     })
     .log("Offset committed for order ${body[order_id]}");
-```
-
-```yaml
-# Auto-commit durable subscriber
-- route:
-    id: durable-subscriber-auto
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-service"
-        autoOffsetReset: earliest
-        autoCommitEnable: true
-        autoCommitIntervalMs: 5000
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Processing order ${body[order_id]}"
-      - to:
-          uri: "direct:send-notification"
-
-# Manual commit for at-least-once guarantees
-- route:
-    id: durable-subscriber-manual
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-service-manual"
-        autoCommitEnable: false
-        allowManualCommit: true
-        autoOffsetReset: earliest
-    steps:
-      - unmarshal:
-          json: {}
-      - to:
-          uri: "direct:send-notification"
-      - process:
-          ref: "#manualCommit"
-      - log:
-          message: "Committed for order ${body[order_id]}"
-```
-
-```xml
-<!-- Auto-commit -->
-<route id="durable-subscriber-auto">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=notification-service&amp;autoOffsetReset=earliest&amp;autoCommitEnable=true&amp;autoCommitIntervalMs=5000"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Processing order ${body[order_id]}"/>
-  <to uri="direct:send-notification"/>
-</route>
-
-<!-- Manual commit -->
-<route id="durable-subscriber-manual">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=notification-service-manual&amp;autoCommitEnable=false&amp;allowManualCommit=true&amp;autoOffsetReset=earliest"/>
-  <unmarshal><json/></unmarshal>
-  <to uri="direct:send-notification"/>
-  <process ref="#manualCommit"/>
-</route>
 ```
 
 ### Auto-commit vs. manual commit
@@ -152,8 +90,6 @@ An **Idempotent Receiver** (also called Idempotent Consumer) tracks which messag
 
 Camel's `idempotentConsumer()` EIP handles this directly:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // In-memory idempotent consumer (for development/testing)
 from("kafka:eip.payments.required?brokers=localhost:9092&groupId=payment-service")
@@ -187,42 +123,6 @@ from("kafka:eip.shipping.scheduled?brokers=localhost:9092&groupId=shipping-servi
             .JdbcMessageIdRepository(dataSource, "shipping_idempotent"))
     .log("Scheduling shipment for order ${body[order_id]}")
     .to("direct:schedule-shipment");
-```
-
-```yaml
-# Memory-backed (development)
-- route:
-    id: idempotent-receiver-memory
-    from:
-      uri: "kafka:eip.payments.required"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "payment-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - idempotentConsumer:
-          expression:
-            simple: "${body[event_id]}"
-          idempotentRepository: "#memoryIdempotentRepo"
-          steps:
-            - log:
-                message: "Processing payment for order ${body[order_id]}"
-            - to:
-                uri: "direct:process-payment"
-```
-
-```xml
-<!-- Memory-backed -->
-<route id="idempotent-receiver-memory">
-  <from uri="kafka:eip.payments.required?brokers=localhost:9092&amp;groupId=payment-service"/>
-  <unmarshal><json/></unmarshal>
-  <idempotentConsumer idempotentRepository="#memoryIdempotentRepo">
-    <simple>${body[event_id]}</simple>
-    <log message="Processing payment for order ${body[order_id]}"/>
-    <to uri="direct:process-payment"/>
-  </idempotentConsumer>
-</route>
 ```
 
 ### Choosing the repository
@@ -261,8 +161,6 @@ True distributed transactions (XA/2PC) across a database and a message broker ar
 ### How Camel models it
 
 **The Outbox Pattern — database-first, publish-after:**
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Step 1: Write both the payment record and the outbox event in one DB transaction
@@ -306,69 +204,6 @@ from("sql:SELECT * FROM payments.outbox WHERE published = false "
     .log("Published outbox event ${body[event_id]} to Kafka");
 ```
 
-```yaml
-# Business operation + outbox write in one transaction
-- route:
-    id: transactional-client
-    from:
-      uri: "kafka:eip.payments.required"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "payment-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - transacted:
-          ref: "PROPAGATION_REQUIRED"
-      - to:
-          uri: "sql:INSERT INTO payments.payments (order_id, amount, status) VALUES (:#${body[order_id]}, :#${body[amount]}, 'PROCESSED')"
-          parameters:
-            dataSource: "#paymentDataSource"
-      - process:
-          ref: "#buildOutboxEvent"
-      - to:
-          uri: "sql:INSERT INTO payments.outbox (event_id, event_type, aggregate_id, payload) VALUES (:#${body[event_id]}, :#${body[event_type]}, :#${body[order_id]}, :#${body[payload]})"
-          parameters:
-            dataSource: "#paymentDataSource"
-
-# Outbox publisher
-- route:
-    id: outbox-publisher
-    from:
-      uri: "sql:SELECT * FROM payments.outbox WHERE published = false ORDER BY created_at LIMIT 100"
-      parameters:
-        dataSource: "#paymentDataSource"
-        delay: 1000
-        onConsume: "UPDATE payments.outbox SET published = true WHERE event_id = :#event_id"
-    steps:
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.payments.processed"
-          parameters:
-            brokers: "localhost:9092"
-            requestRequiredAcks: "all"
-```
-
-```xml
-<!-- Business + outbox in one transaction -->
-<route id="transactional-client">
-  <from uri="kafka:eip.payments.required?brokers=localhost:9092&amp;groupId=payment-service"/>
-  <unmarshal><json/></unmarshal>
-  <transacted ref="PROPAGATION_REQUIRED"/>
-  <to uri="sql:INSERT INTO payments.payments (order_id, amount, status) VALUES (:#${body[order_id]}, :#${body[amount]}, 'PROCESSED')?dataSource=#paymentDataSource"/>
-  <process ref="#buildOutboxEvent"/>
-  <to uri="sql:INSERT INTO payments.outbox (event_id, event_type, aggregate_id, payload) VALUES (:#${body[event_id]}, :#${body[event_type]}, :#${body[order_id]}, :#${body[payload]})?dataSource=#paymentDataSource"/>
-</route>
-
-<!-- Outbox publisher -->
-<route id="outbox-publisher">
-  <from uri="sql:SELECT * FROM payments.outbox WHERE published = false ORDER BY created_at LIMIT 100?dataSource=#paymentDataSource&amp;delay=1000&amp;onConsume=UPDATE payments.outbox SET published = true WHERE event_id = :#event_id"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.payments.processed?brokers=localhost:9092&amp;requestRequiredAcks=all"/>
-</route>
-```
-
 ### The outbox pattern guarantees
 
 1. **Atomicity** — The payment record and the outbox event are written in the same database transaction. Either both exist or neither does.
@@ -390,8 +225,6 @@ A **Service Activator** connects a message channel to application code. It recei
 ### How Camel models it
 
 Camel's `bean()` method and CDI integration make the service activator pattern nearly invisible:
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // The service — plain CDI, no Camel dependency
@@ -418,38 +251,6 @@ from("kafka:eip.payments.required?brokers=localhost:9092&groupId=payment-activat
     .bean("paymentProcessor", "processPayment")
     .marshal().json()
     .to("kafka:eip.payments.processed?brokers=localhost:9092");
-```
-
-```yaml
-- route:
-    id: service-activator
-    from:
-      uri: "kafka:eip.payments.required"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "payment-activator"
-    steps:
-      - unmarshal:
-          json: {}
-      - bean:
-          ref: "#paymentProcessor"
-          method: "processPayment"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.payments.processed"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<route id="service-activator">
-  <from uri="kafka:eip.payments.required?brokers=localhost:9092&amp;groupId=payment-activator"/>
-  <unmarshal><json/></unmarshal>
-  <bean ref="#paymentProcessor" method="processPayment"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.payments.processed?brokers=localhost:9092"/>
-</route>
 ```
 
 ### Why it matters

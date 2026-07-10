@@ -28,8 +28,6 @@ The distinction matters operationally. An invalid message usually means a bug in
 
 Camel's `doTry`/`doCatch` blocks let you catch validation failures and route them to an invalid message channel:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     .routeId("invalid-message-channel")
@@ -56,74 +54,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
         .log(LoggingLevel.ERROR, "Unexpected error: ${exception.message}")
         .to("kafka:eip.orders.dlq?brokers=localhost:9092")
     .end();
-```
-
-```yaml
-- route:
-    id: invalid-message-channel
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - doTry:
-          steps:
-            - unmarshal:
-                json: {}
-            - process:
-                ref: "#validateOrder"
-            - log:
-                message: "Valid order ${body[order_id]} — processing"
-            - to:
-                uri: "direct:check-inventory"
-          doCatch:
-            - exception:
-                - "java.lang.IllegalArgumentException"
-              steps:
-                - log:
-                    message: "Invalid message rejected: ${exception.message}"
-                    loggingLevel: WARN
-                - setHeader:
-                    name: invalidReason
-                    simple: "${exception.message}"
-                - to:
-                    uri: "kafka:eip.orders.invalid"
-                    parameters:
-                      brokers: "localhost:9092"
-            - exception:
-                - "java.lang.Exception"
-              steps:
-                - log:
-                    message: "Unexpected error: ${exception.message}"
-                    loggingLevel: ERROR
-                - to:
-                    uri: "kafka:eip.orders.dlq"
-                    parameters:
-                      brokers: "localhost:9092"
-```
-
-```xml
-<route id="invalid-message-channel">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <doTry>
-    <unmarshal><json/></unmarshal>
-    <process ref="#validateOrder"/>
-    <log message="Valid order ${body[order_id]} — processing"/>
-    <to uri="direct:check-inventory"/>
-    <doCatch>
-      <exception>java.lang.IllegalArgumentException</exception>
-      <log message="Invalid message rejected: ${exception.message}" loggingLevel="WARN"/>
-      <setHeader name="invalidReason"><simple>${exception.message}</simple></setHeader>
-      <to uri="kafka:eip.orders.invalid?brokers=localhost:9092"/>
-    </doCatch>
-    <doCatch>
-      <exception>java.lang.Exception</exception>
-      <log message="Unexpected error: ${exception.message}" loggingLevel="ERROR"/>
-      <to uri="kafka:eip.orders.dlq?brokers=localhost:9092"/>
-    </doCatch>
-  </doTry>
-</route>
 ```
 
 Notice the two-tier error handling: `IllegalArgumentException` (validation failures) goes to `eip.orders.invalid`; everything else (unexpected exceptions) goes to `eip.orders.dlq`. This separation lets operations teams apply different alerting and remediation workflows to each category.
@@ -170,8 +100,6 @@ After 3 failed redeliveries, Pulsar automatically moves the message to the dead 
 
 Camel's `errorHandler` with a `deadLetterChannel` is the standard approach:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.inventory.reserved?brokers=localhost:9092&groupId=payment-service")
     .routeId("dead-letter-channel")
@@ -194,63 +122,6 @@ from("kafka:eip.inventory.reserved?brokers=localhost:9092&groupId=payment-servic
     .to("http://payment-gateway.example.com/charge"
         + "?httpMethod=POST&connectTimeout=3000&socketTimeout=10000")
     .log("Payment processed for order ${body[order_id]}");
-```
-
-```yaml
-- route:
-    id: dead-letter-channel
-    from:
-      uri: "kafka:eip.inventory.reserved"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "payment-service"
-    errorHandler:
-      deadLetterChannel:
-        deadLetterUri: "kafka:eip.inventory.reserved.dlq?brokers=localhost:9092"
-        redeliveryPolicy:
-          maximumRedeliveries: 3
-          redeliveryDelay: 1000
-          backOffMultiplier: 2.0
-          retryAttemptedLogLevel: WARN
-        useOriginalMessage: true
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Processing payment for order ${body[order_id]}"
-      - to:
-          uri: "http://payment-gateway.example.com/charge"
-          parameters:
-            httpMethod: POST
-            connectTimeout: 3000
-            socketTimeout: 10000
-      - log:
-          message: "Payment processed for order ${body[order_id]}"
-```
-
-```xml
-<route id="dead-letter-channel" errorHandlerRef="paymentDlcHandler">
-  <from uri="kafka:eip.inventory.reserved?brokers=localhost:9092&amp;groupId=payment-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Processing payment for order ${body[order_id]}"/>
-  <to uri="http://payment-gateway.example.com/charge?httpMethod=POST&amp;connectTimeout=3000&amp;socketTimeout=10000"/>
-  <log message="Payment processed for order ${body[order_id]}"/>
-</route>
-
-<!-- Defined separately in a RouteBuilder or Spring XML context -->
-<!--
-<bean id="paymentDlcHandler" class="org.apache.camel.builder.DeadLetterChannelBuilder">
-  <property name="deadLetterUri" value="kafka:eip.inventory.reserved.dlq?brokers=localhost:9092"/>
-  <property name="redeliveryPolicy">
-    <bean class="org.apache.camel.processor.errorhandler.RedeliveryPolicy">
-      <property name="maximumRedeliveries" value="3"/>
-      <property name="redeliveryDelay" value="1000"/>
-      <property name="backOffMultiplier" value="2.0"/>
-    </bean>
-  </property>
-  <property name="useOriginalMessage" value="true"/>
-</bean>
--->
 ```
 
 **What happens when the payment gateway fails:**
@@ -301,8 +172,6 @@ In our local stack, we're running a single broker, so replication doesn't apply 
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Producer with guaranteed delivery settings
 from("direct:place-order-guaranteed")
@@ -335,68 +204,6 @@ from("kafka:eip.orders.placed"
             .commit();
     })
     .log("Offset committed for order ${body[order_id]}");
-```
-
-```yaml
-# Producer with guaranteed delivery
-- route:
-    id: guaranteed-delivery-producer
-    from:
-      uri: "direct:place-order-guaranteed"
-    steps:
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-            requestRequiredAcks: "all"
-            retries: 3
-            enableIdempotence: true
-            maxInFlightRequest: 5
-            key: "${header.orderId}"
-
-# Consumer with manual offset commit
-- route:
-    id: guaranteed-delivery-consumer
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-        autoCommitEnable: false
-        allowManualCommit: true
-        breakOnFirstError: true
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Processing order ${body[order_id]}"
-      - to:
-          uri: "direct:check-inventory"
-      - process:
-          ref: "#manualCommit"
-      - log:
-          message: "Offset committed for order ${body[order_id]}"
-```
-
-```xml
-<!-- Producer with guaranteed delivery -->
-<route id="guaranteed-delivery-producer">
-  <from uri="direct:place-order-guaranteed"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;requestRequiredAcks=all&amp;retries=3&amp;enableIdempotence=true&amp;maxInFlightRequest=5&amp;key=${header.orderId}"/>
-</route>
-
-<!-- Consumer with manual offset commit -->
-<route id="guaranteed-delivery-consumer">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service&amp;autoCommitEnable=false&amp;allowManualCommit=true&amp;breakOnFirstError=true"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Processing order ${body[order_id]}"/>
-  <to uri="direct:check-inventory"/>
-  <process ref="#manualCommit"/>
-  <log message="Offset committed for order ${body[order_id]}"/>
-</route>
 ```
 
 **The producer side:** `requestRequiredAcks=all` means Kafka won't acknowledge the send until all in-sync replicas have written the message. `enableIdempotence=true` prevents duplicates if the producer retries a send that actually succeeded (the broker deduplicates by producer ID and sequence number). `retries=3` automatically retries transient failures.

@@ -33,8 +33,6 @@ Think of it like a doctor's referral chain: the primary care physician writes a 
 
 Camel's `routingSlip()` EIP reads a header containing a comma-separated list of endpoint URIs and routes the message through each one sequentially:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Step 1: Determine the routing slip based on order type
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=routing-slip")
@@ -91,79 +89,6 @@ from("direct:customs-declaration")
         // Generate customs forms
         exchange.getIn().setHeader("customsDeclared", true);
     });
-```
-
-```yaml
-# Determine routing slip and execute
-- route:
-    id: routing-slip-entry
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "routing-slip"
-    steps:
-      - unmarshal:
-          json: {}
-      - process:
-          ref: "#determineRoutingSlip"
-      - log:
-          message: "Routing slip: ${header.routingSlip}"
-      - routingSlip:
-          header: "routingSlip"
-
-# Processing steps
-- route:
-    id: slip-step-validate
-    from:
-      uri: "direct:validate"
-    steps:
-      - log:
-          message: "Step: validating order ${body[order_id]}"
-
-- route:
-    id: slip-step-hazmat
-    from:
-      uri: "direct:hazmat-compliance"
-    steps:
-      - log:
-          message: "Step: hazmat compliance for order ${body[order_id]}"
-
-- route:
-    id: slip-step-customs
-    from:
-      uri: "direct:customs-declaration"
-    steps:
-      - log:
-          message: "Step: customs for order ${body[order_id]}"
-```
-
-```xml
-<!-- Determine routing slip and execute -->
-<route id="routing-slip-entry">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=routing-slip"/>
-  <unmarshal><json/></unmarshal>
-  <process ref="#determineRoutingSlip"/>
-  <log message="Routing slip: ${header.routingSlip}"/>
-  <routingSlip>
-    <header>routingSlip</header>
-  </routingSlip>
-</route>
-
-<route id="slip-step-validate">
-  <from uri="direct:validate"/>
-  <log message="Step: validating order ${body[order_id]}"/>
-</route>
-
-<route id="slip-step-hazmat">
-  <from uri="direct:hazmat-compliance"/>
-  <log message="Step: hazmat compliance for order ${body[order_id]}"/>
-</route>
-
-<route id="slip-step-customs">
-  <from uri="direct:customs-declaration"/>
-  <log message="Step: customs for order ${body[order_id]}"/>
-</route>
 ```
 
 ### Routing slip vs. content-based router
@@ -225,8 +150,6 @@ Camel supports the Process Manager pattern through several mechanisms:
 
 Here's the payment flow as a Saga with compensation:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.payment-required?brokers=localhost:9092&groupId=payment-manager")
     .routeId("process-manager")
@@ -286,87 +209,6 @@ from("direct:payment-complete")
     .to("kafka:eip.payments.processed?brokers=localhost:9092");
 ```
 
-```yaml
-- route:
-    id: process-manager
-    from:
-      uri: "kafka:eip.orders.payment-required"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "payment-manager"
-    steps:
-      - unmarshal:
-          json: {}
-      - saga:
-          propagation: "REQUIRES_NEW"
-          completionMode: "MANUAL"
-          compensation:
-            uri: "direct:payment-compensate"
-          completion:
-            uri: "direct:payment-complete"
-          option:
-            - key: "orderId"
-              simple: "${body[order_id]}"
-          steps:
-            - to:
-                uri: "direct:authorize-payment"
-            - choice:
-                when:
-                  - simple: "${header.paymentAuthorized} == true"
-                    steps:
-                      - log:
-                          message: "Payment authorized"
-                      - to:
-                          uri: "direct:capture-payment"
-                otherwise:
-                  steps:
-                    - log:
-                        message: "Payment declined — trying backup"
-                    - to:
-                        uri: "direct:backup-payment"
-
-- route:
-    id: payment-compensate
-    from:
-      uri: "direct:payment-compensate"
-    steps:
-      - log:
-          message: "COMPENSATING: refunding payment"
-      - to:
-          uri: "direct:refund-payment"
-```
-
-```xml
-<route id="process-manager">
-  <from uri="kafka:eip.orders.payment-required?brokers=localhost:9092&amp;groupId=payment-manager"/>
-  <unmarshal><json/></unmarshal>
-  <saga propagation="REQUIRES_NEW" completionMode="MANUAL">
-    <compensation uri="direct:payment-compensate"/>
-    <completion uri="direct:payment-complete"/>
-    <option key="orderId"><simple>${body[order_id]}</simple></option>
-    <option key="amount"><simple>${body[amount]}</simple></option>
-  </saga>
-  <to uri="direct:authorize-payment"/>
-  <choice>
-    <when>
-      <simple>${header.paymentAuthorized} == true</simple>
-      <log message="Payment authorized"/>
-      <to uri="direct:capture-payment"/>
-    </when>
-    <otherwise>
-      <log message="Payment declined — trying backup"/>
-      <to uri="direct:backup-payment"/>
-    </otherwise>
-  </choice>
-</route>
-
-<route id="payment-compensate">
-  <from uri="direct:payment-compensate"/>
-  <log message="COMPENSATING: refunding payment for order ${header.orderId}"/>
-  <to uri="direct:refund-payment"/>
-</route>
-```
-
 ### Saga vs. routing slip
 
 | Dimension | Saga (Process Manager) | Routing Slip |
@@ -393,8 +235,6 @@ A **Scatter-Gather** sends the same request to multiple recipients (scatter) and
 ### How Camel models it
 
 Camel's `multicast()` with an `aggregationStrategy` is the natural implementation:
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 from("direct:get-shipping-estimates")
@@ -435,68 +275,6 @@ from("direct:quote-usps")
     .to("http://usps-api.example.com/rate?connectTimeout=5000")
     .unmarshal().json(Map.class)
     .log("USPS quote: $${body[price]}");
-```
-
-```yaml
-- route:
-    id: scatter-gather
-    from:
-      uri: "direct:get-shipping-estimates"
-    steps:
-      - log:
-          message: "Requesting shipping estimates"
-      - multicast:
-          aggregationStrategy: "#lowestPriceAggregation"
-          parallelProcessing: true
-          timeout: 10000
-          steps:
-            - to:
-                uri: "direct:quote-fedex"
-            - to:
-                uri: "direct:quote-ups"
-            - to:
-                uri: "direct:quote-dhl"
-            - to:
-                uri: "direct:quote-usps"
-      - log:
-          message: "Best estimate: ${body[carrier]} at $${body[price]}"
-
-- route:
-    id: carrier-fedex
-    from:
-      uri: "direct:quote-fedex"
-    steps:
-      - setHeader:
-          name: carrier
-          constant: "FedEx"
-      - to:
-          uri: "http://fedex-api.example.com/rate"
-          parameters:
-            connectTimeout: 5000
-      - unmarshal:
-          json: {}
-```
-
-```xml
-<route id="scatter-gather">
-  <from uri="direct:get-shipping-estimates"/>
-  <log message="Requesting shipping estimates"/>
-  <multicast aggregationStrategyRef="#lowestPriceAggregation"
-             parallelProcessing="true" timeout="10000">
-    <to uri="direct:quote-fedex"/>
-    <to uri="direct:quote-ups"/>
-    <to uri="direct:quote-dhl"/>
-    <to uri="direct:quote-usps"/>
-  </multicast>
-  <log message="Best estimate: ${body[carrier]} at $${body[price]}"/>
-</route>
-
-<route id="carrier-fedex">
-  <from uri="direct:quote-fedex"/>
-  <setHeader name="carrier"><constant>FedEx</constant></setHeader>
-  <to uri="http://fedex-api.example.com/rate?connectTimeout=5000"/>
-  <unmarshal><json/></unmarshal>
-</route>
 ```
 
 ### The aggregation strategy

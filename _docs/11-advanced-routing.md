@@ -28,8 +28,6 @@ A **Dynamic Router** is called repeatedly for each message, and it makes the rou
 
 Camel's `dynamicRouter()` EIP calls a method repeatedly. The method returns the next endpoint, or `null` to stop:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=dynamic-routing")
     .routeId("dynamic-router")
@@ -70,33 +68,6 @@ public class OrderRoutingBean {
 }
 ```
 
-```yaml
-- route:
-    id: dynamic-router
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "dynamic-routing"
-    steps:
-      - unmarshal:
-          json: {}
-      - dynamicRouter:
-          method:
-            ref: "#orderRoutingBean"
-            method: "route"
-```
-
-```xml
-<route id="dynamic-router">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=dynamic-routing"/>
-  <unmarshal><json/></unmarshal>
-  <dynamicRouter>
-    <method ref="#orderRoutingBean" method="route"/>
-  </dynamicRouter>
-</route>
-```
-
 ### Dynamic router vs. routing slip
 
 | Dimension | Dynamic Router | Routing Slip |
@@ -124,8 +95,6 @@ A **Wire Tap** sends a copy of the message to a secondary channel without affect
 
 Camel's `wireTap()` EIP sends a copy of the exchange to another endpoint in a separate thread:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-processor")
     .routeId("wire-tap")
@@ -148,61 +117,6 @@ from("direct:analytics-enrichment")
     })
     .marshal().json()
     .to("kafka:eip.analytics.orders?brokers=localhost:9092");
-```
-
-```yaml
-- route:
-    id: wire-tap
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-processor"
-    steps:
-      - unmarshal:
-          json: {}
-      - wireTap:
-          uri: "kafka:eip.audit.orders"
-          parameters:
-            brokers: "localhost:9092"
-      - wireTap:
-          uri: "direct:analytics-enrichment"
-      - log:
-          message: "Processing order ${body[order_id]}"
-      - to:
-          uri: "direct:process-order"
-
-- route:
-    id: analytics-tap
-    from:
-      uri: "direct:analytics-enrichment"
-    steps:
-      - process:
-          ref: "#enrichForAnalytics"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.analytics.orders"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<route id="wire-tap">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=order-processor"/>
-  <unmarshal><json/></unmarshal>
-  <wireTap uri="kafka:eip.audit.orders?brokers=localhost:9092"/>
-  <wireTap uri="direct:analytics-enrichment"/>
-  <log message="Processing order ${body[order_id]}"/>
-  <to uri="direct:process-order"/>
-</route>
-
-<route id="analytics-tap">
-  <from uri="direct:analytics-enrichment"/>
-  <process ref="#enrichForAnalytics"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.analytics.orders?brokers=localhost:9092"/>
-</route>
 ```
 
 ### Wire tap vs. multicast
@@ -252,8 +166,6 @@ Camel offers two resequencer modes:
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Batch resequencer: collect, sort, emit
 from("kafka:eip.orders.status-updates?brokers=localhost:9092&groupId=resequencer")
@@ -276,76 +188,6 @@ from("kafka:eip.orders.sequenced-updates?brokers=localhost:9092&groupId=stream-r
         .capacity(200)
     .log("Emitting in order: sequence ${header.sequenceNumber}")
     .to("direct:process-in-order");
-```
-
-```yaml
-# Batch resequencer
-- route:
-    id: resequencer-batch
-    from:
-      uri: "kafka:eip.orders.status-updates"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "resequencer"
-    steps:
-      - unmarshal:
-          json: {}
-      - resequence:
-          simple: "${body[event_time]}"
-          batchConfig:
-            batchSize: 50
-            batchTimeout: 5000
-      - log:
-          message: "Ordered: ${body[order_id]} → ${body[status]}"
-      - to:
-          uri: "direct:update-dashboard"
-
-# Stream resequencer
-- route:
-    id: resequencer-stream
-    from:
-      uri: "kafka:eip.orders.sequenced-updates"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "stream-reseq"
-    steps:
-      - unmarshal:
-          json: {}
-      - resequence:
-          header: "sequenceNumber"
-          streamConfig:
-            timeout: 10000
-            capacity: 200
-      - log:
-          message: "Emitting: sequence ${header.sequenceNumber}"
-      - to:
-          uri: "direct:process-in-order"
-```
-
-```xml
-<!-- Batch resequencer -->
-<route id="resequencer-batch">
-  <from uri="kafka:eip.orders.status-updates?brokers=localhost:9092&amp;groupId=resequencer"/>
-  <unmarshal><json/></unmarshal>
-  <resequence>
-    <simple>${body[event_time]}</simple>
-    <batch-config batchSize="50" batchTimeout="5000"/>
-  </resequence>
-  <log message="Ordered: ${body[order_id]} → ${body[status]}"/>
-  <to uri="direct:update-dashboard"/>
-</route>
-
-<!-- Stream resequencer -->
-<route id="resequencer-stream">
-  <from uri="kafka:eip.orders.sequenced-updates?brokers=localhost:9092&amp;groupId=stream-reseq"/>
-  <unmarshal><json/></unmarshal>
-  <resequence>
-    <header>sequenceNumber</header>
-    <stream-config timeout="10000" capacity="200"/>
-  </resequence>
-  <log message="Emitting: sequence ${header.sequenceNumber}"/>
-  <to uri="direct:process-in-order"/>
-</route>
 ```
 
 ### When ordering already works
@@ -374,8 +216,6 @@ A **Composed Message Processor** (also called Splitter-Aggregator) is the combin
 
 Camel's `split()` with an `aggregationStrategy` handles this in one fluent chain:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 from("kafka:eip.orders.bulk?brokers=localhost:9092&groupId=composed-processor")
     .routeId("composed-message-processor")
@@ -391,54 +231,6 @@ from("kafka:eip.orders.bulk?brokers=localhost:9092&groupId=composed-processor")
     .log("Processed order with ${body[item_count]} items, total: $${body[total]}")
     .marshal().json()
     .to("kafka:eip.orders.processed?brokers=localhost:9092");
-```
-
-```yaml
-- route:
-    id: composed-message-processor
-    from:
-      uri: "kafka:eip.orders.bulk"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "composed-processor"
-    steps:
-      - unmarshal:
-          json: {}
-      - split:
-          jsonpath: "$.line_items"
-          aggregationStrategy: "#orderItemAggregation"
-          parallelProcessing: true
-          steps:
-            - to:
-                uri: "direct:check-item-inventory"
-            - to:
-                uri: "direct:calculate-item-price"
-            - to:
-                uri: "direct:assign-warehouse"
-      - log:
-          message: "Processed order — total: $${body[total]}"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.processed"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<route id="composed-message-processor">
-  <from uri="kafka:eip.orders.bulk?brokers=localhost:9092&amp;groupId=composed-processor"/>
-  <unmarshal><json/></unmarshal>
-  <split aggregationStrategyRef="#orderItemAggregation" parallelProcessing="true">
-    <jsonpath>$.line_items</jsonpath>
-    <to uri="direct:check-item-inventory"/>
-    <to uri="direct:calculate-item-price"/>
-    <to uri="direct:assign-warehouse"/>
-  </split>
-  <log message="Processed order — total: $${body[total]}"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.processed?brokers=localhost:9092"/>
-</route>
 ```
 
 The aggregation strategy reassembles the processed items:
@@ -485,8 +277,6 @@ A **Load Balancer** distributes messages across multiple processing nodes using 
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Round-robin across payment service instances
 from("direct:process-payment")
@@ -516,66 +306,6 @@ from("direct:process-payment-sticky")
         .to("http://payment-2:8080/charge")
         .to("http://payment-3:8080/charge")
     .end();
-```
-
-```yaml
-# Round-robin
-- route:
-    id: load-balancer-round-robin
-    from:
-      uri: "direct:process-payment"
-    steps:
-      - loadBalance:
-          roundRobin: {}
-          steps:
-            - to:
-                uri: "http://payment-1:8080/charge"
-            - to:
-                uri: "http://payment-2:8080/charge"
-            - to:
-                uri: "http://payment-3:8080/charge"
-
-# Failover
-- route:
-    id: load-balancer-failover
-    from:
-      uri: "direct:process-payment-failover"
-    steps:
-      - loadBalance:
-          failover:
-            maximumFailoverAttempts: 3
-            roundRobin: true
-          steps:
-            - to:
-                uri: "http://payment-1:8080/charge"
-            - to:
-                uri: "http://payment-2:8080/charge"
-            - to:
-                uri: "http://payment-3:8080/charge"
-```
-
-```xml
-<!-- Round-robin -->
-<route id="load-balancer-round-robin">
-  <from uri="direct:process-payment"/>
-  <loadBalance>
-    <roundRobin/>
-    <to uri="http://payment-1:8080/charge"/>
-    <to uri="http://payment-2:8080/charge"/>
-    <to uri="http://payment-3:8080/charge"/>
-  </loadBalance>
-</route>
-
-<!-- Failover -->
-<route id="load-balancer-failover">
-  <from uri="direct:process-payment-failover"/>
-  <loadBalance>
-    <failover maximumFailoverAttempts="3" roundRobin="true"/>
-    <to uri="http://payment-1:8080/charge"/>
-    <to uri="http://payment-2:8080/charge"/>
-    <to uri="http://payment-3:8080/charge"/>
-  </loadBalance>
-</route>
 ```
 
 ### Load balancer vs. Kafka consumer groups

@@ -50,8 +50,6 @@ In Pulsar, point-to-point semantics come from **subscription types**:
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Kafka point-to-point: consumer group ensures single delivery
 from("kafka:eip.orders.placed"
@@ -71,57 +69,6 @@ from("pulsar:persistent://public/default/eip.orders.placed"
     .routeId("point-to-point-pulsar")
     .log("Instance processing order from Pulsar")
     .to("direct:check-inventory");
-```
-
-```yaml
-# Kafka point-to-point
-- route:
-    id: point-to-point-kafka
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-        autoOffsetReset: earliest
-        maxPollRecords: 10
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Instance processing order ${body[order_id]}"
-      - to:
-          uri: "direct:check-inventory"
-
-# Pulsar point-to-point
-- route:
-    id: point-to-point-pulsar
-    from:
-      uri: "pulsar:persistent://public/default/eip.orders.placed"
-      parameters:
-        subscriptionName: "inventory-service"
-        subscriptionType: "Shared"
-    steps:
-      - log:
-          message: "Instance processing order from Pulsar"
-      - to:
-          uri: "direct:check-inventory"
-```
-
-```xml
-<!-- Kafka point-to-point -->
-<route id="point-to-point-kafka">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service&amp;autoOffsetReset=earliest&amp;maxPollRecords=10"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Instance processing order ${body[order_id]}"/>
-  <to uri="direct:check-inventory"/>
-</route>
-
-<!-- Pulsar point-to-point -->
-<route id="point-to-point-pulsar">
-  <from uri="pulsar:persistent://public/default/eip.orders.placed?subscriptionName=inventory-service&amp;subscriptionType=Shared"/>
-  <log message="Instance processing order from Pulsar"/>
-  <to uri="direct:check-inventory"/>
-</route>
 ```
 
 The critical parameter is `groupId` (Kafka) or `subscriptionName` + `subscriptionType=Shared` (Pulsar). Without a consumer group in Kafka, each consumer instance gets *all* messages — which is publish-subscribe, the next pattern.
@@ -184,8 +131,6 @@ Each subscription gets EVERY message independently.
 
 The publisher route is the same regardless of how many consumers exist — that's the whole point of publish-subscribe:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Publisher — sends to the topic once
 from("direct:publish-order")
@@ -213,78 +158,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=analytics-service")
     .unmarshal().json(Map.class)
     .log("Analytics: recording order ${body[order_id]}")
     .to("direct:record-analytics");
-```
-
-```yaml
-# Publisher
-- route:
-    id: pubsub-publisher
-    from:
-      uri: "direct:publish-order"
-    steps:
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-
-# Subscriber 1 — inventory
-- route:
-    id: pubsub-inventory
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Inventory: checking stock for order ${body[order_id]}"
-      - to:
-          uri: "direct:check-inventory"
-
-# Subscriber 2 — notification
-- route:
-    id: pubsub-notification
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Notification: sending confirmation for order ${body[order_id]}"
-      - to:
-          uri: "direct:send-confirmation"
-```
-
-```xml
-<!-- Publisher -->
-<route id="pubsub-publisher">
-  <from uri="direct:publish-order"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-</route>
-
-<!-- Subscriber 1 — inventory -->
-<route id="pubsub-inventory">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Inventory: checking stock for order ${body[order_id]}"/>
-  <to uri="direct:check-inventory"/>
-</route>
-
-<!-- Subscriber 2 — notification -->
-<route id="pubsub-notification">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=notification-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Notification: sending confirmation for order ${body[order_id]}"/>
-  <to uri="direct:send-confirmation"/>
-</route>
 ```
 
 Notice that adding the analytics subscriber required zero changes to the publisher or the existing subscribers. This is the power of publish-subscribe: subscribers are additive. In a monolithic architecture, adding analytics would mean modifying order-service to call a new endpoint. In an event-driven architecture, it's a new consumer group.
@@ -316,8 +189,6 @@ The alternative — a single `eip.events` topic carrying all event types — wou
 
 With datatype channels, each Camel consumer route handles exactly one event type. No type-checking, no dispatching — the channel guarantees the type:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Each route consumes from a datatype channel — no type dispatch needed
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
@@ -333,56 +204,6 @@ from("kafka:eip.orders.cancelled?brokers=localhost:9092&groupId=inventory-servic
     // We KNOW this is an OrderCancelled
     .log("Processing OrderCancelled: ${body[order_id]}")
     .to("direct:release-inventory");
-```
-
-```yaml
-# OrderPlaced handler — channel guarantees the type
-- route:
-    id: datatype-channel-placed
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Processing OrderPlaced: ${body[order_id]}"
-      - to:
-          uri: "direct:reserve-inventory"
-
-# OrderCancelled handler — separate channel, separate type
-- route:
-    id: datatype-channel-cancelled
-    from:
-      uri: "kafka:eip.orders.cancelled"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Processing OrderCancelled: ${body[order_id]}"
-      - to:
-          uri: "direct:release-inventory"
-```
-
-```xml
-<route id="datatype-channel-placed">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Processing OrderPlaced: ${body[order_id]}"/>
-  <to uri="direct:reserve-inventory"/>
-</route>
-
-<route id="datatype-channel-cancelled">
-  <from uri="kafka:eip.orders.cancelled?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Processing OrderCancelled: ${body[order_id]}"/>
-  <to uri="direct:release-inventory"/>
-</route>
 ```
 
 ### Datatype channels and schema registries

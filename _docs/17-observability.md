@@ -28,8 +28,6 @@ Camel provides a comprehensive Control Bus through multiple mechanisms:
 
 **1. The `controlbus` component — manage routes from within Camel:**
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Control Bus: manage routes via messaging
 from("kafka:eip.system.control?brokers=localhost:9092&groupId=control-bus")
@@ -56,57 +54,6 @@ rest("/api/routes")
 from("direct:route-status")
     .routeId("route-status-api")
     .toD("controlbus:route?routeId=${header.routeId}&action=status");
-```
-
-```yaml
-- route:
-    id: control-bus
-    from:
-      uri: "kafka:eip.system.control"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "control-bus"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Control: ${body[action]} on ${body[routeId]}"
-      - choice:
-          when:
-            - simple: "${body[action]} == 'stop'"
-              steps:
-                - toD:
-                    uri: "controlbus:route?routeId=${body[routeId]}&action=stop"
-            - simple: "${body[action]} == 'start'"
-              steps:
-                - toD:
-                    uri: "controlbus:route?routeId=${body[routeId]}&action=start"
-            - simple: "${body[action]} == 'status'"
-              steps:
-                - toD:
-                    uri: "controlbus:route?routeId=${body[routeId]}&action=status"
-```
-
-```xml
-<route id="control-bus">
-  <from uri="kafka:eip.system.control?brokers=localhost:9092&amp;groupId=control-bus"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Control: ${body[action]} on ${body[routeId]}"/>
-  <choice>
-    <when>
-      <simple>${body[action]} == 'stop'</simple>
-      <toD uri="controlbus:route?routeId=${body[routeId]}&amp;action=stop"/>
-    </when>
-    <when>
-      <simple>${body[action]} == 'start'</simple>
-      <toD uri="controlbus:route?routeId=${body[routeId]}&amp;action=start"/>
-    </when>
-    <when>
-      <simple>${body[action]} == 'status'</simple>
-      <toD uri="controlbus:route?routeId=${body[routeId]}&amp;action=status"/>
-    </when>
-  </choice>
-</route>
 ```
 
 **2. JBang and `camel` CLI — the developer's control bus:**
@@ -160,16 +107,6 @@ public class KafkaHealthCheck implements HealthCheck {
 ```
 
 Kubernetes uses these for liveness and readiness probes:
-```yaml
-livenessProbe:
-  httpGet:
-    path: /q/health/live
-    port: 8080
-readinessProbe:
-  httpGet:
-    path: /q/health/ready
-    port: 8080
-```
 
 ## Pattern: Message Store
 
@@ -182,8 +119,6 @@ When debugging a production issue — "order 42 was placed but never shipped" �
 A **Message Store** captures and persists messages as they flow through the system. It serves as an audit trail, a debugging tool, and (if needed) a replay source. The store captures the message at one or more points in the route — typically at ingress and egress points.
 
 ### How Camel models it
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Message Store: capture every message flowing through the order pipeline
@@ -217,56 +152,6 @@ from("direct:store-message")
         + "?dataSource=#systemDataSource");
 ```
 
-```yaml
-- route:
-    id: message-store-example
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - wireTap:
-          uri: "direct:store-message"
-      - to:
-          uri: "direct:check-inventory"
-      - wireTap:
-          uri: "direct:store-message"
-
-- route:
-    id: message-store
-    from:
-      uri: "direct:store-message"
-    steps:
-      - process:
-          ref: "#buildStoreRecord"
-      - marshal:
-          json: {}
-      - to:
-          uri: "sql:INSERT INTO system.message_store (message_id, route_id, timestamp, payload) VALUES (:#${body[message_id]}, :#${body[route_id]}, :#${body[timestamp]}, :#${body[payload]})"
-          parameters:
-            dataSource: "#systemDataSource"
-```
-
-```xml
-<route id="message-store-example">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <wireTap uri="direct:store-message"/>
-  <to uri="direct:check-inventory"/>
-  <wireTap uri="direct:store-message"/>
-</route>
-
-<route id="message-store">
-  <from uri="direct:store-message"/>
-  <process ref="#buildStoreRecord"/>
-  <marshal><json/></marshal>
-  <to uri="sql:INSERT INTO system.message_store (message_id, route_id, timestamp, payload) VALUES (:#${body[message_id]}, :#${body[route_id]}, :#${body[timestamp]}, :#${body[payload]})?dataSource=#systemDataSource"/>
-</route>
-```
-
 ### Kafka as a message store
 
 Kafka itself is a message store — it retains all messages for the configured retention period (default 7 days). You can replay any consumer group by resetting its offset. For many use cases, Kafka's built-in retention replaces the need for a separate message store.
@@ -290,8 +175,6 @@ A **Message History** records the sequence of processing steps a message has pas
 ### How Camel models it
 
 Camel has built-in message history support. Enable it and every exchange carries a history of all processing steps:
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Enable message history (enabled by default in Camel 4.x)
@@ -320,41 +203,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=history-demo")
         }
     })
     .log("Processing complete for order ${body[order_id]}");
-```
-
-```yaml
-# Message history is automatic in Camel 4.x
-# Just enable in application.properties:
-#   camel.context.message-history = true
-- route:
-    id: message-history-demo
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "history-demo"
-    steps:
-      - unmarshal:
-          json: {}
-      - to:
-          uri: "direct:validate"
-      - to:
-          uri: "direct:check-inventory"
-      - to:
-          uri: "direct:process-payment"
-      - log:
-          message: "Complete — check message history via JMX or camel trace"
-```
-
-```xml
-<route id="message-history-demo">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=history-demo"/>
-  <unmarshal><json/></unmarshal>
-  <to uri="direct:validate"/>
-  <to uri="direct:check-inventory"/>
-  <to uri="direct:process-payment"/>
-  <log message="Complete — check message history via JMX or camel trace"/>
-</route>
 ```
 
 ### Message history and distributed tracing
@@ -411,8 +259,6 @@ We covered the **Wire Tap** in Chapter 11 as a routing pattern. Here, we use it 
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Metrics wire tap: collect metrics without affecting the main flow
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-processing")
@@ -438,48 +284,6 @@ from("direct:collect-metrics")
     .to("micrometer:counter:orders.amount.total"
         + "?tags=country=${header.country}"
         + "&increment=${body[amount]}");
-```
-
-```yaml
-- route:
-    id: metrics-wire-tap
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-processing"
-    steps:
-      - unmarshal:
-          json: {}
-      - wireTap:
-          uri: "direct:collect-metrics"
-      - to:
-          uri: "direct:process-order"
-
-- route:
-    id: metrics-collector
-    from:
-      uri: "direct:collect-metrics"
-    steps:
-      - process:
-          ref: "#extractMetricsTags"
-      - to:
-          uri: "micrometer:counter:orders.received?tags=country=${header.country},priority=${header.priority}"
-```
-
-```xml
-<route id="metrics-wire-tap">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=order-processing"/>
-  <unmarshal><json/></unmarshal>
-  <wireTap uri="direct:collect-metrics"/>
-  <to uri="direct:process-order"/>
-</route>
-
-<route id="metrics-collector">
-  <from uri="direct:collect-metrics"/>
-  <process ref="#extractMetricsTags"/>
-  <to uri="micrometer:counter:orders.received?tags=country=${header.country},priority=${header.priority}"/>
-</route>
 ```
 
 ### The three pillars in our stack

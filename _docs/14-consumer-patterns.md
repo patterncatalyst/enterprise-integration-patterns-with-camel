@@ -31,8 +31,6 @@ Polling consumers are appropriate when:
 
 Many Camel components are polling consumers by nature. The `file`, `ftp`, `sql`, `timer`, and `scheduler` components all poll their source:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // File polling consumer: check for new CSV files every 10 seconds
 from("file:data/incoming?include=.*\\.csv"
@@ -69,70 +67,6 @@ from("quartz:orders/nightly-export?cron=0+0+2+*+*+?")
         .marshal().json()
         .to("kafka:eip.accounting.orders?brokers=localhost:9092")
     .end();
-```
-
-```yaml
-# File polling consumer
-- route:
-    id: polling-consumer-file
-    from:
-      uri: "file:data/incoming"
-      parameters:
-        include: ".*\\.csv"
-        move: ".done"
-        delay: 10000
-        sortBy: "file:modified"
-        maxMessagesPerPoll: 5
-    steps:
-      - log:
-          message: "Processing: ${header.CamelFileName}"
-      - unmarshal:
-          csv: {}
-      - split:
-          simple: "${body}"
-          steps:
-            - to:
-                uri: "direct:process-csv-row"
-
-# Database polling consumer
-- route:
-    id: polling-consumer-sql
-    from:
-      uri: "sql:SELECT * FROM orders.orders WHERE status = 'NEW' ORDER BY created_at LIMIT 10"
-      parameters:
-        dataSource: "#orderDataSource"
-        delay: 30000
-        onConsume: "UPDATE orders.orders SET status = 'PROCESSING' WHERE id = :#id"
-    steps:
-      - log:
-          message: "Processing order: ${body[id]}"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<!-- File polling consumer -->
-<route id="polling-consumer-file">
-  <from uri="file:data/incoming?include=.*\\.csv&amp;move=.done&amp;delay=10000&amp;sortBy=file:modified&amp;maxMessagesPerPoll=5"/>
-  <log message="Processing: ${header.CamelFileName}"/>
-  <unmarshal><csv/></unmarshal>
-  <split>
-    <simple>${body}</simple>
-    <to uri="direct:process-csv-row"/>
-  </split>
-</route>
-
-<!-- Database polling consumer -->
-<route id="polling-consumer-sql">
-  <from uri="sql:SELECT * FROM orders.orders WHERE status = 'NEW' ORDER BY created_at LIMIT 10?dataSource=#orderDataSource&amp;delay=30000&amp;onConsume=UPDATE orders.orders SET status = 'PROCESSING' WHERE id = :#id"/>
-  <log message="Processing order: ${body[id]}"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-</route>
 ```
 
 ### Polling parameters
@@ -190,8 +124,6 @@ In Camel, most messaging component consumers (Kafka, Pulsar, JMS, AMQP, MQTT) ar
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Kafka event-driven consumer: the Kafka client pushes messages to the route
 from("kafka:eip.orders.placed?brokers=localhost:9092"
@@ -220,36 +152,6 @@ from("platform-http:/api/orders?httpMethodRestrict=POST")
     .to("direct:create-order");
 ```
 
-```yaml
-# Kafka event-driven consumer
-- route:
-    id: event-driven-consumer-kafka
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-        autoOffsetReset: earliest
-        maxPollRecords: 100
-        consumersCount: 3
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Received order ${body[order_id]}"
-      - to:
-          uri: "direct:check-inventory"
-```
-
-```xml
-<route id="event-driven-consumer-kafka">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service&amp;autoOffsetReset=earliest&amp;maxPollRecords=100&amp;consumersCount=3"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Received order ${body[order_id]}"/>
-  <to uri="direct:check-inventory"/>
-</route>
-```
-
 ### Polling vs. event-driven in Kafka
 
 Kafka's consumer API is technically a polling API (`consumer.poll()`), but the Camel Kafka component abstracts this into an event-driven interface: your route logic runs when `poll()` returns records. So from the Camel programmer's perspective, the Kafka consumer is event-driven — you don't manage the poll loop.
@@ -270,8 +172,6 @@ We introduced this concept in Chapter 04 (Point-to-Point Channel). Here, we focu
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Multiple consumer threads within a single Camel application
 from("kafka:eip.orders.placed?brokers=localhost:9092"
@@ -283,35 +183,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
     .unmarshal().json(Map.class)
     .log("Thread ${threadName}: processing order ${body[order_id]}")
     .to("direct:check-inventory");
-```
-
-```yaml
-- route:
-    id: competing-consumers
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-        consumersCount: 3
-        maxPollRecords: 50
-        autoOffsetReset: earliest
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Thread ${threadName}: processing order ${body[order_id]}"
-      - to:
-          uri: "direct:check-inventory"
-```
-
-```xml
-<route id="competing-consumers">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service&amp;consumersCount=3&amp;maxPollRecords=50&amp;autoOffsetReset=earliest"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Thread ${threadName}: processing order ${body[order_id]}"/>
-  <to uri="direct:check-inventory"/>
-</route>
 ```
 
 ### Scaling dimensions
@@ -354,8 +225,6 @@ A **Message Dispatcher** receives messages from a channel and distributes them t
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Dispatcher: single consumer, multiple handlers
 from("kafka:eip.orders.status-updates?brokers=localhost:9092&groupId=order-dispatcher")
@@ -379,68 +248,6 @@ from("direct:handle-OrderRefunded")
     .routeId("handler-order-refunded")
     .log("Processing refund for order ${body[order_id]}")
     .to("direct:process-refund");
-```
-
-```yaml
-# Dispatcher
-- route:
-    id: message-dispatcher
-    from:
-      uri: "kafka:eip.orders.status-updates"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "order-dispatcher"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Dispatching ${body[event_type]}"
-      - toD:
-          uri: "direct:handle-${body[event_type]}"
-
-# Handlers
-- route:
-    id: handler-order-placed
-    from:
-      uri: "direct:handle-OrderPlaced"
-    steps:
-      - log:
-          message: "Creating order ${body[order_id]}"
-      - to:
-          uri: "direct:create-order"
-
-- route:
-    id: handler-order-cancelled
-    from:
-      uri: "direct:handle-OrderCancelled"
-    steps:
-      - log:
-          message: "Cancelling order ${body[order_id]}"
-      - to:
-          uri: "direct:cancel-order"
-```
-
-```xml
-<!-- Dispatcher -->
-<route id="message-dispatcher">
-  <from uri="kafka:eip.orders.status-updates?brokers=localhost:9092&amp;groupId=order-dispatcher"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Dispatching ${body[event_type]}"/>
-  <toD uri="direct:handle-${body[event_type]}"/>
-</route>
-
-<!-- Handlers -->
-<route id="handler-order-placed">
-  <from uri="direct:handle-OrderPlaced"/>
-  <log message="Creating order ${body[order_id]}"/>
-  <to uri="direct:create-order"/>
-</route>
-
-<route id="handler-order-cancelled">
-  <from uri="direct:handle-OrderCancelled"/>
-  <log message="Cancelling order ${body[order_id]}"/>
-  <to uri="direct:cancel-order"/>
-</route>
 ```
 
 ### Dispatcher vs. datatype channels

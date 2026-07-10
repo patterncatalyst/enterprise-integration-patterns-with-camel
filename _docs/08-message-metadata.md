@@ -33,8 +33,6 @@ Camel automates most of this through its `InOut` exchange pattern. When you use 
 
 **Using Kafka request-reply with `ReplyTo` headers:**
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Requestor: send to the request channel, wait for reply
 from("direct:check-stock")
@@ -68,70 +66,6 @@ from("kafka:eip.inventory.requests?brokers=localhost:9092&groupId=inventory-serv
         exchange.getIn().setBody(reply);
     })
     .marshal().json();
-```
-
-```yaml
-# Requestor
-- route:
-    id: request-reply-requestor
-    from:
-      uri: "direct:check-stock"
-    steps:
-      - setHeader:
-          name: orderId
-          simple: "${body[order_id]}"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.inventory.requests"
-          pattern: "InOut"
-          parameters:
-            brokers: "localhost:9092"
-            replyTopic: "eip.inventory.replies"
-            requestTimeout: 30000
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Stock check result: ${body[available]}"
-
-# Replier
-- route:
-    id: request-reply-replier
-    from:
-      uri: "kafka:eip.inventory.requests"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Checking inventory for SKU ${body[item_sku]}"
-      - process:
-          ref: "#inventoryCheck"
-      - marshal:
-          json: {}
-```
-
-```xml
-<!-- Requestor -->
-<route id="request-reply-requestor">
-  <from uri="direct:check-stock"/>
-  <setHeader name="orderId"><simple>${body[order_id]}</simple></setHeader>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.inventory.requests?brokers=localhost:9092&amp;replyTopic=eip.inventory.replies&amp;requestTimeout=30000" pattern="InOut"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Stock check result: ${body[available]}"/>
-</route>
-
-<!-- Replier -->
-<route id="request-reply-replier">
-  <from uri="kafka:eip.inventory.requests?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Checking inventory for SKU ${body[item_sku]}"/>
-  <process ref="#inventoryCheck"/>
-  <marshal><json/></marshal>
-</route>
 ```
 
 ### JBang quick-test
@@ -171,8 +105,6 @@ This decouples the replier from the requestor's infrastructure. The replier does
 
 In Kafka, the return address is the **reply topic** — a header (or property) on the request message that tells the replier where to send the response. Camel's Kafka component supports this with `CamelKafkaReplyTopic`:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Requestor specifies the return address
 from("direct:stock-check-with-return-address")
@@ -197,64 +129,6 @@ from("direct:stock-check-from-analytics")
         + "&requestTimeout=30000");
 ```
 
-```yaml
-# Order-service specifies its own reply topic
-- route:
-    id: return-address
-    from:
-      uri: "direct:stock-check-with-return-address"
-    steps:
-      - setHeader:
-          name: CamelKafkaReplyTopic
-          constant: "eip.order-service.replies"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.inventory.requests"
-          pattern: "InOut"
-          parameters:
-            brokers: "localhost:9092"
-            replyTopic: "eip.order-service.replies"
-            requestTimeout: 30000
-
-# Analytics-service specifies a different reply topic
-- route:
-    id: return-address-analytics
-    from:
-      uri: "direct:stock-check-from-analytics"
-    steps:
-      - setHeader:
-          name: CamelKafkaReplyTopic
-          constant: "eip.analytics-service.replies"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.inventory.requests"
-          pattern: "InOut"
-          parameters:
-            brokers: "localhost:9092"
-            replyTopic: "eip.analytics-service.replies"
-            requestTimeout: 30000
-```
-
-```xml
-<!-- Order-service reply address -->
-<route id="return-address">
-  <from uri="direct:stock-check-with-return-address"/>
-  <setHeader name="CamelKafkaReplyTopic"><constant>eip.order-service.replies</constant></setHeader>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.inventory.requests?brokers=localhost:9092&amp;replyTopic=eip.order-service.replies&amp;requestTimeout=30000" pattern="InOut"/>
-</route>
-
-<!-- Analytics-service reply address -->
-<route id="return-address-analytics">
-  <from uri="direct:stock-check-from-analytics"/>
-  <setHeader name="CamelKafkaReplyTopic"><constant>eip.analytics-service.replies</constant></setHeader>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.inventory.requests?brokers=localhost:9092&amp;replyTopic=eip.analytics-service.replies&amp;requestTimeout=30000" pattern="InOut"/>
-</route>
-```
-
 The replier routes are identical in both cases — it just replies to whatever `CamelKafkaReplyTopic` header it finds. The return address makes the replier completely agnostic to who's asking.
 
 ## Pattern: Correlation Identifier
@@ -270,8 +144,6 @@ A **Correlation Identifier** is a unique ID placed on the request message and co
 Camel handles correlation automatically in `InOut` exchanges — the framework generates a correlation ID, attaches it to the request, and matches the reply. But you can also do it explicitly when you need custom correlation logic:
 
 ### How Camel models it
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Explicit correlation: set a correlation ID on the request
@@ -308,65 +180,6 @@ from("kafka:eip.inventory.replies?brokers=localhost:9092&groupId=order-service")
     .to("direct:process-inventory-reply");
 ```
 
-```yaml
-# Sender with explicit correlation ID
-- route:
-    id: correlation-id-sender
-    from:
-      uri: "direct:correlated-request"
-    steps:
-      - process:
-          ref: "#generateCorrelationId"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.inventory.requests"
-          parameters:
-            brokers: "localhost:9092"
-
-# Replier preserves the correlation ID
-- route:
-    id: correlation-id-replier
-    from:
-      uri: "kafka:eip.inventory.requests"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Processing request ${header.correlationId}"
-      - process:
-          ref: "#inventoryCheck"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.inventory.replies"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<!-- Sender -->
-<route id="correlation-id-sender">
-  <from uri="direct:correlated-request"/>
-  <process ref="#generateCorrelationId"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.inventory.requests?brokers=localhost:9092"/>
-</route>
-
-<!-- Replier preserves correlation -->
-<route id="correlation-id-replier">
-  <from uri="kafka:eip.inventory.requests?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Processing request ${header.correlationId}"/>
-  <process ref="#inventoryCheck"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.inventory.replies?brokers=localhost:9092"/>
-</route>
-```
-
 ### Correlation in our event-driven domain
 
 Even without explicit request-reply, correlation is everywhere in the shipping domain. The `order_id` field is a natural correlation identifier — it ties together `OrderPlaced`, `InventoryReserved`, `PaymentProcessed`, and `ShipmentScheduled` events across services. When debugging a problem with order 42, you `grep` for `order_id=42` across all topics and reconstruct the full conversation.
@@ -391,8 +204,6 @@ A **Message Sequence** splits a large message into numbered parts, with metadata
 Camel's **Splitter** EIP produces message sequences automatically: each split message gets `CamelSplitIndex`, `CamelSplitSize`, and `CamelSplitComplete` headers. On the receiving side, Camel's **Aggregator** EIP reassembles the parts — which we'll cover in Part 6 (Message Transformation).
 
 ### How Camel models it
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Split a bulk order into individual line items
@@ -424,87 +235,6 @@ from("kafka:eip.orders.line-items?brokers=localhost:9092&groupId=fulfillment-ser
         .to("direct:process-complete-order");
 ```
 
-```yaml
-# Splitter: break bulk order into parts
-- route:
-    id: message-sequence-splitter
-    from:
-      uri: "direct:bulk-order"
-    steps:
-      - process:
-          ref: "#generateSequenceId"
-      - split:
-          jsonpath: "$.line_items"
-          steps:
-            - setHeader:
-                name: sequenceNumber
-                simple: "${header.CamelSplitIndex}"
-            - setHeader:
-                name: sequenceSize
-                simple: "${header.CamelSplitSize}"
-            - marshal:
-                json: {}
-            - to:
-                uri: "kafka:eip.orders.line-items"
-                parameters:
-                  brokers: "localhost:9092"
-                  key: "${header.sequenceId}"
-            - log:
-                message: "Sent item ${header.sequenceNumber} of ${header.sequenceSize}"
-
-# Aggregator: reassemble
-- route:
-    id: message-sequence-aggregator
-    from:
-      uri: "kafka:eip.orders.line-items"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "fulfillment-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - aggregate:
-          correlationExpression:
-            header: "sequenceId"
-          aggregationStrategy: "#groupedBody"
-          completionSize:
-            header: "sequenceSize"
-          completionTimeout: 60000
-          steps:
-            - log:
-                message: "All items received for sequence ${header.sequenceId}"
-            - to:
-                uri: "direct:process-complete-order"
-```
-
-```xml
-<!-- Splitter -->
-<route id="message-sequence-splitter">
-  <from uri="direct:bulk-order"/>
-  <process ref="#generateSequenceId"/>
-  <split>
-    <jsonpath>$.line_items</jsonpath>
-    <setHeader name="sequenceNumber"><simple>${header.CamelSplitIndex}</simple></setHeader>
-    <setHeader name="sequenceSize"><simple>${header.CamelSplitSize}</simple></setHeader>
-    <marshal><json/></marshal>
-    <to uri="kafka:eip.orders.line-items?brokers=localhost:9092&amp;key=${header.sequenceId}"/>
-    <log message="Sent item ${header.sequenceNumber} of ${header.sequenceSize}"/>
-  </split>
-</route>
-
-<!-- Aggregator -->
-<route id="message-sequence-aggregator">
-  <from uri="kafka:eip.orders.line-items?brokers=localhost:9092&amp;groupId=fulfillment-service"/>
-  <unmarshal><json/></unmarshal>
-  <aggregate aggregationStrategyRef="#groupedBody" completionTimeout="60000">
-    <correlationExpression><header>sequenceId</header></correlationExpression>
-    <completionSizeExpression><header>sequenceSize</header></completionSizeExpression>
-    <log message="All items received for sequence ${header.sequenceId}"/>
-    <to uri="direct:process-complete-order"/>
-  </aggregate>
-</route>
-```
-
 ### Kafka ordering and sequences
 
 When splitting a message sequence across Kafka, use the **same key** for all parts (`key=${header.sequenceId}`). Kafka guarantees ordering within a partition, and messages with the same key go to the same partition. This means parts arrive in order at the consumer — which simplifies reassembly.
@@ -526,8 +256,6 @@ A **Message Expiration** (also called Time-to-Live or TTL) attaches a timestamp 
 ### How Camel models it
 
 Kafka doesn't natively support per-message TTL (it has topic-level retention, which is different). But you can implement expiration at the application level with Camel headers:
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Producer: set expiration on the message
@@ -555,78 +283,6 @@ from("kafka:eip.notifications.flash-sale?brokers=localhost:9092&groupId=notifica
             .log("Processing flash sale notification")
             .to("direct:send-notification")
     .end();
-```
-
-```yaml
-# Producer with TTL
-- route:
-    id: message-expiration-producer
-    from:
-      uri: "direct:flash-sale-notification"
-    steps:
-      - process:
-          ref: "#setExpiration"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.notifications.flash-sale"
-          parameters:
-            brokers: "localhost:9092"
-
-# Consumer checks TTL
-- route:
-    id: message-expiration-consumer
-    from:
-      uri: "kafka:eip.notifications.flash-sale"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - choice:
-          when:
-            - groovy: "request.headers['messageExpiresAt'] < System.currentTimeMillis()"
-              steps:
-                - log:
-                    message: "EXPIRED: discarding flash sale notification"
-                - to:
-                    uri: "kafka:eip.notifications.expired"
-                    parameters:
-                      brokers: "localhost:9092"
-          otherwise:
-            steps:
-              - log:
-                  message: "Processing flash sale notification"
-              - to:
-                  uri: "direct:send-notification"
-```
-
-```xml
-<!-- Producer with TTL -->
-<route id="message-expiration-producer">
-  <from uri="direct:flash-sale-notification"/>
-  <process ref="#setExpiration"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.notifications.flash-sale?brokers=localhost:9092"/>
-</route>
-
-<!-- Consumer checks TTL -->
-<route id="message-expiration-consumer">
-  <from uri="kafka:eip.notifications.flash-sale?brokers=localhost:9092&amp;groupId=notification-service"/>
-  <unmarshal><json/></unmarshal>
-  <choice>
-    <when>
-      <groovy>request.headers['messageExpiresAt'] &lt; System.currentTimeMillis()</groovy>
-      <log message="EXPIRED: discarding flash sale notification"/>
-      <to uri="kafka:eip.notifications.expired?brokers=localhost:9092"/>
-    </when>
-    <otherwise>
-      <log message="Processing flash sale notification"/>
-      <to uri="direct:send-notification"/>
-    </otherwise>
-  </choice>
-</route>
 ```
 
 ### Pulsar's native TTL
@@ -667,8 +323,6 @@ In HTTP-based systems, `Content-Type` is the format indicator. In messaging syst
 
 Camel's data format mechanism is the natural home for format indicators. When you `marshal()` and `unmarshal()`, you're declaring the format. Headers make it dynamic:
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Producer: include format indicator as a header
 from("direct:multi-format-producer")
@@ -704,118 +358,6 @@ from("kafka:eip.accounting.exports?brokers=localhost:9092&groupId=accounting-imp
             .to("kafka:eip.accounting.errors?brokers=localhost:9092")
     .end()
     .to("direct:process-accounting-record");
-```
-
-```yaml
-# Producer with format indicator
-- route:
-    id: format-indicator-producer
-    from:
-      uri: "direct:multi-format-producer"
-    steps:
-      - choice:
-          when:
-            - simple: "${header.targetFormat} == 'json'"
-              steps:
-                - marshal:
-                    json: {}
-                - setHeader:
-                    name: contentType
-                    constant: "application/json"
-            - simple: "${header.targetFormat} == 'xml'"
-              steps:
-                - marshal:
-                    jacksonXml: {}
-                - setHeader:
-                    name: contentType
-                    constant: "application/xml"
-          otherwise:
-            steps:
-              - marshal:
-                  csv: {}
-              - setHeader:
-                  name: contentType
-                  constant: "text/csv"
-      - to:
-          uri: "kafka:eip.accounting.exports"
-          parameters:
-            brokers: "localhost:9092"
-
-# Consumer reads format indicator
-- route:
-    id: format-indicator-consumer
-    from:
-      uri: "kafka:eip.accounting.exports"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "accounting-import"
-    steps:
-      - choice:
-          when:
-            - simple: "${header.contentType} == 'application/json'"
-              steps:
-                - unmarshal:
-                    json: {}
-                - log:
-                    message: "Imported JSON record"
-            - simple: "${header.contentType} == 'application/xml'"
-              steps:
-                - unmarshal:
-                    jacksonXml: {}
-                - log:
-                    message: "Imported XML record"
-          otherwise:
-            steps:
-              - log:
-                  message: "Unknown format: ${header.contentType}"
-      - to:
-          uri: "direct:process-accounting-record"
-```
-
-```xml
-<!-- Producer with format indicator -->
-<route id="format-indicator-producer">
-  <from uri="direct:multi-format-producer"/>
-  <choice>
-    <when>
-      <simple>${header.targetFormat} == 'json'</simple>
-      <marshal><json/></marshal>
-      <setHeader name="contentType"><constant>application/json</constant></setHeader>
-    </when>
-    <when>
-      <simple>${header.targetFormat} == 'xml'</simple>
-      <marshal><jacksonXml/></marshal>
-      <setHeader name="contentType"><constant>application/xml</constant></setHeader>
-    </when>
-    <otherwise>
-      <marshal><csv/></marshal>
-      <setHeader name="contentType"><constant>text/csv</constant></setHeader>
-    </otherwise>
-  </choice>
-  <to uri="kafka:eip.accounting.exports?brokers=localhost:9092"/>
-</route>
-
-<!-- Consumer reads format indicator -->
-<route id="format-indicator-consumer">
-  <from uri="kafka:eip.accounting.exports?brokers=localhost:9092&amp;groupId=accounting-import"/>
-  <choice>
-    <when>
-      <simple>${header.contentType} == 'application/json'</simple>
-      <unmarshal><json/></unmarshal>
-      <log message="Imported JSON record"/>
-    </when>
-    <when>
-      <simple>${header.contentType} == 'application/xml'</simple>
-      <unmarshal><jacksonXml/></unmarshal>
-      <log message="Imported XML record"/>
-    </when>
-    <otherwise>
-      <log message="Unknown format: ${header.contentType}"/>
-      <to uri="kafka:eip.accounting.errors?brokers=localhost:9092"/>
-    </otherwise>
-  </choice>
-  <to uri="direct:process-accounting-record"/>
-</route>
 ```
 
 ### Schema registry as a format indicator

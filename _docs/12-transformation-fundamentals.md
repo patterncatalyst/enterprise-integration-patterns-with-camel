@@ -16,16 +16,6 @@ This chapter covers four patterns that change a message's content. The next chap
 
 The partner order management system sends orders as XML:
 
-```xml
-<order>
-  <orderId>42</orderId>
-  <customerRef>CUST-100</customerRef>
-  <lineItems>
-    <item sku="SKU-ABC-42" qty="2" unitPrice="74.99"/>
-  </lineItems>
-</order>
-```
-
 But the shipping domain's internal services expect JSON events:
 
 ```json
@@ -53,8 +43,6 @@ A **Message Translator** transforms a message from one format/schema to another.
 Camel provides multiple approaches to message translation:
 
 **Data format marshaling/unmarshaling** for format translation:
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Simple format translation: XML → JSON
@@ -96,65 +84,6 @@ from("kafka:eip.partners.json-orders?brokers=localhost:9092&groupId=jolt-transla
     .to("kafka:eip.orders.placed?brokers=localhost:9092");
 ```
 
-```yaml
-# Format translation: XML → JSON
-- route:
-    id: translator-format
-    from:
-      uri: "file:data/incoming"
-      parameters:
-        include: ".*\\.xml"
-        move: ".done"
-    steps:
-      - unmarshal:
-          jacksonXml: {}
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-
-# Schema translation
-- route:
-    id: translator-schema
-    from:
-      uri: "kafka:eip.partners.orders"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "translator"
-    steps:
-      - unmarshal:
-          jacksonXml: {}
-      - process:
-          ref: "#partnerToInternalTranslator"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<!-- Format translation -->
-<route id="translator-format">
-  <from uri="file:data/incoming?include=.*\\.xml&amp;move=.done"/>
-  <unmarshal><jacksonXml/></unmarshal>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-</route>
-
-<!-- Schema translation -->
-<route id="translator-schema">
-  <from uri="kafka:eip.partners.orders?brokers=localhost:9092&amp;groupId=translator"/>
-  <unmarshal><jacksonXml/></unmarshal>
-  <process ref="#partnerToInternalTranslator"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-</route>
-```
-
 ### Translation approaches in Camel
 
 | Approach | When to use |
@@ -181,8 +110,6 @@ Similarly, SOAP services wrap payloads in a SOAP envelope with headers, namespac
 An **Envelope Wrapper** adds (wraps) or removes (unwraps) a layer of metadata around the core message payload. The wrapper carries context — routing information, security tokens, schema identifiers, timestamps — that the messaging infrastructure needs but the business logic doesn't.
 
 ### How Camel models it
-
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
 
 ```java
 // Wrapping: add an event envelope before publishing
@@ -216,65 +143,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     .setBody(simple("${body[data]}"))
     .log("Processing order: ${body[order_id]}")
     .to("direct:check-inventory");
-```
-
-```yaml
-# Wrapping
-- route:
-    id: envelope-wrapper-wrap
-    from:
-      uri: "direct:wrap-order-event"
-    steps:
-      - process:
-          ref: "#wrapInEventEnvelope"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.orders.placed"
-          parameters:
-            brokers: "localhost:9092"
-
-# Unwrapping
-- route:
-    id: envelope-wrapper-unwrap
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "inventory-service"
-    steps:
-      - unmarshal:
-          json: {}
-      - setHeader:
-          name: eventType
-          simple: "${body[event_type]}"
-      - setHeader:
-          name: eventId
-          simple: "${body[event_id]}"
-      - setBody:
-          simple: "${body[data]}"
-      - to:
-          uri: "direct:check-inventory"
-```
-
-```xml
-<!-- Wrapping -->
-<route id="envelope-wrapper-wrap">
-  <from uri="direct:wrap-order-event"/>
-  <process ref="#wrapInEventEnvelope"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.orders.placed?brokers=localhost:9092"/>
-</route>
-
-<!-- Unwrapping -->
-<route id="envelope-wrapper-unwrap">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=inventory-service"/>
-  <unmarshal><json/></unmarshal>
-  <setHeader name="eventType"><simple>${body[event_type]}</simple></setHeader>
-  <setHeader name="eventId"><simple>${body[event_id]}</simple></setHeader>
-  <setBody><simple>${body[data]}</simple></setBody>
-  <to uri="direct:check-inventory"/>
-</route>
 ```
 
 ### Envelope design in the shipping domain
@@ -318,8 +186,6 @@ Camel supports two enrichment approaches:
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Enrich the order event with customer details from the database
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=notification-enricher")
@@ -353,49 +219,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=notification-enrich
         })
     .log("Enriched order ${body[order_id]} for ${body[customer_name]}")
     .to("direct:send-order-confirmation");
-```
-
-```yaml
-- route:
-    id: content-enricher
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-enricher"
-    steps:
-      - unmarshal:
-          json: {}
-      - log:
-          message: "Enriching order ${body[order_id]}"
-      - enrich:
-          expression:
-            simple: "sql:SELECT name, email FROM orders.customers WHERE customer_id = :#${body[customer_id]}?dataSource=#orderDataSource"
-          aggregationStrategy: "#customerEnrichmentStrategy"
-      - enrich:
-          expression:
-            constant: "http://shipping-calc.example.com/estimate?httpMethod=POST&connectTimeout=5000"
-          aggregationStrategy: "#deliveryEnrichmentStrategy"
-      - log:
-          message: "Enriched order for ${body[customer_name]}"
-      - to:
-          uri: "direct:send-order-confirmation"
-```
-
-```xml
-<route id="content-enricher">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=notification-enricher"/>
-  <unmarshal><json/></unmarshal>
-  <log message="Enriching order ${body[order_id]}"/>
-  <enrich aggregationStrategyRef="#customerEnrichmentStrategy">
-    <simple>sql:SELECT name, email FROM orders.customers WHERE customer_id = :#${body[customer_id]}?dataSource=#orderDataSource</simple>
-  </enrich>
-  <enrich aggregationStrategyRef="#deliveryEnrichmentStrategy">
-    <constant>http://shipping-calc.example.com/estimate?httpMethod=POST&amp;connectTimeout=5000</constant>
-  </enrich>
-  <log message="Enriched order for ${body[customer_name]}"/>
-  <to uri="direct:send-order-confirmation"/>
-</route>
 ```
 
 ### Enrichment with Redis cache
@@ -453,8 +276,6 @@ Content filters are essential for:
 
 ### How Camel models it
 
-{% raw %}{% include codetabs.html langs="Java DSL|YAML DSL|XML DSL" %}{% endraw %}
-
 ```java
 // Strip internal fields before sending customer notification
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=notification-filter")
@@ -499,66 +320,6 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=analytics-pii-filte
     })
     .marshal().json()
     .to("kafka:eip.analytics.orders?brokers=localhost:9092");
-```
-
-```yaml
-# Content filter for customer notification
-- route:
-    id: content-filter
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "notification-filter"
-    steps:
-      - unmarshal:
-          json: {}
-      - process:
-          ref: "#customerFieldsFilter"
-      - marshal:
-          json: {}
-      - to:
-          uri: "direct:send-customer-notification"
-
-# PII filter for analytics
-- route:
-    id: content-filter-pii
-    from:
-      uri: "kafka:eip.orders.placed"
-      parameters:
-        brokers: "localhost:9092"
-        groupId: "analytics-pii-filter"
-    steps:
-      - unmarshal:
-          json: {}
-      - process:
-          ref: "#piiFilter"
-      - marshal:
-          json: {}
-      - to:
-          uri: "kafka:eip.analytics.orders"
-          parameters:
-            brokers: "localhost:9092"
-```
-
-```xml
-<!-- Content filter for customer notification -->
-<route id="content-filter">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=notification-filter"/>
-  <unmarshal><json/></unmarshal>
-  <process ref="#customerFieldsFilter"/>
-  <marshal><json/></marshal>
-  <to uri="direct:send-customer-notification"/>
-</route>
-
-<!-- PII filter for analytics -->
-<route id="content-filter-pii">
-  <from uri="kafka:eip.orders.placed?brokers=localhost:9092&amp;groupId=analytics-pii-filter"/>
-  <unmarshal><json/></unmarshal>
-  <process ref="#piiFilter"/>
-  <marshal><json/></marshal>
-  <to uri="kafka:eip.analytics.orders?brokers=localhost:9092"/>
-</route>
 ```
 
 ### Allowlist vs. blocklist
