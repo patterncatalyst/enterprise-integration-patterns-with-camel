@@ -8,6 +8,8 @@ duration: "30 minutes"
 
 So far, we've treated messages as generic packets of data. But messages carry intent — they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types — command, document, and event — fundamentally shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
 
+{% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1 — The three message types and their channel/consumer affinities." %}
+
 This chapter and the next cover Message Construction: what goes *inside* a message and what metadata accompanies it. We start here with the three message types, then move to metadata patterns — request-reply, correlation, sequencing, and expiration — in the next chapter.
 
 ## Pattern: Command Message

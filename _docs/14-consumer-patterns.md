@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 So far, we've treated the connection between a Camel route and a messaging system as a simple `from()` statement. But the *way* a consumer connects to a channel — polling vs. event-driven, single vs. competing, direct delivery vs. dispatched — fundamentally affects throughput, latency, resource usage, and scalability. These are the Messaging Endpoint patterns, and they sit at the boundary between the messaging system and your application code.
 
+{% include excalidraw.html file="14-consumer-patterns" alt="Competing Consumers and Event-Driven Consumer" caption="Figure 14.1 — Competing Consumers scale horizontally; Event-Driven Consumers react to message arrival." %}
+
 This chapter covers four consumer-side patterns. The next two chapters cover producer-side patterns, transactional messaging, and system-level endpoint management.
 
 ## Pattern: Polling Consumer

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="20" width="840" height="260" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#888">Message Types</text>
+<rect x="50" y="70" width="120" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
+<text x="110.0" y="93.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Command</text>
+<text x="110.0" y="110.0" font-size="11.5" fill="#dddddd" text-anchor="middle">ProcessPayment</text>
+<rect x="50" y="150" width="120" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="110.0" y="173.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Event</text>
+<text x="110.0" y="190.0" font-size="11.5" fill="#555555" text-anchor="middle">OrderPlaced</text>
+<rect x="50" y="230" width="120" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="110.0" y="253.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Document</text>
+<text x="110.0" y="270.0" font-size="11.5" fill="#555555" text-anchor="middle">OrderRecord</text>
+<rect x="260" y="70" width="200" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="360.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Point-to-Point Channel</text>
+<text x="360.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">exactly-once processing</text>
+<rect x="260" y="150" width="200" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="360.0" y="173.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Publish-Subscribe</text>
+<text x="360.0" y="190.0" font-size="11.5" fill="#555555" text-anchor="middle">all consumers notified</text>
+<rect x="260" y="230" width="200" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="360.0" y="253.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Any Channel</text>
+<text x="360.0" y="270.0" font-size="11.5" fill="#555555" text-anchor="middle">data transfer, no action</text>
+<rect x="560" y="70" width="140" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="630.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">payment-service</text>
+<text x="630.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">executes command</text>
+<rect x="560" y="130" width="140" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="630.0" y="153.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">inventory-service</text>
+<text x="630.0" y="170.0" font-size="11.5" fill="#555555" text-anchor="middle">reacts to event</text>
+<rect x="560" y="190" width="140" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="630.0" y="213.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">notification-svc</text>
+<text x="630.0" y="230.0" font-size="11.5" fill="#555555" text-anchor="middle">reacts to event</text>
+<rect x="560" y="230" width="140" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="630.0" y="253.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">accounting-svc</text>
+<text x="630.0" y="270.0" font-size="11.5" fill="#555555" text-anchor="middle">stores document</text>
+<path d="M170,95 L260,95" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M170,175 L260,175" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M170,255 L260,255" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M460,95 L560,95" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M460,165 L560,155" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M460,175 L560,215" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M460,255 L560,255" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+</svg>

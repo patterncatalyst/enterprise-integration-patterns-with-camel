@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 The previous chapter covered how consumers receive messages. This chapter covers the other side: how producers send messages durably, how consumers guarantee exactly-once processing, how transactions span messaging and database operations, and how messaging integrates with service-oriented application code.
 
+{% include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1 — The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." %}
+
 ## Pattern: Durable Subscriber
 
 ### The problem

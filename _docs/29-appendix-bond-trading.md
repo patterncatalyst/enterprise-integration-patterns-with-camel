@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 The Loan Broker (Appendix J) showed how Scatter-Gather solves comparison shopping. This case study tackles a different integration challenge: real-time data distribution. A bond trading platform must ingest market data from multiple feeds, normalize it into a canonical format, route it to interested subscribers, and execute trades — all with low latency and guaranteed delivery.
 
+{% include excalidraw.html file="29-bond-trading" alt="Bond Trading market data distribution" caption="Figure K.1 — Bond Trading: multiple feeds normalized, filtered per desk, traded, and audited." %}
+
 ## The bond trading problem
 
 A trading desk needs:

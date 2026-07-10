@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 Messages rarely arrive in exactly the format the receiver needs. An external partner sends XML; your services expect JSON. Kafka events carry order IDs but not customer names — you need to look up the name before sending a notification. An audit log needs the full order, but a summary report needs only the total and status. Messages need to be translated, enriched, stripped down, wrapped, and unwrapped as they flow between systems.
 
+{% include excalidraw.html file="12-transformation-flow" alt="Message transformation pipeline" caption="Figure 12.1 — A transformation pipeline: translate, enrich from external data, filter out PII, produce canonical output." %}
+
 This chapter covers four patterns that change a message's content. The next chapter covers structural transformation: how to combine multiple messages into one (Aggregator), normalize different formats into a canonical form (Normalizer), and what to do when systems can't change (Anti-Corruption Layer).
 
 ## Pattern: Message Translator

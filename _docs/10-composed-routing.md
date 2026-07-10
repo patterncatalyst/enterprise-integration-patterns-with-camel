@@ -8,6 +8,8 @@ duration: "45 minutes"
 
 The previous chapter covered the building blocks: content-based router, filter, recipient list, and splitter. Each makes a single routing decision. But real workflows involve *sequences* of decisions: this order needs to go through fraud check, *then* inventory reservation, *then* payment — but the specific sequence depends on the order type, the customer tier, and the product category. The sequence isn't hardcoded; it's determined at runtime.
 
+{% include excalidraw.html file="10-scatter-gather" alt="Scatter-Gather pattern" caption="Figure 10.1 — Scatter-Gather fans out to multiple recipients and aggregates their replies." %}
+
 This chapter covers three patterns that compose routing steps into dynamic workflows.
 
 ## Pattern: Routing Slip

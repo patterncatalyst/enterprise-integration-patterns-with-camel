@@ -8,6 +8,8 @@ duration: "35 minutes"
 
 The previous chapter covered how messages are delivered — to one consumer or to all. This chapter covers what happens when delivery *fails*. Messages can be malformed, consumers can crash mid-processing, brokers can go down, and networks can partition. The three patterns here — Invalid Message Channel, Dead Letter Channel, and Guaranteed Delivery — are the safety nets that keep a messaging system reliable in the face of real-world failures.
 
+{% include excalidraw.html file="05-reliability-patterns" alt="Dead Letter Channel and Guaranteed Delivery flow" caption="Figure 5.1 — Guaranteed Delivery with Dead Letter Channel as the fallback for exhausted retries." %}
+
 These aren't optional patterns. Any production messaging system needs all three, and most of the operational pain in message-driven architectures comes from getting them wrong.
 
 ## Pattern: Invalid Message Channel

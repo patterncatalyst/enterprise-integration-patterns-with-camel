@@ -8,6 +8,8 @@ duration: "35 minutes"
 
 The previous chapter introduced the Message Channel as one of six building blocks. But not all channels behave the same way. The most important design decision in any messaging architecture is the channel type: does a message go to *one* consumer or to *all* consumers? This chapter covers the three channel patterns that answer that question, shows how Kafka and Pulsar implement each one, and demonstrates how Camel routes connect to them.
 
+{% include excalidraw.html file="04-channel-types" alt="Point-to-Point vs Publish-Subscribe channel types" caption="Figure 4.1 — Point-to-Point delivers to one consumer; Publish-Subscribe delivers to all consumer groups." %}
+
 ## Pattern: Point-to-Point Channel
 
 ### The problem

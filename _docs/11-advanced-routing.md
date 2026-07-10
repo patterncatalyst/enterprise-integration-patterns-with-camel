@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 The previous two chapters covered the most common routing patterns. This chapter rounds out the routing catalog with five patterns that address specific challenges: routing decisions that change at runtime, observability without disrupting the flow, reordering out-of-sequence messages, processing composite messages efficiently, and distributing load across multiple processing nodes.
 
+{% include excalidraw.html file="11-wire-tap" alt="Wire Tap pattern" caption="Figure 11.1 — Wire Tap sends a copy of the message to a monitoring channel without affecting the main flow." %}
+
 ## Pattern: Dynamic Router
 
 ### The problem

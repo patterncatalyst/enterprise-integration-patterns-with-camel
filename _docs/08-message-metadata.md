@@ -8,6 +8,8 @@ duration: "45 minutes"
 
 A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations — without coupling sender and receiver.
 
+{% include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1 — Request-Reply using separate channels and a Correlation Identifier to match replies." %}
+
 This chapter covers six patterns that address these questions. Together with the three message types from the previous chapter, they complete Message Construction — everything that goes *into* a message before it hits the wire.
 
 ## Pattern: Request-Reply

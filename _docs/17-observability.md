@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
 
+{% include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1 — The Control Bus manages routes at runtime and exports metrics to observability tools." %}
+
 System Management patterns address operational concerns: monitoring, debugging, testing, and managing a running integration system. This chapter covers four observability patterns. The next chapter covers management and testing patterns.
 
 ## Pattern: Control Bus

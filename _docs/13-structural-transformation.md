@@ -8,6 +8,8 @@ duration: "40 minutes"
 
 The previous chapter transformed individual messages — translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
 
+{% include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1 — The Aggregator collects correlated messages and emits a single combined result." %}
+
 ## Pattern: Aggregator
 
 ### The problem

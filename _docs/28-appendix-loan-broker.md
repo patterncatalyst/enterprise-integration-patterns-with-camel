@@ -8,6 +8,8 @@ duration: "45 minutes"
 
 The Loan Broker is the original end-to-end EIP case study from *Enterprise Integration Patterns*. It combines nearly every major pattern: Content-Based Router, Recipient List, Scatter-Gather, Aggregator, Message Translator, and more. This appendix rebuilds the Loan Broker with Camel on Quarkus, using Kafka as the messaging backbone — and then maps its lessons back to our shipping domain.
 
+{% include excalidraw.html file="28-loan-broker" alt="Loan Broker Scatter-Gather architecture" caption="Figure J.1 — The Loan Broker: gateway, enricher, recipient list, bank services, and aggregator." %}
+
 ## The Loan Broker problem
 
 A customer wants the best loan rate. The broker must:
