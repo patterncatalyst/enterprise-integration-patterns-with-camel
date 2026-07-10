@@ -1,0 +1,41 @@
+name: Build Examples
+
+on:
+  push:
+    paths:
+      - 'examples/**'
+      - '.github/workflows/examples.yml'
+  pull_request:
+    paths:
+      - 'examples/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        example:
+          - 05-reliability
+          - 09-routing-fundamentals
+          - 10-composed-routing
+          - 12-transformation
+          - 13-aggregator
+          - 15-endpoints
+          - 17-observability
+          - loan-broker
+      fail-fast: false
+
+    name: Build ${{ matrix.example }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build ${{ matrix.example }}
+        run: mvn -B package -DskipTests
+        working-directory: examples/${{ matrix.example }}

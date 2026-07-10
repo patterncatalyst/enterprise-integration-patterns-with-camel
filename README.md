@@ -6,22 +6,11 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 
 ## What's inside
 
-- **Tutorial site** — 10 parts covering all 65 EIP patterns, from integration styles through system management, with diagrams and code examples in Java DSL, YAML DSL, and XML DSL.
-- **Runnable examples** — Quarkus projects you can build and run against a local Podman stack.
+- **31 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 12 deep-dive appendices.
+- **19 Excalidraw diagrams** — visual architecture and pattern flow diagrams embedded throughout.
+- **8 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including the Loan Broker case study.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
-
-## Stack
-
-| Component | Version |
-|-----------|---------|
-| Apache Camel | 4.20.0 |
-| Camel Quarkus | 3.36.0 |
-| Camel CLI (JBang) | 4.20.0 |
-| Quarkus | 3.36.x |
-| Java | 21 (LTS) |
-| JBang | latest |
-| Podman | 5.x |
 
 ## Quick start
 
@@ -30,21 +19,33 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 gh repo clone patterncatalyst/enterprise-integration-patterns-with-camel
 cd enterprise-integration-patterns-with-camel
 
-# Install JBang + Camel CLI (if you haven't already)
-curl -Ls https://sh.jbang.dev | bash -s - app setup
-jbang app install camel@apache/camel
-
-# Run a pattern example directly — no Maven project needed
-camel run examples/patterns/content-based-router.yaml --dev
-
-# Start the local stack (for examples that need Kafka, Redis, etc.)
+# Start the local stack
 ./scripts/setup-stack.sh
+
+# Run a Camel Quarkus example
+cd examples/09-routing-fundamentals
+mvn quarkus:dev
 
 # Start with observability (Grafana, Loki, Tempo, Mimir)
 ./scripts/setup-stack.sh --lgtm
 ```
 
 See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integration-patterns-with-camel/docs/00-prerequisites/) for full environment setup.
+
+## Runnable examples
+
+| Example | Patterns | Chapter |
+|---------|----------|---------|
+| `examples/05-reliability` | Dead Letter Channel, Guaranteed Delivery | Ch 5 |
+| `examples/09-routing-fundamentals` | Content-Based Router, Filter, Splitter, Recipient List | Ch 9 |
+| `examples/10-composed-routing` | Scatter-Gather, Routing Slip | Ch 10 |
+| `examples/12-transformation` | Message Translator, Content Enricher, Content Filter | Ch 12 |
+| `examples/13-aggregator` | Aggregator, Normalizer | Ch 13 |
+| `examples/15-endpoints` | Idempotent Receiver, Service Activator | Ch 15 |
+| `examples/17-observability` | Control Bus, Wire Tap, Message History | Ch 17 |
+| `examples/loan-broker` | Scatter-Gather case study (13 patterns) | Appendix J |
+
+Each example runs with `mvn quarkus:dev` against the infrastructure stack.
 
 ## Tutorial structure
 
@@ -56,10 +57,23 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | 3 | Messaging Channels | Point-to-Point, Pub/Sub, Dead Letter, Guaranteed Delivery, and more |
 | 4 | Message Construction | Command, Document, Event messages, Request-Reply, Correlation |
 | 5 | Message Routing | Content-Based Router, Splitter, Aggregator, Scatter-Gather, and more |
-| 6 | Message Transformation | Translator, Enricher, Content Filter, Claim Check, Normalizer |
+| 6 | Message Transformation | Translator, Enricher, Content Filter, Normalizer, Canonical Model |
 | 7 | Messaging Endpoints | Gateway, Consumers, Dispatcher, Idempotent Receiver, Service Activator |
 | 8 | System Management | Control Bus, Wire Tap, Message History, Message Store |
-| 9 | Deep-Dive Appendices | Kafka, Pulsar, Redis, Drools, observability, case studies |
+| 9 | Appendices | Spring Boot vs Quarkus, Kafka, Pulsar, Redis, Drools, Observability, Case Studies, Glossary |
+
+## Stack
+
+| Component | Role |
+|-----------|------|
+| Apache Camel 4.x | Integration framework (Java DSL) |
+| Quarkus 3.x | Runtime (fast startup, Dev Services, native builds) |
+| Apache Kafka (KRaft) | Primary messaging backbone |
+| Apache Pulsar | Multi-tenant messaging, geo-replication |
+| Redis | Caching, idempotent repositories, Pub/Sub |
+| PostgreSQL | Persistent storage, outbox pattern |
+| Apicurio Registry | Avro/Protobuf schema registry |
+| Grafana + Loki + Tempo + Mimir | Observability (optional LGTM overlay) |
 
 ## License
 
