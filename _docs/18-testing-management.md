@@ -8,6 +8,8 @@ duration: "35 minutes"
 
 The previous chapter covered observability — knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
 
+{% include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1 — Test Message injection and Detour toggle" %}
+
 ## Pattern: Test Message
 
 ### The problem

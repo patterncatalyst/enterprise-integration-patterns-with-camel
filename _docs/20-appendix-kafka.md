@@ -10,19 +10,7 @@ Kafka is the backbone of the shipping domain's event-driven architecture. This a
 
 ## Architecture recap
 
-Kafka's storage model:
-
-```
-Cluster
-├── Broker 0 (KRaft controller + broker)
-├── Broker 1
-└── Broker 2
-
-Topic: eip.orders.placed (3 partitions, replication factor 2)
-├── Partition 0 → Leader: Broker 0, Follower: Broker 1
-├── Partition 1 → Leader: Broker 1, Follower: Broker 2
-└── Partition 2 → Leader: Broker 2, Follower: Broker 0
-```
+{% include excalidraw.html file="20-kafka-architecture" alt="Kafka cluster architecture" caption="Figure K.1 — Kafka cluster with KRaft, partitions, and consumer groups" %}
 
 In our Podman stack, we run a single KRaft broker (no ZooKeeper). In production, you'd run 3+ brokers for fault tolerance.
 

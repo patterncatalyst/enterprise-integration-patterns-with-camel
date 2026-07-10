@@ -101,6 +101,8 @@ Notice how Kafka metadata (key, partition, offset, topic, timestamp) arrives as 
 
 ## Pattern 3: Pipes and Filters
 
+{% include excalidraw.html file="03-pipes-and-filters" alt="Pipes and Filters pattern" caption="Figure 3.1 — Pipes and Filters: each filter transforms the message" %}
+
 ### What it is
 
 **Pipes and Filters** is the architectural style that decomposes a message processing task into a sequence of independent, composable steps. Each step is a **filter** — a self-contained processing unit that receives a message, does one thing to it, and passes it along. The **pipes** are the channels that connect filters together.

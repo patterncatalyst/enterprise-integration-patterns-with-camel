@@ -27,7 +27,7 @@ assets/         — CSS, diagrams (SVG + Excalidraw source)
 examples/       — runnable Camel Quarkus projects
   _infra/       — Podman compose stack (Kafka, Pulsar, Redis, PostgreSQL)
   domain-model/ — shared canonical entities
-  05-reliability/ through loan-broker/ — per-chapter examples
+  05-reliability/ through bond-trading/ — per-chapter and case-study examples
 scripts/        — setup-stack.sh, generate_diagram.py
 ```
 

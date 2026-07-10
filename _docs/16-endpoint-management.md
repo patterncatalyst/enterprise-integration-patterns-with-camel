@@ -8,6 +8,8 @@ duration: "35 minutes"
 
 The previous two chapters covered how consumers receive and producers send messages. This chapter completes the Messaging Endpoints catalog with four patterns that manage the boundary layer itself: abstracting messaging behind a gateway, selectively consuming from shared channels, purging stale messages, and mapping between domain objects and messages.
 
+{% include excalidraw.html file="16-messaging-gateway" alt="Messaging Gateway pattern" caption="Figure 16.1 — Messaging Gateway hides the messaging system from application code" %}
+
 ## Pattern: Messaging Gateway
 
 ### The problem

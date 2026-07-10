@@ -14,12 +14,7 @@ The Detour pattern (Chapter 18) used configuration properties to toggle processi
 
 ### Architecture
 
-```
-┌─────────────────┐     gRPC     ┌──────────┐     watch     ┌────────────┐
-│  Camel Route    │  ─────────▶  │  flagd   │  ◀──────────  │ flags.json │
-│  (evaluates)    │              │ :8013    │               │ (ConfigMap)│
-└─────────────────┘              └──────────┘               └────────────┘
-```
+{% include excalidraw.html file="26-feature-flags" alt="flagd architecture" caption="Figure Q.1 — flagd evaluation with OpenFeature SDK" %}
 
 ### Flag definitions
 

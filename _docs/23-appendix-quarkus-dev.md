@@ -101,22 +101,7 @@ public class OrderRouteTest {
 
 ## The promotion workflow
 
-```
-┌─────────────────┐     camel export      ┌──────────────────┐
-│  JBang / YAML   │  ──────────────────▶  │  Quarkus Project │
-│  camel run --dev│                       │  mvn quarkus:dev  │
-│  Fast prototype │                       │  Full IDE support │
-└─────────────────┘                       └──────────────────┘
-                                                   │
-                                          mvn package -Dnative
-                                                   │
-                                                   ▼
-                                          ┌──────────────────┐
-                                          │  Native Binary   │
-                                          │  ~20ms startup   │
-                                          │  ~50MB RSS       │
-                                          └──────────────────┘
-```
+{% include excalidraw.html file="23-promotion-workflow" alt="JBang to Quarkus promotion workflow" caption="Figure N.1 — From JBang prototype to native Quarkus binary" %}
 
 ```bash
 # Step 1: Prototype

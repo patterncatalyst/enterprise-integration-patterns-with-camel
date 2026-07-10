@@ -12,14 +12,7 @@ Apache Pulsar appears in this tutorial wherever its features provide a better fi
 
 Pulsar separates serving (brokers) from storage (BookKeeper):
 
-```
-Pulsar Cluster
-├── Broker 0 (stateless — serves topics, no local storage)
-├── Broker 1
-├── BookKeeper Bookie 0 (persistent storage)
-├── BookKeeper Bookie 1
-└── BookKeeper Bookie 2
-```
+{% include excalidraw.html file="21-pulsar-architecture" alt="Pulsar cluster architecture" caption="Figure L.1 — Pulsar cluster with stateless brokers and BookKeeper storage" %}
 
 Our Podman stack runs Pulsar in **standalone mode** — a single process that embeds a broker, bookie, and ZooKeeper. This is fine for development but not for production.
 

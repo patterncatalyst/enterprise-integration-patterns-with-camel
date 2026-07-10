@@ -7,8 +7,8 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 ## What's inside
 
 - **31 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 12 deep-dive appendices.
-- **19 Excalidraw diagrams** — visual architecture and pattern flow diagrams embedded throughout.
-- **8 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including the Loan Broker case study.
+- **26 Excalidraw diagrams** — visual architecture and pattern flow diagrams embedded throughout.
+- **9 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
 
@@ -44,6 +44,7 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | `examples/15-endpoints` | Idempotent Receiver, Service Activator | Ch 15 |
 | `examples/17-observability` | Control Bus, Wire Tap, Message History | Ch 17 |
 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) | Appendix J |
+| `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |
 
 Each example runs with `mvn quarkus:dev` against the infrastructure stack.
 

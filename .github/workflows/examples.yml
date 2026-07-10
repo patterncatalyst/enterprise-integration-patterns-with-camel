@@ -23,6 +23,7 @@ jobs:
           - 15-endpoints
           - 17-observability
           - loan-broker
+          - bond-trading
       fail-fast: false
 
     name: Build ${{ matrix.example }}

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="20" width="840" height="220" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#888">Feature Flags — flagd + OpenFeature</text>
+<rect x="50" y="80" width="150" height="60" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="125.0" y="100.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Camel Route</text>
+<text x="125.0" y="117.5" font-size="11.5" fill="#555555" text-anchor="middle">evaluates flag</text>
+<text x="125.0" y="132.5" font-size="11.5" fill="#555555" text-anchor="middle">via OpenFeature</text>
+<rect x="300" y="80" width="130" height="60" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
+<text x="365.0" y="100.5" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">flagd</text>
+<text x="365.0" y="117.5" font-size="11.5" fill="#dddddd" text-anchor="middle">evaluation</text>
+<text x="365.0" y="132.5" font-size="11.5" fill="#dddddd" text-anchor="middle">daemon :8013</text>
+<rect x="520" y="80" width="140" height="60" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="590.0" y="100.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">flags.json</text>
+<text x="590.0" y="117.5" font-size="11.5" fill="#555555" text-anchor="middle">flag definitions</text>
+<text x="590.0" y="132.5" font-size="11.5" fill="#555555" text-anchor="middle">ConfigMap</text>
+<rect x="730" y="60" width="120" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="790.0" y="78.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Flag: ON</text>
+<text x="790.0" y="95.0" font-size="11.5" fill="#555555" text-anchor="middle">route to enricher</text>
+<rect x="730" y="120" width="120" height="40" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="790.0" y="138.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Flag: OFF</text>
+<text x="790.0" y="155.0" font-size="11.5" fill="#555555" text-anchor="middle">skip enrichment</text>
+<path d="M200,110 L300,110" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="256.0" y="104.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">gRPC</text>
+<text x="256.0" y="104.0" font-size="11" fill="#b8650a" text-anchor="middle">gRPC</text>
+<path d="M430,110 L520,110" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="481.0" y="104.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">watch</text>
+<text x="481.0" y="104.0" font-size="11" fill="#555" text-anchor="middle">watch</text>
+<path d="M200,90 L730,80" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M200,130 L730,140" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="440" y="180" font-size="11" fill="#888" text-anchor="middle">Dynamic flag evaluation — no redeployment needed</text>
+</svg>
