@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Message Sequence -->
+  <rect x="35" y="35" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="35,35 50,47 65,35" fill="none" stroke="#151515"/>
+  <rect x="45" y="45" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="45,45 60,57 75,45" fill="none" stroke="#151515"/>
+  <rect x="55" y="55" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="55,55 70,67 85,55" fill="none" stroke="#151515"/>
+  <text x="50" y="49" text-anchor="middle" font-size="8" font-family="monospace" fill="#EE0000" stroke="none">1</text>
+  <text x="60" y="59" text-anchor="middle" font-size="8" font-family="monospace" fill="#EE0000" stroke="none">2</text>
+  <text x="70" y="69" text-anchor="middle" font-size="8" font-family="monospace" fill="#EE0000" stroke="none">3</text>
+</svg>

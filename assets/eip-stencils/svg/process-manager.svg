@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Process Manager -->
+  <rect x="30" y="35" width="60" height="40" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <circle cx="42" cy="55" r="5" fill="#EE0000" stroke="none"/>
+  <line x1="47" y1="55" x2="55" y2="55" stroke="#151515"/>
+  <rect x="55" y="49" width="12" height="12" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <line x1="67" y1="55" x2="72" y2="55" stroke="#151515"/>
+  <circle cx="76" cy="55" r="4" fill="none" stroke="#151515" stroke-width="2.5"/>
+</svg>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Messaging Bridge -->
+  <ellipse cx="10" cy="57" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="10" y1="48" x2="45" y2="48" stroke="#151515"/>
+  <line x1="10" y1="66" x2="45" y2="66" stroke="#151515"/>
+  <ellipse cx="45" cy="57" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <ellipse cx="75" cy="57" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="75" y1="48" x2="110" y2="48" stroke="#151515"/>
+  <line x1="75" y1="66" x2="110" y2="66" stroke="#151515"/>
+  <ellipse cx="110" cy="57" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="51" y1="57" x2="69" y2="57" stroke="#EE0000" stroke-width="2"/>
+  <line x1="51" y1="53" x2="51" y2="61" stroke="#EE0000"/>
+  <line x1="69" y1="53" x2="69" y2="61" stroke="#EE0000"/>
+</svg>

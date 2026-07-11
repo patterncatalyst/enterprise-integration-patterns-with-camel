@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Selective Consumer -->
+  <rect x="40" y="35" width="40" height="30" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <polygon points="48,40 72,40 65,52 55,52" fill="none" stroke="#EE0000" stroke-width="1.5"/>
+  <line x1="60" y1="80" x2="60" y2="65" stroke="#151515"/>
+  <polyline points="56,70 60,65 64,70" fill="none" stroke="#151515"/>
+</svg>

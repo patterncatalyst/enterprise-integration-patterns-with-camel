@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Canonical Data Model -->
+  <rect x="35" y="25" width="50" height="65" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <rect x="35" y="25" width="50" height="12" fill="#EE0000" stroke="#151515" rx="2"/>
+  <rect x="35" y="35" width="50" height="2" fill="#151515" stroke="none"/>
+  <line x1="42" y1="48" x2="78" y2="48" stroke="#151515" stroke-width="1"/>
+  <line x1="42" y1="56" x2="78" y2="56" stroke="#151515" stroke-width="1"/>
+  <line x1="42" y1="64" x2="78" y2="64" stroke="#151515" stroke-width="1"/>
+  <line x1="42" y1="72" x2="78" y2="72" stroke="#151515" stroke-width="1"/>
+</svg>

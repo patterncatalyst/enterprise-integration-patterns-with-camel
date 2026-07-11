@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Aggregator -->
+  <circle cx="75" cy="60" r="12" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="10" y1="30" x2="63" y2="52" stroke="#151515"/>
+  <polyline points="57.4,52.4 63,52 59.3,47.8" stroke="#151515" fill="none"/>
+  <line x1="10" y1="60" x2="63" y2="60" stroke="#151515"/>
+  <polyline points="58.0,62.5 63,60 58.0,57.5" stroke="#151515" fill="none"/>
+  <line x1="10" y1="90" x2="63" y2="68" stroke="#151515"/>
+  <polyline points="59.3,72.2 63,68 57.4,67.6" stroke="#151515" fill="none"/>
+  <line x1="87" y1="60" x2="112" y2="60" stroke="#151515"/>
+  <polyline points="107.0,62.5 112,60 107.0,57.5" stroke="#151515" fill="none"/>
+  <text x="75" y="65" text-anchor="middle" font-size="14" font-family="sans-serif" fill="#EE0000" stroke="none">&#x03A3;</text>
+</svg>

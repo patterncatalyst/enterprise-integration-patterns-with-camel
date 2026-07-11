@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Saga -->
+  <rect x="15" y="40" width="20" height="16" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <text x="25" y="51" text-anchor="middle" font-size="7" font-family="monospace" fill="#EE0000" stroke="none">S1</text>
+  <rect x="15" y="68" width="20" height="12" fill="#FFF8F0" stroke="#EE0000" rx="1" stroke-dasharray="3,2"/>
+  <line x1="25" y1="56" x2="25" y2="68" stroke="#151515" stroke-dasharray="2,2"/>
+  <rect x="45" y="40" width="20" height="16" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <text x="55" y="51" text-anchor="middle" font-size="7" font-family="monospace" fill="#EE0000" stroke="none">S2</text>
+  <rect x="45" y="68" width="20" height="12" fill="#FFF8F0" stroke="#EE0000" rx="1" stroke-dasharray="3,2"/>
+  <line x1="55" y1="56" x2="55" y2="68" stroke="#151515" stroke-dasharray="2,2"/>
+  <rect x="75" y="40" width="20" height="16" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <text x="85" y="51" text-anchor="middle" font-size="7" font-family="monospace" fill="#EE0000" stroke="none">S3</text>
+  <rect x="75" y="68" width="20" height="12" fill="#FFF8F0" stroke="#EE0000" rx="1" stroke-dasharray="3,2"/>
+  <line x1="85" y1="56" x2="85" y2="68" stroke="#151515" stroke-dasharray="2,2"/>
+  <line x1="35" y1="48" x2="45" y2="48" stroke="#151515"/>
+  <line x1="65" y1="48" x2="75" y2="48" stroke="#151515"/>
+</svg>

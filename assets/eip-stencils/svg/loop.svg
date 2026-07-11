@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Loop -->
+  <rect x="38" y="38" width="44" height="34" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <path d="M 50,50 A 12,12 0 1,1 55,62" fill="none" stroke="#EE0000" stroke-width="2"/>
+  <polyline points="52,58 55,62 59,58" fill="none" stroke="#EE0000" stroke-width="1.5"/>
+</svg>

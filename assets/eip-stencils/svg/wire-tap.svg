@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Wire Tap -->
+  <ellipse cx="15" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="15" y1="45" x2="100" y2="45" stroke="#151515"/>
+  <line x1="15" y1="63" x2="100" y2="63" stroke="#151515"/>
+  <ellipse cx="100" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="60" y1="63" x2="60" y2="95" stroke="#151515"/>
+  <polyline points="56,90 60,95 64,90" fill="none" stroke="#151515"/>
+  <rect x="52" y="95" width="16" height="10" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="52,95 60,102 68,95" fill="none" stroke="#151515"/>
+</svg>

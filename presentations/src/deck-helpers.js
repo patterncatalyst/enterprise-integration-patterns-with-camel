@@ -373,10 +373,248 @@ function addNotes(slide, text) {
   slide.addNotes(text);
 }
 
+// Pattern card: EIP icon on the left, problem/solution text on the right.
+// `icon` is a PNG filename (without .png) looked up in `PNG/eip-icons/`.
+// `problem` and `solution` are short strings (1–3 sentences each).
+function addPatternCard(slide, eyebrow, title, icon, problem, solution, opts = {}) {
+  addContentTitle(slide, eyebrow, title);
+  const iconX = opts.iconX ?? 0.82;
+  const iconY = opts.iconY ?? 2.10;
+  const iconSize = opts.iconSize ?? 2.80;
+  try {
+    slide.addImage({
+      path: `${PNG}/eip-icons/${icon}.png`,
+      x: iconX, y: iconY, w: iconSize, h: iconSize,
+      sizing: { type: "contain", w: iconSize, h: iconSize },
+    });
+  } catch (e) { /* ok if icon missing */ }
+  // light panel behind icon
+  slide.addShape("rect", {
+    x: iconX - 0.15, y: iconY - 0.10, w: iconSize + 0.30, h: iconSize + 0.20,
+    fill: { color: COLOR.panel }, line: { color: COLOR.grid, width: 0.5 },
+    rectRadius: 0.08,
+  });
+  // re-add icon on top of panel
+  try {
+    slide.addImage({
+      path: `${PNG}/eip-icons/${icon}.png`,
+      x: iconX, y: iconY, w: iconSize, h: iconSize,
+      sizing: { type: "contain", w: iconSize, h: iconSize },
+    });
+  } catch (e) { /* ok */ }
+  const textX = iconX + iconSize + 0.60;
+  const textW = 12.09 - textX + 0.62;
+  // "The problem" label + text
+  slide.addText("THE PROBLEM", {
+    x: textX, y: 2.10, w: textW, h: 0.30,
+    fontFace: FONT.title, fontSize: 11, bold: true, color: COLOR.red,
+    charSpacing: 3, align: "left", valign: "middle",
+  });
+  slide.addText(problem, {
+    x: textX, y: 2.45, w: textW, h: 1.30,
+    fontFace: FONT.body, fontSize: 15, color: COLOR.body,
+    align: "left", valign: "top", lineSpacingMultiple: 1.25,
+  });
+  // "The solution" label + text
+  slide.addText("THE SOLUTION", {
+    x: textX, y: 3.90, w: textW, h: 0.30,
+    fontFace: FONT.title, fontSize: 11, bold: true, color: COLOR.platform,
+    charSpacing: 3, align: "left", valign: "middle",
+  });
+  slide.addText(solution, {
+    x: textX, y: 4.25, w: textW, h: 1.80,
+    fontFace: FONT.body, fontSize: 15, color: COLOR.body,
+    align: "left", valign: "top", lineSpacingMultiple: 1.25,
+  });
+}
+
+// Side-by-side comparison (e.g., P2P vs Pub/Sub, Kafka vs Pulsar).
+// `left` and `right` are {header, color, items[]} objects.
+function addComparisonSlide(slide, eyebrow, title, left, right, opts = {}) {
+  addContentTitle(slide, eyebrow, title);
+  const y = opts.y ?? 1.95;
+  const colW = opts.colW ?? 5.85;
+  const gap = opts.gap ?? 0.40;
+  const h = opts.h ?? 4.60;
+  const leftX = 0.62;
+  const rightX = leftX + colW + gap;
+
+  [{ col: left, x: leftX }, { col: right, x: rightX }].forEach(({ col, x }) => {
+    // accent bar
+    slide.addShape("rect", {
+      x, y, w: colW, h: 0.06,
+      fill: { color: col.color || COLOR.red },
+    });
+    // header
+    slide.addText(col.header, {
+      x, y: y + 0.15, w: colW, h: 0.45,
+      fontFace: FONT.title, fontSize: 20, bold: true, color: COLOR.ink,
+      align: "left", valign: "middle",
+    });
+    // items
+    const items = col.items.map((ln) => {
+      if (typeof ln === "string") {
+        return { text: ln, options: { bullet: { code: "25CF" }, paraSpaceAfter: 6, breakLine: true } };
+      }
+      return { text: ln.text, options: { bullet: { code: "25CF" }, paraSpaceAfter: 6, breakLine: true, ...(ln.options || {}) } };
+    });
+    slide.addText(items, {
+      x, y: y + 0.65, w: colW, h: h - 0.65,
+      fontFace: FONT.body, fontSize: 15, color: COLOR.body,
+      align: "left", valign: "top", lineSpacingMultiple: 1.20,
+    });
+  });
+}
+
+// Icon grid: cards in a 2- or 3-column layout.
+// `items` is an array of {icon, label, desc} objects.
+function addIconGrid(slide, eyebrow, title, items, opts = {}) {
+  addContentTitle(slide, eyebrow, title);
+  const cols = opts.cols ?? (items.length <= 4 ? 2 : 3);
+  const startY = opts.y ?? 2.00;
+  const startX = 0.62;
+  const totalW = 12.09;
+  const gap = 0.30;
+  const cellW = (totalW - gap * (cols - 1)) / cols;
+  const cellH = opts.cellH ?? 2.10;
+  const iconSize = opts.iconSize ?? 0.60;
+
+  items.forEach((item, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const x = startX + col * (cellW + gap);
+    const y = startY + row * (cellH + 0.15);
+    // card background
+    slide.addShape("rect", {
+      x, y, w: cellW, h: cellH,
+      fill: { color: COLOR.panel },
+      line: { color: COLOR.grid, width: 0.5 },
+      rectRadius: 0.06,
+    });
+    // icon
+    if (item.icon) {
+      try {
+        slide.addImage({
+          path: `${PNG}/eip-icons/${item.icon}.png`,
+          x: x + 0.20, y: y + 0.20, w: iconSize, h: iconSize,
+          sizing: { type: "contain", w: iconSize, h: iconSize },
+        });
+      } catch (e) { /* ok */ }
+    }
+    // label
+    slide.addText(item.label, {
+      x: item.icon ? x + 0.20 + iconSize + 0.15 : x + 0.20,
+      y: y + 0.18,
+      w: cellW - 0.50 - (item.icon ? iconSize + 0.15 : 0),
+      h: 0.38,
+      fontFace: FONT.title, fontSize: 14, bold: true, color: COLOR.ink,
+      align: "left", valign: "middle",
+    });
+    // description
+    slide.addText(item.desc, {
+      x: x + 0.20, y: y + 0.70, w: cellW - 0.40, h: cellH - 0.90,
+      fontFace: FONT.body, fontSize: 12, color: COLOR.body,
+      align: "left", valign: "top", lineSpacingMultiple: 1.20,
+    });
+  });
+}
+
+// Horizontal process flow: arrow-connected step boxes.
+// `steps` is an array of {label, desc?} objects.
+function addFlowSlide(slide, eyebrow, title, steps, opts = {}) {
+  addContentTitle(slide, eyebrow, title);
+  const y = opts.y ?? 2.80;
+  const boxH = opts.boxH ?? 2.00;
+  const totalW = 12.09;
+  const startX = 0.62;
+  const arrowW = 0.50;
+  const n = steps.length;
+  const boxW = (totalW - arrowW * (n - 1)) / n;
+
+  steps.forEach((step, i) => {
+    const x = startX + i * (boxW + arrowW);
+    // step number circle
+    slide.addShape("ellipse", {
+      x: x + boxW / 2 - 0.18, y: y - 0.10, w: 0.36, h: 0.36,
+      fill: { color: COLOR.red }, line: { color: COLOR.red, width: 0 },
+    });
+    slide.addText(String(i + 1), {
+      x: x + boxW / 2 - 0.18, y: y - 0.10, w: 0.36, h: 0.36,
+      fontFace: FONT.title, fontSize: 14, bold: true, color: COLOR.white,
+      align: "center", valign: "middle",
+    });
+    // box
+    slide.addShape("rect", {
+      x, y: y + 0.40, w: boxW, h: boxH,
+      fill: { color: COLOR.panel },
+      line: { color: COLOR.grid, width: 0.5 },
+      rectRadius: 0.06,
+    });
+    // label
+    slide.addText(step.label, {
+      x: x + 0.12, y: y + 0.50, w: boxW - 0.24, h: 0.50,
+      fontFace: FONT.title, fontSize: 13, bold: true, color: COLOR.ink,
+      align: "center", valign: "middle",
+    });
+    // description
+    if (step.desc) {
+      slide.addText(step.desc, {
+        x: x + 0.12, y: y + 1.05, w: boxW - 0.24, h: boxH - 0.75,
+        fontFace: FONT.body, fontSize: 11, color: COLOR.body,
+        align: "center", valign: "top", lineSpacingMultiple: 1.15,
+      });
+    }
+    // arrow between boxes
+    if (i < n - 1) {
+      const arrowX = x + boxW + 0.05;
+      const arrowY = y + 0.40 + boxH / 2;
+      slide.addShape("line", {
+        x: arrowX, y: arrowY, w: arrowW - 0.10, h: 0,
+        line: { color: COLOR.red, width: 2, endArrowType: "triangle" },
+      });
+    }
+  });
+}
+
+// Key-value pairs in alternating-row layout.
+// `pairs` is an array of {key, value} objects.
+function addKeyValueSlide(slide, eyebrow, title, pairs, opts = {}) {
+  addContentTitle(slide, eyebrow, title);
+  const startY = opts.y ?? 1.95;
+  const x = 0.62;
+  const totalW = 12.09;
+  const rowH = opts.rowH ?? 0.60;
+  const keyW = opts.keyW ?? 3.80;
+
+  pairs.forEach((pair, i) => {
+    const y = startY + i * rowH;
+    // alternating background
+    if (i % 2 === 0) {
+      slide.addShape("rect", {
+        x, y, w: totalW, h: rowH,
+        fill: { color: COLOR.panel },
+      });
+    }
+    // key
+    slide.addText(pair.key, {
+      x: x + 0.20, y, w: keyW, h: rowH,
+      fontFace: FONT.title, fontSize: 15, bold: true, color: COLOR.ink,
+      align: "left", valign: "middle",
+    });
+    // value
+    slide.addText(pair.value, {
+      x: x + keyW + 0.40, y, w: totalW - keyW - 0.60, h: rowH,
+      fontFace: FONT.body, fontSize: 14, color: COLOR.body,
+      align: "left", valign: "middle",
+    });
+  });
+}
+
 module.exports = {
   PptxGenJS, COLOR, FONT, W, H, PNG, ASSETS,
   newDeck,
   addFooter, addContentTitle, addBullets, addTwoColBullets, addStatusTable,
   addCaption, addPerfCallout,
   addDiagramSlide, addCodeSlide, addLangChip, addSectionDivider, addNotes,
+  addPatternCard, addComparisonSlide, addIconGrid, addFlowSlide, addKeyValueSlide,
 };

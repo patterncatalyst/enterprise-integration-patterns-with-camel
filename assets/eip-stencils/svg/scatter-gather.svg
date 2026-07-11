@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Scatter-Gather -->
+  <polygon points="35,44 51,60 35,76 19,60" fill="#FFF8F0" stroke="#151515"/>
+  <polygon points="85,44 101,60 85,76 69,60" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="51" y1="52" x2="69" y2="44" stroke="#151515"/>
+  <line x1="51" y1="60" x2="69" y2="60" stroke="#151515"/>
+  <line x1="51" y1="68" x2="69" y2="76" stroke="#151515"/>
+  <line x1="3" y1="60" x2="19" y2="60" stroke="#151515"/>
+  <polyline points="14.0,62.5 19,60 14.0,57.5" stroke="#151515" fill="none"/>
+  <line x1="101" y1="60" x2="117" y2="60" stroke="#151515"/>
+  <polyline points="112.0,62.5 117,60 112.0,57.5" stroke="#151515" fill="none"/>
+</svg>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Return Address -->
+  <rect x="40" y="41" width="40" height="28" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="40,41 60,57 80,41" fill="none" stroke="#151515"/>
+  <polyline points="50,48 42,48 42,55 50,55" fill="none" stroke="#EE0000" stroke-width="1.5"/>
+  <polyline points="47,52 50,55 47,58" fill="none" stroke="#EE0000" stroke-width="1.5"/>
+</svg>

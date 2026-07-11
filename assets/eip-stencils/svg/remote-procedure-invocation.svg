@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Remote Procedure Invocation -->
+  <rect x="15" y="43" width="30" height="25" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <rect x="75" y="43" width="30" height="25" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <line x1="45" y1="50" x2="75" y2="50" stroke="#151515"/>
+  <polyline points="70.0,52.5 75,50 70.0,47.5" stroke="#151515" fill="none"/>
+  <line x1="75" y1="60" x2="45" y2="60" stroke="#151515" stroke-dasharray="4,2"/>
+  <polyline points="50,57 45,60 50,63" fill="none" stroke="#151515"/>
+</svg>

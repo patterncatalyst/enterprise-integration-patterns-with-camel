@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Detour -->
+  <line x1="15" y1="60" x2="40" y2="60" stroke="#151515"/>
+  <path d="M 40,60 Q 40,30 60,30 Q 80,30 80,60" fill="none" stroke="#EE0000" stroke-dasharray="4,2"/>
+  <circle cx="40" cy="60" r="4" fill="#FFF8F0" stroke="#151515"/>
+  <circle cx="80" cy="60" r="4" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="84" y1="60" x2="105" y2="60" stroke="#151515"/>
+  <rect x="48" y="22" width="24" height="16" fill="#FFF8F0" stroke="#151515" rx="3"/>
+</svg>

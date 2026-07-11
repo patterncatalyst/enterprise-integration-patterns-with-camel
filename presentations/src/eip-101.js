@@ -10,6 +10,7 @@ const {
   addFooter, addContentTitle, addBullets, addTwoColBullets, addStatusTable,
   addCaption, addPerfCallout,
   addDiagramSlide, addCodeSlide, addLangChip, addSectionDivider, addNotes,
+  addPatternCard, addComparisonSlide, addIconGrid, addFlowSlide, addKeyValueSlide,
 } = require("./deck-helpers");
 
 // ── counters & shortcuts ────────────────────────────────────────────
@@ -183,13 +184,12 @@ divider(pres, "01", "Why Integration\nPatterns?",
 // Slide 6: The EIP book
 {
   const s = S(pres);
-  addContentTitle(s, "THE BOOK", "Enterprise Integration Patterns (2003)");
-  addBullets(s, bsub([
-    { text: "Gregor Hohpe & Bobby Woolf", sub: "Cataloged 65 messaging patterns drawn from decades of real-world enterprise integration." },
-    { text: "Built on the Gang of Four tradition", sub: "Each pattern has a name, icon, problem statement, solution, consequences, and known uses." },
-    { text: "Technology-neutral descriptions", sub: "The patterns apply to JMS, AMQP, Kafka, Pulsar, gRPC streaming, or any messaging system." },
-    { text: "Still the definitive reference 20+ years later", sub: "Frameworks like Apache Camel, Spring Integration, and MuleSoft implement these patterns by name." },
-  ]));
+  addKeyValueSlide(s, "THE BOOK", "Enterprise Integration Patterns (2003)", [
+    { key: "Authors", value: "Gregor Hohpe & Bobby Woolf — 65 messaging patterns from decades of real-world enterprise integration." },
+    { key: "Structure", value: "Gang of Four tradition — each pattern has a name, icon, problem, solution, consequences, and known uses." },
+    { key: "Tech-neutral", value: "Patterns apply to JMS, AMQP, Kafka, Pulsar, gRPC streaming, or any messaging system." },
+    { key: "Still definitive", value: "Apache Camel, Spring Integration, and MuleSoft implement these patterns by name — 20+ years later." },
+  ]);
   addNotes(s,
     "In 2003, Gregor Hohpe and Bobby Woolf published 'Enterprise Integration Patterns,' which did " +
     "for messaging what the Gang of Four did for object-oriented design. They studied real integration " +
@@ -206,13 +206,12 @@ divider(pres, "01", "Why Integration\nPatterns?",
 // Slide 7: Pattern language
 {
   const s = S(pres);
-  addContentTitle(s, "PATTERN LANGUAGE", "A Shared Vocabulary for Integration");
-  addBullets(s, bsub([
-    { text: "Names create precision", sub: "Saying 'Content-Based Router' is unambiguous; saying 'that if-else thing that routes messages' is not." },
-    { text: "Icons create visual consistency", sub: "Each pattern has a distinctive icon used in architecture diagrams worldwide." },
-    { text: "Patterns compose", sub: "A Scatter-Gather is a Recipient List + Aggregator. Composition reduces complex designs to familiar building blocks." },
-    { text: "Patterns reveal trade-offs", sub: "Every pattern documents forces — performance, coupling, reliability — so you choose with eyes open." },
-  ]));
+  addKeyValueSlide(s, "PATTERN LANGUAGE", "A Shared Vocabulary for Integration", [
+    { key: "Names → precision", value: "'Content-Based Router' is unambiguous; 'that if-else thing' is not." },
+    { key: "Icons → visual clarity", value: "Each pattern has a distinctive icon used in architecture diagrams worldwide." },
+    { key: "Composition", value: "Scatter-Gather = Recipient List + Aggregator. Complex designs decompose into familiar blocks." },
+    { key: "Trade-offs", value: "Every pattern documents forces — performance, coupling, reliability — so you choose with eyes open." },
+  ]);
   addNotes(s,
     "A pattern language does something no API documentation can do: it gives your entire team " +
     "a shared vocabulary. When an architect says 'we need a Recipient List here,' every developer " +
@@ -280,14 +279,10 @@ divider(pres, "01", "Why Integration\nPatterns?",
 // Slide 10: File Transfer
 {
   const s = S(pres);
-  addContentTitle(s, "INTEGRATION STYLE 1", "File Transfer");
-  addBullets(s, bsub([
-    { text: "Applications share data through files", sub: "One application writes a file (CSV, XML, JSON) to a shared location; another reads it." },
-    { text: "Simple and widely supported", sub: "Every language and platform can read and write files. No middleware required." },
-    { text: "Latency is inherently high", sub: "Polling intervals mean minutes or hours between production and consumption." },
-    { text: "No built-in error handling", sub: "If the consumer crashes mid-read, partial processing can corrupt state." },
-    { text: "Still common in batch-oriented domains", sub: "Financial reconciliation, regulatory reporting, and data warehouse loading still rely on file drops." },
-  ]));
+  addPatternCard(s, "INTEGRATION STYLE 1", "File Transfer", "file-transfer",
+    "Applications need to share data, but they are built on different platforms with different data models. The simplest approach is to write files to a shared location.",
+    "One application writes a file (CSV, XML, JSON) to a shared directory or SFTP server; another polls and reads it. Simple and universal, but high latency (minutes, not milliseconds) and no built-in error handling. Still common in batch-oriented domains: financial reconciliation, regulatory reporting, data warehouse ETL."
+  );
   addNotes(s,
     "File Transfer is the simplest integration style — and often the first one teams reach for. " +
     "Application A writes an XML or CSV file to a shared directory or SFTP server. Application B " +
@@ -307,14 +302,10 @@ divider(pres, "01", "Why Integration\nPatterns?",
 // Slide 11: Shared Database
 {
   const s = S(pres);
-  addContentTitle(s, "INTEGRATION STYLE 2", "Shared Database");
-  addBullets(s, bsub([
-    { text: "Applications read and write to a common database", sub: "A shared schema becomes the contract between applications." },
-    { text: "Instant data visibility", sub: "When Application A commits a row, Application B can see it immediately." },
-    { text: "Tight schema coupling", sub: "Changing a column type or adding a constraint requires coordinating every application." },
-    { text: "Performance contention", sub: "All applications compete for the same connection pool, indexes, and locks." },
-    { text: "The integration database anti-pattern", sub: "Microservice practitioners call this out as one of the most common integration mistakes." },
-  ]));
+  addPatternCard(s, "INTEGRATION STYLE 2", "Shared Database", "shared-database",
+    "Applications need instant data visibility across system boundaries. File transfer is too slow — can multiple applications just share one database?",
+    "All applications read and write to a common database. Instant visibility (no polling), but tight schema coupling — changing a column breaks everyone. Performance contention as apps compete for connections and locks. Microservice practitioners call this the 'integration database anti-pattern.'"
+  );
   addNotes(s,
     "Shared Database solves the latency problem of File Transfer — data is available instantly. " +
     "But it introduces a different kind of coupling: schema coupling. " +
@@ -333,14 +324,10 @@ divider(pres, "01", "Why Integration\nPatterns?",
 // Slide 12: Remote Procedure Invocation
 {
   const s = S(pres);
-  addContentTitle(s, "INTEGRATION STYLE 3", "Remote Procedure Invocation");
-  addBullets(s, bsub([
-    { text: "Applications expose procedures that others can call", sub: "REST, gRPC, GraphQL, SOAP — synchronous request-response over the network." },
-    { text: "Familiar programming model", sub: "Calling a remote service feels like calling a local method (with caveats)." },
-    { text: "Temporal coupling", sub: "The caller blocks until the callee responds. If the callee is down, the call fails." },
-    { text: "Cascading failures", sub: "A slow downstream service can exhaust the caller's thread pool, propagating failure upstream." },
-    { text: "Appropriate for queries and commands that need immediate feedback", sub: "User-facing APIs, real-time validation, and synchronous workflows." },
-  ]));
+  addPatternCard(s, "INTEGRATION STYLE 3", "Remote Procedure Invocation", "remote-procedure",
+    "Applications need real-time interaction — a user places an order and expects an immediate response. File drops and database polling are too slow for interactive use cases.",
+    "Applications expose procedures (REST, gRPC, GraphQL, SOAP) that others call synchronously. Familiar programming model but temporal coupling — if the callee is down, the call fails. Cascading failures can bring down entire service meshes. Best for queries and commands that genuinely need immediate feedback."
+  );
   addNotes(s,
     "Remote Procedure Invocation is the dominant style for user-facing APIs. REST over HTTP is " +
     "the most common flavor, but gRPC, GraphQL, and even legacy SOAP fall into this category. " +
@@ -360,14 +347,10 @@ divider(pres, "01", "Why Integration\nPatterns?",
 // Slide 13: Messaging
 {
   const s = S(pres);
-  addContentTitle(s, "INTEGRATION STYLE 4", "Messaging — Where EIP Focuses");
-  addBullets(s, bsub([
-    { text: "Applications exchange messages through a messaging system", sub: "Sender and receiver are decoupled in time and space." },
-    { text: "Asynchronous by nature", sub: "The sender fires and forgets; the messaging system guarantees delivery." },
-    { text: "Resilient to failures", sub: "If the receiver is down, messages queue up and are delivered when it recovers." },
-    { text: "Scalable through partitioning", sub: "Add more consumers to process messages in parallel without changing the sender." },
-    { text: "This is where the remaining 61 patterns live", sub: "Channels, messages, routing, transformation, endpoints, and management — all for messaging." },
-  ]));
+  addPatternCard(s, "INTEGRATION STYLE 4", "Messaging — Where EIP Focuses", "messaging",
+    "How can applications communicate without being coupled to each other's availability, location, or technology stack? RPC requires both sides to be up simultaneously.",
+    "Applications exchange messages through a messaging system — decoupled in time and space. Asynchronous, resilient (messages queue when receivers are down), and scalable through partitioning. This is where the remaining 61 EIP patterns live: channels, routing, transformation, endpoints, and management."
+  );
   addNotes(s,
     "Messaging is the integration style that the remaining sixty-one patterns elaborate on. " +
     "The core idea is simple: instead of calling another application directly, you put a message " +
@@ -396,15 +379,14 @@ divider(pres, "02", "Messaging Systems\nFundamentals",
 // Slide 15: Six fundamental concepts overview
 {
   const s = S(pres);
-  addContentTitle(s, "THE FUNDAMENTALS", "Six Concepts That Underpin Everything");
-  addBullets(s, bsub([
-    { text: "Message Channel", sub: "The virtual pipe that connects sender to receiver — the highway for messages." },
-    { text: "Message", sub: "The data packet that travels through the system — header plus body." },
-    { text: "Pipes and Filters", sub: "Chained processing steps that each do one thing well." },
-    { text: "Message Router", sub: "A filter that examines the message and decides where to send it." },
-    { text: "Message Translator", sub: "A filter that converts the message from one format to another." },
-    { text: "Message Endpoint", sub: "The connection point where your application code meets the messaging system." },
-  ]));
+  addIconGrid(s, "THE FUNDAMENTALS", "Six Concepts That Underpin Everything", [
+    { icon: "message-channel", label: "Message Channel", desc: "The virtual pipe that connects sender to receiver — the highway for messages." },
+    { icon: "message", label: "Message", desc: "The data packet that travels through the system — header plus body." },
+    { icon: "pipes-and-filters", label: "Pipes and Filters", desc: "Chained processing steps that each do one thing well." },
+    { icon: "message-router", label: "Message Router", desc: "A filter that examines the message and decides where to send it." },
+    { icon: "message-translator", label: "Message Translator", desc: "A filter that converts the message from one format to another." },
+    { icon: "message-endpoint", label: "Message Endpoint", desc: "The connection point where your application code meets the messaging system." },
+  ]);
   addNotes(s,
     "Think of these six concepts as the periodic table of messaging. Every integration solution " +
     "you will ever build uses some combination of them. " +
@@ -585,13 +567,12 @@ divider(pres, "02", "Messaging Systems\nFundamentals",
 // Slide 23: Why these six matter
 {
   const s = S(pres);
-  addContentTitle(s, "BUILDING BLOCKS", "Why These Six Concepts Matter");
-  addBullets(s, bsub([
-    { text: "Every pattern is a specialization of these six", sub: "A Dead Letter Channel is a specialized channel. A Content-Based Router is a specialized router." },
-    { text: "They define the integration architecture", sub: "Channels for transport, messages for data, pipes and filters for structure, endpoints for connection." },
-    { text: "They are technology-independent", sub: "Kafka, Pulsar, AMQP, JMS — different products, same six concepts." },
-    { text: "They map directly to Camel's programming model", sub: "from() = endpoint, to() = endpoint, choice() = router, marshal() = translator." },
-  ]));
+  addKeyValueSlide(s, "BUILDING BLOCKS", "Why These Six Concepts Matter", [
+    { key: "Specialization", value: "Every pattern is a specialization — Dead Letter Channel is a channel, Content-Based Router is a router." },
+    { key: "Architecture", value: "Channels for transport, messages for data, pipes and filters for structure, endpoints for connection." },
+    { key: "Technology-neutral", value: "Kafka, Pulsar, AMQP, JMS — different products, same six concepts." },
+    { key: "Camel mapping", value: "from() = endpoint, to() = endpoint, choice() = router, marshal() = translator." },
+  ]);
   addNotes(s,
     "Let me emphasize why we spent time on these six concepts before diving into the specialized " +
     "patterns. Every single one of the remaining patterns is either a specialization or a " +
@@ -609,14 +590,12 @@ divider(pres, "02", "Messaging Systems\nFundamentals",
 // Slide 24: Modern implementations
 {
   const s = S(pres);
-  addContentTitle(s, "MODERN PLATFORMS", "Kafka, Pulsar, Redis — Same Patterns, New Tech");
-  addBullets(s, bsub([
-    { text: "Apache Kafka", sub: "Distributed log with topics, partitions, consumer groups — P2P and Pub-Sub in one system." },
-    { text: "Apache Pulsar", sub: "Multi-tenant messaging with topics, subscriptions, and built-in tiered storage." },
-    { text: "Redis Streams", sub: "Lightweight message streaming with consumer groups — great for moderate-throughput scenarios." },
-    { text: "The patterns remain the same", sub: "Whether you use Kafka or Pulsar, you still need routers, translators, and endpoints." },
-    { text: "Camel abstracts the differences", sub: "Swap from('kafka:orders') to from('pulsar:orders') — the route logic does not change." },
-  ]));
+  addIconGrid(s, "MODERN PLATFORMS", "Kafka, Pulsar, Redis — Same Patterns, New Tech", [
+    { label: "Apache Kafka", desc: "Distributed log with topics, partitions, consumer groups — P2P and Pub-Sub in one system." },
+    { label: "Apache Pulsar", desc: "Multi-tenant messaging with topics, subscriptions, and built-in tiered storage." },
+    { label: "Redis Streams", desc: "Lightweight message streaming with consumer groups — great for moderate-throughput scenarios." },
+  ], { cols: 3, cellH: 2.60 });
+  addCaption(s, "The patterns remain the same — Camel abstracts the differences: swap from('kafka:orders') to from('pulsar:orders')");
   addNotes(s,
     "The original EIP book was written when JMS and TIBCO were the dominant messaging platforms. " +
     "Today, Apache Kafka and Apache Pulsar have taken over much of the messaging landscape — " +
@@ -668,14 +647,10 @@ divider(pres, "03", "Messaging\nChannels",
 // Slide 27: Point-to-Point
 {
   const s = S(pres);
-  addContentTitle(s, "POINT-TO-POINT CHANNEL", "One Sender, One Receiver");
-  addBullets(s, bsub([
-    { text: "Each message is consumed by exactly one receiver", sub: "The messaging system ensures only one consumer processes each message — no duplicates." },
-    { text: "Enables Competing Consumers", sub: "Add more consumers to increase throughput — the channel distributes messages among them." },
-    { text: "Ordering guarantees vary", sub: "JMS queues guarantee order; Kafka guarantees order within a partition, not across partitions." },
-    { text: "Common use cases", sub: "Command processing, work distribution, task queues — anything where a job should run once." },
-    { text: "Camel: from('kafka:orders?groupId=order-processors')", sub: "Multiple instances with the same consumer group form competing consumers." },
-  ]));
+  addPatternCard(s, "POINT-TO-POINT CHANNEL", "One Sender, One Receiver", "point-to-point-channel",
+    "A message represents work that should be done exactly once — placing an order, processing a payment. How do we ensure only one consumer handles each message?",
+    "The messaging system delivers each message to exactly one consumer. Enables Competing Consumers — add more instances to increase throughput. Kafka: same consumer group = P2P. Camel: from('kafka:orders?groupId=order-processors')."
+  );
   addNotes(s,
     "A Point-to-Point Channel is the right choice when a message represents work that should be " +
     "done exactly once. Think of it as a work queue — a pool of workers pulls tasks from the queue, " +
@@ -694,14 +669,10 @@ divider(pres, "03", "Messaging\nChannels",
 // Slide 28: Publish-Subscribe
 {
   const s = S(pres);
-  addContentTitle(s, "PUBLISH-SUBSCRIBE CHANNEL", "One Sender, Many Receivers");
-  addBullets(s, bsub([
-    { text: "Each message is delivered to every subscriber", sub: "Fan-out: one order event reaches inventory, billing, shipping, and analytics simultaneously." },
-    { text: "Subscribers are independent", sub: "Adding a new subscriber requires no changes to the publisher or existing subscribers." },
-    { text: "Decouples event producers from consumers", sub: "The Order Service does not know — or care — how many systems react to its events." },
-    { text: "Foundation of event-driven architecture", sub: "Events flow through topics; interested services subscribe and react independently." },
-    { text: "Camel: from('kafka:order-events') in each consumer service", sub: "Each service uses a different consumer group, so each gets all messages." },
-  ]));
+  addPatternCard(s, "PUBLISH-SUBSCRIBE CHANNEL", "One Sender, Many Receivers", "publish-subscribe-channel",
+    "When an order is placed, inventory, billing, shipping, and analytics all need to know. How do we deliver one event to multiple independent consumers?",
+    "Each message is delivered to every subscriber — fan-out. Subscribers are independent; adding a new one requires no changes to the publisher. Foundation of event-driven architecture. In Kafka: different consumer groups per service. Camel: from('kafka:order-events') in each consumer."
+  );
   addNotes(s,
     "Publish-Subscribe is the foundation of event-driven architecture. When the Order Service " +
     "publishes an order-placed event, it does not address it to the Inventory Service or the " +
@@ -874,14 +845,10 @@ divider(pres, "04", "Message\nConstruction",
 // Slide 36: Command Message
 {
   const s = S(pres);
-  addContentTitle(s, "COMMAND MESSAGE", "\"Do Something\"");
-  addBullets(s, bsub([
-    { text: "Tells the receiver to perform an action", sub: "ProcessOrder, ChargePayment, ReserveInventory — imperative, action-oriented." },
-    { text: "Typically sent to a Point-to-Point Channel", sub: "Only one consumer should execute the command — you do not want two charges for one order." },
-    { text: "Often paired with Request-Reply", sub: "The sender needs to know whether the command succeeded or failed." },
-    { text: "Must be idempotent when retries are possible", sub: "If ChargePayment is retried after a timeout, the receiver must not double-charge." },
-    { text: "CQRS separates commands from queries", sub: "Commands write state; queries read state — different paths, different models." },
-  ]));
+  addPatternCard(s, "COMMAND MESSAGE", "\"Do Something\"", "command-message",
+    "The Order Service needs the Payment Service to charge a credit card. This is an instruction — imperative, action-oriented. Only one consumer should execute it.",
+    "Commands tell the receiver to perform an action: ProcessOrder, ChargePayment, ReserveInventory. Sent to P2P channels (one consumer executes). Must be idempotent when retries are possible. Often paired with Request-Reply for confirmation."
+  );
   addNotes(s,
     "A Command Message is an instruction: do this thing. When the Order Service sends a " +
     "'ChargePayment' command to the Payment Service, it is saying 'I need you to charge " +
@@ -929,13 +896,10 @@ divider(pres, "04", "Message\nConstruction",
 // Slide 38: Event Message
 {
   const s = S(pres);
-  addContentTitle(s, "EVENT MESSAGE", "\"Something Happened\"");
-  addBullets(s, bsub([
-    { text: "Notifies subscribers that a state change occurred", sub: "OrderPlaced, PaymentReceived, ItemShipped — past tense, factual, immutable." },
-    { text: "Typically sent to a Publish-Subscribe Channel", sub: "Multiple subscribers react independently — inventory, notification, analytics." },
-    { text: "Should contain enough context to be useful", sub: "Include the relevant data; do not force receivers to call back for details." },
-    { text: "Foundation of event sourcing and event-driven architecture", sub: "Events are the source of truth — current state is derived by replaying events." },
-  ]));
+  addPatternCard(s, "EVENT MESSAGE", "\"Something Happened\"", "event-message",
+    "When an order is placed, multiple systems need to react — inventory, billing, shipping, analytics. No single receiver should own the reaction.",
+    "Events notify subscribers of a state change: OrderPlaced, PaymentReceived, ItemShipped. Past tense, factual, immutable. Sent to Pub-Sub channels. Should contain enough context to be useful — don't force receivers to call back. Foundation of event sourcing and EDA."
+  );
   addNotes(s,
     "An Event Message is a notification that something happened in the past. OrderPlaced, " +
     "PaymentReceived, ItemShipped — notice the past tense. Events are facts — they cannot " +
@@ -1112,14 +1076,10 @@ divider(pres, "05", "Message\nRouting",
 // Slide 46: Message Filter
 {
   const s = S(pres);
-  addContentTitle(s, "MESSAGE FILTER", "Dropping Unwanted Messages");
-  addBullets(s, bsub([
-    { text: "Routes wanted messages to the output; discards the rest", sub: "Like a Content-Based Router with only one output and a discard pile." },
-    { text: "Reduces downstream load", sub: "Why process 100,000 messages when only 1,000 match your criteria?" },
-    { text: "Predicate-based", sub: "Define a condition: only messages where amount > 1000, or status = 'ACTIVE'." },
-    { text: "Camel: filter(predicate)", sub: ".filter(simple(\"${header.amount} > 1000\")).to(\"kafka:large-orders\")" },
-    { text: "Common in event-driven systems", sub: "Each consumer filters the event stream for the events it cares about." },
-  ]));
+  addPatternCard(s, "MESSAGE FILTER", "Dropping Unwanted Messages", "message-filter",
+    "A topic carries 100,000 messages but a consumer only cares about 1,000 of them. Processing all 100,000 wastes resources and slows the pipeline.",
+    "Routes wanted messages to the output; discards the rest — like a Content-Based Router with only one output. Predicate-based: only messages matching a condition pass through. Camel: .filter(simple(\"${header.amount} > 1000\")).to(\"kafka:large-orders\")."
+  );
   addNotes(s,
     "The Message Filter is a simplified router with only two outputs: keep or discard. It " +
     "evaluates a predicate against each message and only forwards messages that pass the test. " +
@@ -1457,14 +1417,10 @@ divider(pres, "06", "Message\nTransformation",
 // Slide 60: Content Enricher
 {
   const s = S(pres);
-  addContentTitle(s, "CONTENT ENRICHER", "Add Data from External Sources");
-  addBullets(s, bsub([
-    { text: "Augments a message with data from another source", sub: "An order message arrives with a customer ID; the enricher adds the full customer profile." },
-    { text: "The message drives the lookup", sub: "The enricher uses data from the incoming message to query the external source." },
-    { text: "Common sources: databases, REST APIs, caches", sub: "Look up customer details, product prices, inventory levels, or credit scores." },
-    { text: "Camel: enrich('direct:lookupCustomer', strategy)", sub: "The enrich() EIP calls a sub-route and merges the result using an AggregationStrategy." },
-    { text: "Watch for latency", sub: "Every enrichment call adds latency — cache aggressively and enrich only what you need." },
-  ]));
+  addPatternCard(s, "CONTENT ENRICHER", "Add Data from External Sources", "content-enricher",
+    "An order message arrives with only a customer ID, but the notification service needs the customer's name and email to send a confirmation.",
+    "Augments a message with data from an external source — databases, REST APIs, caches. The message drives the lookup. Camel: enrich('direct:lookupCustomer', strategy). Watch for latency — cache aggressively and enrich only what you need."
+  );
   addNotes(s,
     "The Content Enricher adds data to a message by consulting an external source. The most " +
     "common scenario: a message arrives with a customer ID, and the enricher looks up the " +
@@ -1650,14 +1606,10 @@ divider(pres, "07", "Messaging\nEndpoints",
 // Slide 68: Transactional Client
 {
   const s = S(pres);
-  addContentTitle(s, "TRANSACTIONAL CLIENT", "Coordinate with Transactions");
-  addBullets(s, bsub([
-    { text: "Ensures messaging operations participate in transactions", sub: "Send a message and update a database — both succeed or both fail." },
-    { text: "Prevents message/data inconsistency", sub: "Without transactions: the database commits but the message send fails — data is updated but nobody knows." },
-    { text: "Kafka transactions: exactly-once semantics", sub: "Kafka 0.11+ supports transactional producers and consumers for atomic read-process-write." },
-    { text: "Outbox pattern as an alternative", sub: "Write the message to an outbox table in the same database transaction; a poller sends it later." },
-    { text: "Camel: transacted() DSL and TransactionManager", sub: "Camel integrates with JTA, Spring transactions, and Kafka transactions." },
-  ]));
+  addPatternCard(s, "TRANSACTIONAL CLIENT", "Coordinate with Transactions", "transactional-client",
+    "A service updates its database and sends a message. If the DB commits but the message send fails, data is updated but nobody knows. How do we keep both in sync?",
+    "Messaging operations participate in transactions — both succeed or both fail. Kafka 0.11+ supports exactly-once semantics. The Outbox pattern is a common alternative: write to an outbox table in the same DB transaction, poll and send later. Camel: transacted() DSL."
+  );
   addNotes(s,
     "The Transactional Client pattern ensures that messaging operations are coordinated with " +
     "other resources — typically a database. The classic problem: your service processes an " +
@@ -1815,13 +1767,12 @@ divider(pres, "08", "System\nManagement",
 // Slide 75: Monitoring and managing
 {
   const s = S(pres);
-  addContentTitle(s, "OBSERVABILITY", "Monitoring and Managing Messaging Systems");
-  addBullets(s, bsub([
-    { text: "Messages are invisible by design", sub: "Unlike HTTP requests, messages flow through channels that are not directly observable from outside." },
-    { text: "You need dedicated management patterns", sub: "Wire Tap for monitoring, Message History for tracing, Control Bus for management." },
-    { text: "Observability is not optional in production", sub: "Without visibility, debugging a stuck message or a slow consumer becomes guesswork." },
-    { text: "Modern tools: distributed tracing, metrics, structured logs", sub: "OpenTelemetry + Camel + Kafka = end-to-end visibility across services." },
-  ]));
+  addIconGrid(s, "OBSERVABILITY", "Monitoring and Managing Messaging Systems", [
+    { icon: "wire-tap", label: "Wire Tap", desc: "Copy messages for monitoring without disrupting the main flow." },
+    { icon: "message-history", label: "Message History", desc: "Record the path a message takes through the system for tracing." },
+    { icon: "control-bus", label: "Control Bus", desc: "Programmatic access to manage, start/stop, and configure routes." },
+    { label: "Modern Tooling", desc: "OpenTelemetry + Camel + Kafka = end-to-end distributed tracing and metrics." },
+  ], { cols: 2, cellH: 2.40 });
   addNotes(s,
     "One of the challenges of messaging systems is observability. In a synchronous REST " +
     "architecture, you can put a reverse proxy in front of your services and see every request " +
@@ -1997,14 +1948,13 @@ divider(pres, "09", "Case Studies &\nRunning Examples",
 // Slide 83: Order flow
 {
   const s = S(pres);
-  addContentTitle(s, "THE ORDER FLOW", "Order → Inventory → Payment → Shipping → Notification");
-  addBullets(s, bsub([
-    { text: "Order placed → Event Message on 'order-events' topic", sub: "The Order Service publishes an OrderPlaced event; all interested services subscribe." },
-    { text: "Inventory reserved → Command Message to Payment", sub: "After reserving stock, Inventory sends a ChargePayment command to the Payment Service." },
-    { text: "Payment charged → Event Message on 'payment-events'", sub: "PaymentCompleted event triggers shipping label generation and customer notification." },
-    { text: "Shipping arranged → Event Message on 'shipping-events'", sub: "ShipmentCreated event with tracking number sent to Notification Service." },
-    { text: "Notification sent → Saga complete", sub: "The customer receives a confirmation email with tracking details." },
-  ]));
+  addFlowSlide(s, "THE ORDER FLOW", "Order → Inventory → Payment → Shipping → Notification", [
+    { label: "Order\nPlaced", desc: "Event Message on order-events topic (Pub-Sub)" },
+    { label: "Inventory\nReserved", desc: "Command Message to Payment Service (P2P)" },
+    { label: "Payment\nCharged", desc: "Event on payment-events triggers shipping" },
+    { label: "Shipping\nArranged", desc: "ShipmentCreated event with tracking number" },
+    { label: "Notification\nSent", desc: "Customer receives confirmation email" },
+  ]);
   addNotes(s,
     "Let us trace a single order through the system. A customer places an order via the REST " +
     "API. The Order Service validates it and publishes an OrderPlaced event to the order-events " +
@@ -2025,14 +1975,13 @@ divider(pres, "09", "Case Studies &\nRunning Examples",
 // Slide 84: Patterns in the system
 {
   const s = S(pres);
-  addContentTitle(s, "PATTERNS IN CONTEXT", "How Patterns Compose in a Real System");
-  addBullets(s, bsub([
-    { text: "Content-Based Router — route by order type (standard, priority, international)", sub: "Different order types need different processing pipelines." },
-    { text: "Splitter + Aggregator — break multi-item orders, process, recombine", sub: "Each item routes to the appropriate warehouse; results are aggregated into one response." },
-    { text: "Dead Letter Channel — capture failed messages for investigation", sub: "Payment failures, inventory shortages, and serialization errors all land in dead letter topics." },
-    { text: "Wire Tap — copy all order events to the analytics pipeline", sub: "Real-time dashboards and historical analytics without affecting order processing." },
-    { text: "Idempotent Receiver — prevent duplicate payment charges", sub: "At-least-once delivery means ChargePayment commands may be delivered twice." },
-  ]));
+  addIconGrid(s, "PATTERNS IN CONTEXT", "How Patterns Compose in a Real System", [
+    { icon: "content-based-router", label: "Content-Based Router", desc: "Route by order type: standard, priority, international — different pipelines." },
+    { icon: "splitter", label: "Splitter + Aggregator", desc: "Break multi-item orders, process each, recombine results." },
+    { icon: "dead-letter-channel", label: "Dead Letter Channel", desc: "Capture failed messages for investigation and retry." },
+    { icon: "wire-tap", label: "Wire Tap", desc: "Copy all events to analytics without affecting processing." },
+    { icon: "idempotent-receiver", label: "Idempotent Receiver", desc: "Prevent duplicate payment charges on retry." },
+  ], { cols: 3, cellH: 2.20 });
   addNotes(s,
     "When you look at a real system through the lens of integration patterns, you start to see " +
     "patterns everywhere. The shipping domain uses at least fifteen distinct patterns. " +
@@ -2146,14 +2095,13 @@ divider(pres, "09", "Case Studies &\nRunning Examples",
 // Slide 89: Loan Broker architecture detail
 {
   const s = S(pres);
-  addContentTitle(s, "LOAN BROKER ARCHITECTURE", "Gateway → Enricher → Recipient List → Aggregator");
-  addBullets(s, bsub([
-    { text: "Messaging Gateway receives the loan request", sub: "Hides messaging details from the web application — looks like a REST call." },
-    { text: "Content Enricher adds the credit score", sub: "Calls the credit bureau API and adds the score to the message before routing." },
-    { text: "Recipient List calculates eligible banks", sub: "Based on loan amount and credit score, determines which banks can offer quotes." },
-    { text: "Scatter-Gather broadcasts and collects quotes", sub: "Each bank receives the request, calculates a quote, and sends it back." },
-    { text: "Aggregator selects the best quote", sub: "Waits for all responses (with timeout), picks the lowest rate, returns to customer." },
-  ]));
+  addFlowSlide(s, "LOAN BROKER ARCHITECTURE", "Gateway → Enricher → Recipient List → Aggregator", [
+    { label: "Messaging\nGateway", desc: "Receives loan request — hides messaging from the web app" },
+    { label: "Content\nEnricher", desc: "Calls credit bureau API, adds credit score" },
+    { label: "Recipient\nList", desc: "Calculates eligible banks by amount and score" },
+    { label: "Scatter-\nGather", desc: "Broadcasts to banks, collects quotes" },
+    { label: "Aggregator", desc: "Waits for all responses, selects best rate" },
+  ]);
   addNotes(s,
     "Let us walk through the Loan Broker step by step. " +
     "Step one: the web application calls the Messaging Gateway with a loan request — " +
@@ -2229,15 +2177,13 @@ divider(pres, "09", "Case Studies &\nRunning Examples",
 // Slide 92: Bond Trading architecture
 {
   const s = S(pres);
-  addContentTitle(s, "BOND TRADING ARCHITECTURE", "Channel Adapters, Normalizer, Desk Distribution");
-  addBullets(s, bsub([
-    { text: "Channel Adapters connect to Bloomberg, Reuters, Tradeweb", sub: "Each adapter speaks the vendor's protocol and produces messages in a common channel." },
-    { text: "Normalizer converts all formats to canonical bond price", sub: "FIX, binary, JSON — all normalized to a single BondPrice record." },
-    { text: "Content-Based Router routes by bond type", sub: "Government bonds to the government desk; corporate bonds to the credit desk." },
-    { text: "Content Filter customizes data for each desk", sub: "The government desk does not need credit ratings; the credit desk does not need sovereign risk." },
-    { text: "Pub-Sub Channel broadcasts to all desks simultaneously", sub: "Each desk subscribes to the bond types it trades — independent, decoupled, real-time." },
-    { text: "Wire Tap sends all prices to the compliance system", sub: "Regulatory requirement: every price update must be recorded for audit." },
-  ]));
+  addFlowSlide(s, "BOND TRADING ARCHITECTURE", "Channel Adapters → Normalizer → Desk Distribution", [
+    { label: "Channel\nAdapters", desc: "Connect to Bloomberg, Reuters, Tradeweb — each protocol" },
+    { label: "Normalizer", desc: "Convert FIX, binary, JSON to canonical BondPrice" },
+    { label: "Content-Based\nRouter", desc: "Route by bond type to the right desk" },
+    { label: "Pub-Sub\nChannel", desc: "Fan-out to all desks simultaneously" },
+    { label: "Wire Tap +\nCompliance", desc: "Copy all prices to audit trail" },
+  ]);
   addNotes(s,
     "The Bond Trading system demonstrates patterns working together at scale. Let us walk " +
     "through the flow. " +
@@ -2258,17 +2204,14 @@ divider(pres, "09", "Case Studies &\nRunning Examples",
 // Slide 93: 16 patterns for market data
 {
   const s = S(pres);
-  addContentTitle(s, "16 PATTERNS FOR MARKET DATA", "The Bond Trading Pattern Inventory");
-  addBullets(s, bsub([
-    { text: "Channel Adapter (3x) — connect to Bloomberg, Reuters, Tradeweb", sub: "Each external feed requires its own protocol-specific adapter." },
-    { text: "Normalizer + Message Translator — canonical BondPrice model", sub: "Three input formats normalized to one canonical representation." },
-    { text: "Content-Based Router + Message Filter — route and filter by bond type", sub: "Each desk gets only the bonds and fields it needs." },
-    { text: "Publish-Subscribe Channel — fan-out to trading desks", sub: "Independent desk subscriptions with real-time delivery." },
-    { text: "Wire Tap + Message Store — compliance audit trail", sub: "Every price update recorded for regulatory requirements." },
-    { text: "Guaranteed Delivery + Dead Letter — no lost prices", sub: "Market data must be reliable; failures are captured and investigated." },
-    { text: "Content Filter — customize for each desk's view", sub: "Strip irrelevant fields to reduce noise and bandwidth." },
-    { text: "Control Bus — manage feeds and desks dynamically", sub: "Start/stop feeds, add desks, adjust filtering rules — all through messaging." },
-  ]));
+  addIconGrid(s, "16 PATTERNS FOR MARKET DATA", "The Bond Trading Pattern Inventory", [
+    { icon: "channel-adapter", label: "Channel Adapter (3x)", desc: "Bloomberg, Reuters, Tradeweb — each protocol" },
+    { icon: "normalizer", label: "Normalizer", desc: "Three formats → one canonical BondPrice model" },
+    { icon: "content-based-router", label: "Router + Filter", desc: "Route by bond type; filter per desk view" },
+    { icon: "publish-subscribe-channel", label: "Pub-Sub", desc: "Fan-out to all trading desks simultaneously" },
+    { icon: "wire-tap", label: "Wire Tap + Store", desc: "Compliance audit trail for all price updates" },
+    { icon: "control-bus", label: "Control Bus", desc: "Manage feeds, desks, and filtering rules live" },
+  ], { cols: 3, cellH: 2.10 });
   addNotes(s,
     "The Bond Trading system uses sixteen patterns, demonstrating how even complex real-world " +
     "systems decompose into familiar building blocks. " +

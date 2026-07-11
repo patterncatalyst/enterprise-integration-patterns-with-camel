@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Message Router -->
+  <polygon points="60,33 82,55 60,77 38,55" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="10" y1="55" x2="38" y2="55" stroke="#151515"/>
+  <polyline points="33.0,57.5 38,55 33.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="82" y1="55" x2="110" y2="35" stroke="#151515"/>
+  <polyline points="107.4,39.9 110,35 104.5,35.9" stroke="#151515" fill="none"/>
+  <line x1="82" y1="55" x2="110" y2="55" stroke="#151515"/>
+  <polyline points="105.0,57.5 110,55 105.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="82" y1="55" x2="110" y2="75" stroke="#151515"/>
+  <polyline points="104.5,74.1 110,75 107.4,70.1" stroke="#151515" fill="none"/>
+</svg>

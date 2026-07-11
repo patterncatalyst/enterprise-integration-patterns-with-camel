@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Competing Consumers -->
+  <rect x="55" y="30" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <rect x="60" y="35" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <rect x="65" y="40" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <ellipse cx="15" cy="79" rx="6" ry="7" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="15" y1="72" x2="80" y2="72" stroke="#151515"/>
+  <line x1="15" y1="86" x2="80" y2="86" stroke="#151515"/>
+  <ellipse cx="80" cy="79" rx="6" ry="7" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="50" y1="72" x2="50" y2="60" stroke="#151515"/>
+  <polyline points="47,64 50,60 53,64" fill="none" stroke="#151515"/>
+</svg>

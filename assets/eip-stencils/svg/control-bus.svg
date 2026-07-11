@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Control Bus -->
+  <rect x="15" y="55" width="90" height="8" fill="#EE0000" stroke="#151515" rx="4"/>
+  <line x1="30" y1="55" x2="30" y2="40" stroke="#151515" stroke-dasharray="3,2"/>
+  <polygon points="30.0,24.0 33.3,27.5 37.6,29.5 35.3,33.7 34.7,38.5 30.0,37.6 25.3,38.5 24.7,33.7 22.4,29.5 26.7,27.5" fill="#FFF8F0" stroke="#151515"/>
+  <circle cx="30" cy="32" r="2.0" fill="#151515"/>
+  <line x1="55" y1="55" x2="55" y2="40" stroke="#151515" stroke-dasharray="3,2"/>
+  <polygon points="55.0,24.0 58.3,27.5 62.6,29.5 60.3,33.7 59.7,38.5 55.0,37.6 50.3,38.5 49.7,33.7 47.4,29.5 51.7,27.5" fill="#FFF8F0" stroke="#151515"/>
+  <circle cx="55" cy="32" r="2.0" fill="#151515"/>
+  <line x1="80" y1="55" x2="80" y2="40" stroke="#151515" stroke-dasharray="3,2"/>
+  <polygon points="80.0,24.0 83.3,27.5 87.6,29.5 85.3,33.7 84.7,38.5 80.0,37.6 75.3,38.5 74.7,33.7 72.4,29.5 76.7,27.5" fill="#FFF8F0" stroke="#151515"/>
+  <circle cx="80" cy="32" r="2.0" fill="#151515"/>
+</svg>

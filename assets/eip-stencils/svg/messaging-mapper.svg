@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Messaging Mapper -->
+  <rect x="35" y="38" width="50" height="35" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <circle cx="47" cy="47" r="3" fill="#EE0000" stroke="none"/>
+  <circle cx="47" cy="57" r="3" fill="#EE0000" stroke="none"/>
+  <circle cx="47" cy="67" r="3" fill="#EE0000" stroke="none"/>
+  <circle cx="73" cy="47" r="3" fill="#EE0000" stroke="none"/>
+  <circle cx="73" cy="62" r="3" fill="#EE0000" stroke="none"/>
+  <line x1="50" y1="47" x2="70" y2="62" stroke="#151515" stroke-width="1"/>
+  <line x1="50" y1="57" x2="70" y2="47" stroke="#151515" stroke-width="1"/>
+  <line x1="50" y1="67" x2="70" y2="62" stroke="#151515" stroke-width="1"/>
+</svg>

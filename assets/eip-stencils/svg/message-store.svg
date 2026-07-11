@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Message Store -->
+  <ellipse cx="60" cy="38" rx="25" ry="10" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="35" y1="38" x2="35" y2="75" stroke="#151515"/>
+  <line x1="85" y1="38" x2="85" y2="75" stroke="#151515"/>
+  <ellipse cx="60" cy="75" rx="25" ry="10" fill="#FFF8F0" stroke="#151515"/>
+  <rect x="52" y="25" width="16" height="10" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="52,25 60,32 68,25" fill="none" stroke="#151515"/>
+</svg>

@@ -64,37 +64,32 @@ function bsub(items) {
 // --- Slide 1: Cover ---
 {
   const s = pres.addSlide();
-  s.background = { color: COLOR.white };
+  s.background = { color: COLOR.ink };
   try {
     s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: H });
   } catch (e) { /* ok */ }
-  s.addText("ENTERPRISE INTEGRATION PATTERNS", {
-    x: 0.62, y: 1.60, w: 8.50, h: 0.65,
-    fontFace: FONT.title, fontSize: 14, bold: true, color: COLOR.red,
-    charSpacing: 6, align: "left", valign: "middle",
-  });
-  s.addText("with Apache Camel", {
-    x: 0.62, y: 2.20, w: 8.50, h: 1.30,
-    fontFace: FONT.title, fontSize: 42, bold: true, color: COLOR.ink,
+  s.addText("Enterprise Integration Patterns", {
+    x: 6.20, y: 1.60, w: 6.60, h: 2.00,
+    fontFace: FONT.title, fontSize: 42, bold: true, color: COLOR.white,
     align: "left", valign: "top",
   });
-  s.addText("Implementation Deep-Dive: Java DSL on Quarkus", {
-    x: 0.62, y: 3.50, w: 8.50, h: 0.60,
-    fontFace: FONT.body, fontSize: 18, italic: true, color: COLOR.caption,
-    align: "left", valign: "top",
+  s.addText("with Apache Camel\nImplementation Deep-Dive: Java DSL on Quarkus", {
+    x: 6.20, y: 3.65, w: 6.60, h: 1.10,
+    fontFace: FONT.body, fontSize: 17, color: "FFD9D9",
+    align: "left", valign: "top", lineSpacingMultiple: 1.30,
   });
   s.addText("Robert Sedor", {
-    x: 0.62, y: 5.40, w: 6.00, h: 0.40,
-    fontFace: FONT.body, fontSize: 16, color: COLOR.body,
+    x: 6.20, y: 5.30, w: 6.60, h: 0.50,
+    fontFace: FONT.body, fontSize: 15, color: COLOR.white,
     align: "left", valign: "middle",
   });
   s.addText("Kafka  |  Pulsar  |  Redis  |  PostgreSQL  |  Podman", {
-    x: 0.62, y: 5.85, w: 8.00, h: 0.35,
-    fontFace: FONT.mono, fontSize: 12, color: COLOR.caption,
+    x: 6.20, y: 5.80, w: 6.60, h: 0.35,
+    fontFace: FONT.mono, fontSize: 12, color: "FFD9D9",
     align: "left", valign: "middle",
   });
   try {
-    s.addImage({ path: `${ASSETS}/logo-candidate-2.png`, x: 11.55, y: 6.95, w: 1.13, h: 0.27 });
+    s.addImage({ path: `${ASSETS}/redhat-logo-white.png`, x: 11.42, y: 6.88, w: 1.33, h: 0.31 });
   } catch (e) { /* ok */ }
   addNotes(s, "Welcome to EIP 201 — the Implementation Deep-Dive. This deck assumes you have seen EIP 101 or are already familiar with the 65 Enterprise Integration Patterns from Hohpe and Woolf. Today we go hands-on: every pattern shown in real Apache Camel 4.x Java DSL running on Quarkus 3.x with Kafka, Pulsar, Redis, and PostgreSQL. The shipping domain ties every example together — orders flow from placement through validation, payment, fulfillment, and notification. We will build, debug, and reason about each pattern in code, not just in theory.");
 }
@@ -2558,40 +2553,41 @@ divider("12", "Closing\n& Appendices", "Key takeaways, reference catalogs, and r
 // Slide 123: Thank You
 {
   const s = pres.addSlide();
-  s.background = { color: COLOR.white };
+  s.background = { color: COLOR.ink };
   try {
     s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: H });
   } catch (e) { /* ok */ }
   s.addText("Thank You", {
-    x: 0.62, y: 2.20, w: 8.50, h: 1.10,
-    fontFace: FONT.title, fontSize: 52, bold: true, color: COLOR.ink,
+    x: 6.20, y: 1.80, w: 6.60, h: 1.40,
+    fontFace: FONT.title, fontSize: 48, bold: true, color: COLOR.white,
     align: "left", valign: "top",
   });
   s.addText("Enterprise Integration Patterns with Apache Camel", {
-    x: 0.62, y: 3.30, w: 8.50, h: 0.50,
-    fontFace: FONT.body, fontSize: 18, color: COLOR.caption,
+    x: 6.20, y: 3.30, w: 6.60, h: 0.60,
+    fontFace: FONT.body, fontSize: 17, color: "FFD9D9",
     align: "left", valign: "top",
-  });
-  s.addText("Implementation Deep-Dive: Java DSL on Quarkus", {
-    x: 0.62, y: 3.80, w: 8.50, h: 0.50,
-    fontFace: FONT.body, fontSize: 16, italic: true, color: COLOR.caption,
-    align: "left", valign: "top",
-  });
-  s.addText("Robert Sedor", {
-    x: 0.62, y: 5.20, w: 6.00, h: 0.40,
-    fontFace: FONT.body, fontSize: 16, color: COLOR.body,
-    align: "left", valign: "middle",
   });
   s.addText([
-    { text: "Tutorial: ", options: { bold: true, color: COLOR.body } },
-    { text: "github.com/enterprise-integration-patterns-with-camel", options: { color: COLOR.svc } },
+    { text: "Tutorial: ", options: { bold: true, color: COLOR.white, fontSize: 15 } },
+    { text: "patterncatalyst.github.io/enterprise-integration-patterns-with-camel", options: { color: "FFD9D9", fontSize: 15 } },
   ], {
-    x: 0.62, y: 5.70, w: 10.00, h: 0.35,
-    fontFace: FONT.mono, fontSize: 12,
+    x: 6.20, y: 4.40, w: 6.60, h: 0.40,
+    fontFace: FONT.body, align: "left", valign: "middle",
+  });
+  s.addText([
+    { text: "GitHub: ", options: { bold: true, color: COLOR.white, fontSize: 15 } },
+    { text: "github.com/PatternCatalyst/enterprise-integration-patterns-with-camel", options: { color: "FFD9D9", fontSize: 15 } },
+  ], {
+    x: 6.20, y: 4.85, w: 6.60, h: 0.40,
+    fontFace: FONT.body, align: "left", valign: "middle",
+  });
+  s.addText("Robert Sedor", {
+    x: 6.20, y: 5.70, w: 6.60, h: 0.50,
+    fontFace: FONT.body, fontSize: 15, color: COLOR.white,
     align: "left", valign: "middle",
   });
   try {
-    s.addImage({ path: `${ASSETS}/logo-candidate-2.png`, x: 11.55, y: 6.95, w: 1.13, h: 0.27 });
+    s.addImage({ path: `${ASSETS}/redhat-logo-white.png`, x: 11.42, y: 6.88, w: 1.33, h: 0.31 });
   } catch (e) { /* ok */ }
   addNotes(s, "Thank you for attending EIP 201 — the Implementation Deep-Dive. You now have a working understanding of how to implement all 65 Enterprise Integration Patterns in Apache Camel Java DSL on Quarkus. The runnable examples in the GitHub repository give you a foundation to build on — fork the repo, modify the examples, and start building your own integrations. Remember: start with the patterns, design with diagrams, implement with Camel, deploy on Quarkus, and observe with the LGTM stack. The patterns have been proven over decades of enterprise integration — your job is to compose them correctly for your specific problem. Good luck, and happy integrating.");
 }

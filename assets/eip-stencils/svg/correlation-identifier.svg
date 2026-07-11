@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Correlation Identifier -->
+  <rect x="70" y="40" width="30" height="20" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="70,40 85,52 100,40" fill="none" stroke="#151515"/>
+  <line x1="50" y1="50" x2="70" y2="50" stroke="#EE0000" stroke-dasharray="4,2"/>
+  <text x="35" y="54" text-anchor="middle" font-size="9" font-family="monospace" fill="#EE0000" stroke="none">ID</text>
+  <text x="85" y="54" text-anchor="middle" font-size="9" font-family="monospace" fill="#EE0000" stroke="none">ID</text>
+</svg>

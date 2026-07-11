@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Claim Check -->
+  <rect x="35" y="35" width="50" height="30" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <line x1="65" y1="35" x2="65" y2="65" stroke="#151515" stroke-dasharray="3,2"/>
+  <text x="50" y="54" text-anchor="middle" font-size="9" font-family="monospace" fill="#EE0000" stroke="none">#42</text>
+  <ellipse cx="60" cy="82" rx="18" ry="5" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="42" y1="82" x2="42" y2="95" stroke="#151515"/>
+  <line x1="78" y1="82" x2="78" y2="95" stroke="#151515"/>
+  <ellipse cx="60" cy="95" rx="18" ry="5" fill="#FFF8F0" stroke="#151515"/>
+</svg>

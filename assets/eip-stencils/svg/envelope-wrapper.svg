@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Envelope Wrapper -->
+  <rect x="36" y="38" width="48" height="34" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="36,38 60,57 84,38" fill="none" stroke="#151515"/>
+  <rect x="46" y="51" width="28" height="18" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="46,51 60,62 74,51" fill="none" stroke="#151515"/>
+</svg>

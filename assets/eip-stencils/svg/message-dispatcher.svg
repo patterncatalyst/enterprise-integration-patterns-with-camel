@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Message Dispatcher -->
+  <rect x="40" y="40" width="40" height="30" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <line x1="80" y1="48" x2="108" y2="35" stroke="#151515"/>
+  <polyline points="104.5,39.4 108,35 102.4,34.8" stroke="#151515" fill="none"/>
+  <line x1="80" y1="55" x2="108" y2="55" stroke="#151515"/>
+  <polyline points="103.0,57.5 108,55 103.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="80" y1="62" x2="108" y2="75" stroke="#151515"/>
+  <polyline points="102.4,75.2 108,75 104.5,70.6" stroke="#151515" fill="none"/>
+  <line x1="10" y1="55" x2="40" y2="55" stroke="#151515"/>
+  <polyline points="35.0,57.5 40,55 35.0,52.5" stroke="#151515" fill="none"/>
+  <text x="60" y="58" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#EE0000" stroke="none">D</text>
+</svg>

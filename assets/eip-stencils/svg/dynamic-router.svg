@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Dynamic Router -->
+  <polygon points="60,28 82,50 60,72 38,50" fill="#FFF8F0" stroke="#151515"/>
+  <circle cx="60" cy="50" r="8" fill="none" stroke="#EE0000" stroke-width="1.5"/>
+  <circle cx="60" cy="50" r="3" fill="#EE0000" stroke="none"/>
+  <line x1="10" y1="50" x2="38" y2="50" stroke="#151515"/>
+  <polyline points="33.0,52.5 38,50 33.0,47.5" stroke="#151515" fill="none"/>
+  <line x1="82" y1="50" x2="110" y2="50" stroke="#151515"/>
+  <polyline points="105.0,52.5 110,50 105.0,47.5" stroke="#151515" fill="none"/>
+  <line x1="60" y1="72" x2="60" y2="100" stroke="#EE0000" stroke-dasharray="4,2"/>
+</svg>

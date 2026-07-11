@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"
+     width="120" height="120" fill="none" stroke="#151515" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <!-- Idempotent Consumer -->
+  <rect x="37" y="38" width="46" height="34" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <line x1="50" y1="51" x2="70" y2="51" stroke="#EE0000" stroke-width="2.5"/>
+  <line x1="50" y1="59" x2="70" y2="59" stroke="#EE0000" stroke-width="2.5"/>
+</svg>
