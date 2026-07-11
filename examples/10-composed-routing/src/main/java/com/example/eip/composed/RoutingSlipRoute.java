@@ -31,7 +31,7 @@ public class RoutingSlipRoute extends RouteBuilder {
                 exchange.getIn().setHeader("orderSlip", String.join(",", steps));
             })
             .log("Routing slip: ${header.orderSlip}")
-            .routingSlip(header("orderSlip")).delimiter(",");
+            .routingSlip(header("orderSlip"), ",");
 
         from("direct:validate-order")
             .routeId("validate-order")

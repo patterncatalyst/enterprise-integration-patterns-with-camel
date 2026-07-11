@@ -145,7 +145,7 @@ No special `settings.xml` is needed. All dependencies come from Maven Central, a
 |-----------|---------|
 | Apache Camel | 4.20.0 |
 | Camel Quarkus | 3.36.0 |
-| Quarkus | 3.36.x |
+| Quarkus | 3.36.3 |
 | Camel CLI (JBang) | 4.20.0 |
 | Drools | 10.2.0 |
 
