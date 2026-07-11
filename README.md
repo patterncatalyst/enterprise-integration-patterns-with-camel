@@ -76,6 +76,23 @@ Each example runs with `mvn quarkus:dev` against the infrastructure stack.
 | Apicurio Registry | Avro/Protobuf schema registry |
 | Grafana + Loki + Tempo + Mimir | Observability (optional LGTM overlay) |
 
+## Presentations
+
+Two slide decks in `presentations/`:
+
+| Deck | Slides | Focus |
+|------|--------|-------|
+| **EIP 101** | 98 | Conceptual guide — all 65 patterns with diagrams |
+| **EIP 201** | 135 | Implementation deep-dive — Java DSL, code, case studies |
+
+## Getting started
+
+See [GETTING-STARTED.md](GETTING-STARTED.md) for a quick-start guide, or [the tutorial site](https://patterncatalyst.github.io/enterprise-integration-patterns-with-camel/) for the full walkthrough.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 [Apache 2.0](LICENSE)
