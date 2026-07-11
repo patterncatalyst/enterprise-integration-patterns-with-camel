@@ -256,7 +256,7 @@ When you run the examples in later chapters, you'll follow a consistent pattern:
 For the full-stack case studies and multi-service examples, you'll use the promoted Quarkus projects in `examples/`:
 
 ```bash
-cd examples/patterns/03-message-routing/content-based-router
+cd examples/09-routing-fundamentals
 mvn quarkus:dev
 ```
 

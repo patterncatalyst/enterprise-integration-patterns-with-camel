@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 370" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="10" y="10" width="220" height="350" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="22" y="30" font-size="12" font-weight="700" fill="#888">Camel Services</text>
+<rect x="240" y="10" width="200" height="350" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="252" y="30" font-size="12" font-weight="700" fill="#888">Collection</text>
+<rect x="450" y="10" width="210" height="350" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="462" y="30" font-size="12" font-weight="700" fill="#888">Storage</text>
+<rect x="670" y="10" width="200" height="350" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="682" y="30" font-size="12" font-weight="700" fill="#888">Visualization</text>
+<rect x="30" y="50" width="130" height="45" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="95.0" y="70.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">order-service</text>
+<text x="95.0" y="87.5" font-size="11.5" fill="#555555" text-anchor="middle">Camel routes</text>
+<rect x="30" y="115" width="130" height="45" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="95.0" y="135.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">inventory-service</text>
+<text x="95.0" y="152.5" font-size="11.5" fill="#555555" text-anchor="middle">Camel routes</text>
+<rect x="30" y="180" width="130" height="45" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="95.0" y="200.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">payment-service</text>
+<text x="95.0" y="217.5" font-size="11.5" fill="#555555" text-anchor="middle">Camel routes</text>
+<rect x="30" y="260" width="140" height="40" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="100.0" y="278.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">OpenTelemetry</text>
+<text x="100.0" y="295.0" font-size="11.5" fill="#555555" text-anchor="middle">auto-instrument</text>
+<rect x="30" y="315" width="140" height="35" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="100.0" y="330.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Micrometer</text>
+<text x="100.0" y="347.5" font-size="11.5" fill="#555555" text-anchor="middle">metrics export</text>
+<rect x="265" y="75" width="150" height="55" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
+<text x="340.0" y="100.5" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">OTel Collector</text>
+<text x="340.0" y="117.5" font-size="11.5" fill="#dddddd" text-anchor="middle">receive + batch</text>
+<rect x="265" y="165" width="120" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="325.0" y="180.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">OTLP gRPC</text>
+<text x="325.0" y="197.5" font-size="11.5" fill="#555555" text-anchor="middle">:4317</text>
+<rect x="265" y="215" width="120" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="325.0" y="230.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">OTLP HTTP</text>
+<text x="325.0" y="247.5" font-size="11.5" fill="#555555" text-anchor="middle">:4318</text>
+<rect x="475" y="50" width="120" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="535.0" y="68.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Loki</text>
+<text x="535.0" y="85.0" font-size="11.5" fill="#555555" text-anchor="middle">logs (:3100)</text>
+<rect x="475" y="115" width="120" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="535.0" y="133.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Tempo</text>
+<text x="535.0" y="150.0" font-size="11.5" fill="#555555" text-anchor="middle">traces (:3200)</text>
+<rect x="475" y="180" width="120" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="535.0" y="198.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Mimir</text>
+<text x="535.0" y="215.0" font-size="11.5" fill="#555555" text-anchor="middle">metrics (:9009)</text>
+<rect x="475" y="260" width="120" height="40" rx="9" fill="#ffffff" stroke="#999999" stroke-width="1.5"/>
+<text x="535.0" y="278.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Kafka</text>
+<text x="535.0" y="295.0" font-size="11.5" fill="#555555" text-anchor="middle">trace context</text>
+<rect x="700" y="80" width="150" height="55" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="775.0" y="105.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Grafana</text>
+<text x="775.0" y="122.5" font-size="11.5" fill="#555555" text-anchor="middle">dashboards (:3000)</text>
+<rect x="700" y="180" width="140" height="40" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="770.0" y="198.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Dashboards</text>
+<text x="770.0" y="215.0" font-size="11.5" fill="#555555" text-anchor="middle">rate, errors, p99</text>
+<rect x="700" y="250" width="120" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="760.0" y="265.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Alerts</text>
+<text x="760.0" y="282.5" font-size="11.5" fill="#555555" text-anchor="middle">error-rate &gt; 5%</text>
+<path d="M160,72 L265,95" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M160,138 L265,108" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M160,202 L265,118" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M415,90 L475,70" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="451.0" y="74.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">logs</text>
+<text x="451.0" y="74.0" font-size="11" fill="#555" text-anchor="middle">logs</text>
+<path d="M415,100 L475,135" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="451.0" y="111.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">traces</text>
+<text x="451.0" y="111.5" font-size="11" fill="#555" text-anchor="middle">traces</text>
+<path d="M415,110 L475,200" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="451.0" y="149.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">metrics</text>
+<text x="451.0" y="149.0" font-size="11" fill="#555" text-anchor="middle">metrics</text>
+<path d="M595,70 L700,100" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M595,135 L700,110" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M595,200 L700,120" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M775,135 L775,180" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M760,220 L760,250" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M160,210 L265,125" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M535,180 L535,260" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#a)"/>
+<text x="541.0" y="214.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">context</text>
+<text x="541.0" y="214.0" font-size="11" fill="#555" text-anchor="middle">context</text>
+<text x="265" y="290" font-size="10" fill="#888" text-anchor="start">W3C Trace Context propagation</text>
+<text x="475" y="320" font-size="10" fill="#888" text-anchor="start">via Kafka headers (traceparent)</text>
+</svg>

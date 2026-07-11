@@ -8,6 +8,8 @@ duration: "20 minutes"
 
 Redis appears throughout this tutorial in supporting roles: caching for Content Enrichers, idempotent message deduplication, pub/sub for lightweight messaging, and distributed locks for Competing Consumers coordination. This appendix covers each use case with Camel integration.
 
+{% include excalidraw.html file="22-appendix-redis" alt="Redis four integration roles: caching, idempotent store, pub/sub, and distributed locking" caption="Figure D.1 — Redis serves four distinct roles in integration: cache-aside enrichment, idempotent message deduplication, pub/sub notifications, and distributed locking." %}
+
 ## Redis in the shipping domain
 
 Our Podman stack runs Redis on port 6379. In the shipping domain, Redis serves four roles:
