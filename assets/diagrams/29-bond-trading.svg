@@ -54,18 +54,9 @@
 <rect x="600" y="240" width="120" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
 <text x="660.0" y="263.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Trade Engine</text>
 <text x="660.0" y="280.0" font-size="11.5" fill="#dddddd" text-anchor="middle">validate + exec</text>
-<rect x="780" y="240" width="80" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
-<g transform="translate(805.0,244) scale(0.25)"><!-- Wire Tap -->
-  <ellipse cx="15" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
-  <line x1="15" y1="45" x2="100" y2="45" stroke="#151515"/>
-  <line x1="15" y1="63" x2="100" y2="63" stroke="#151515"/>
-  <ellipse cx="100" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
-  <line x1="60" y1="63" x2="60" y2="95" stroke="#151515"/>
-  <polyline points="56,90 60,95 64,90" fill="none" stroke="#151515"/>
-  <rect x="52" y="95" width="16" height="10" fill="#FFF8F0" stroke="#151515" rx="1"/>
-  <polyline points="52,95 60,102 68,95" fill="none" stroke="#151515"/></g>
-<text x="820.0" y="281.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Audit</text>
-<text x="820.0" y="298.0" font-size="11.5" fill="#555555" text-anchor="middle">Wire Tap</text>
+<rect x="780" y="240" width="80" height="50" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
+<text x="820.0" y="263.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Audit</text>
+<text x="820.0" y="280.0" font-size="11.5" fill="#555555" text-anchor="middle">Wire Tap</text>
 <path d="M150,83 L200,120" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <path d="M150,138 L200,130" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
 <path d="M150,193 L200,145" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
