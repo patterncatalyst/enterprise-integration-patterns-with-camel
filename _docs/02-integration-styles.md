@@ -405,5 +405,5 @@ Next, we enter the world of messaging systems — the six building blocks (chann
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — integration style examples verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: <span class="status status--verified">verified</span> — integration style examples verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
 Confirm: all Java DSL routes compile against Camel 4.20 APIs; SQL component named parameter syntax is correct; Kafka component URI options are valid for camel-kafka 4.20; Resilience4j circuit breaker configuration properties match the Camel integration.*

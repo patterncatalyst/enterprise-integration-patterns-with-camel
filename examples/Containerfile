@@ -4,7 +4,7 @@
 ARG PROJECT=09-routing-fundamentals
 
 # Stage 1: Build
-FROM registry.access.redhat.com/ubi9/openjdk-21:latest AS builder
+FROM registry.access.redhat.com/ubi9/openjdk-25:latest AS builder
 ARG PROJECT
 USER root
 WORKDIR /build
@@ -15,7 +15,7 @@ COPY ${PROJECT}/src ./src
 RUN mvn package -DskipTests -Dquarkus.package.jar.type=uber-jar
 
 # Stage 2: Runtime
-FROM registry.access.redhat.com/ubi9/openjdk-21-runtime:latest
+FROM registry.access.redhat.com/ubi9/openjdk-25-runtime:latest
 ARG PROJECT
 ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0"
 

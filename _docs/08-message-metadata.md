@@ -426,4 +426,4 @@ This completes Part 4 — Message Construction. Next: Part 5 — Message Routing
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*

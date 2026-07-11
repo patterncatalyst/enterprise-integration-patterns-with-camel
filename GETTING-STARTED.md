@@ -6,7 +6,7 @@ Quick-start guide for running the EIP tutorial examples locally.
 
 | Tool | Minimum | Install |
 |------|---------|---------|
-| Java | 21 (LTS) | `sdk install java 21.0.7-tem` ([SDKMAN](https://sdkman.io/)) |
+| Java | 25 (LTS) | `sdk install java 25.0.2-tem` ([SDKMAN](https://sdkman.io/)) |
 | Maven | 3.9+ | `sdk install maven` |
 | JBang | latest | `curl -Ls https://sh.jbang.dev \| bash -s - app setup` |
 | Camel CLI | latest | `jbang app install camel@apache/camel` |

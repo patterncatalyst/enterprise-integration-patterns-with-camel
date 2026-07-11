@@ -12,10 +12,10 @@
     <description>Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, and Load Balancer — Chapter 11 examples.</description>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <quarkus.platform.version>3.36.3</quarkus.platform.version>
+        <quarkus.platform.version>3.37.0</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>

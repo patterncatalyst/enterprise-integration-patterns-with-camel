@@ -6,29 +6,48 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 INFRA_DIR="$PROJECT_ROOT/examples/_infra"
 
 LGTM=false
-if [[ "${1:-}" == "--lgtm" ]]; then
-  LGTM=true
+CLEAN=false
+for arg in "$@"; do
+  case "$arg" in
+    --lgtm)  LGTM=true ;;
+    --clean) CLEAN=true ;;
+  esac
+done
+
+if $CLEAN; then
+  echo "==> Cleaning existing stack and volumes..."
+  podman-compose -p eip -f "$INFRA_DIR/compose.yaml" down -v 2>/dev/null || true
+  for vol in eip-kafka-data eip-pulsar-data eip-redis-data eip-postgres-data; do
+    podman volume rm "$vol" 2>/dev/null || true
+  done
+  echo "    Volumes removed."
 fi
 
 echo "==> Starting EIP base stack (Kafka, Pulsar, Redis, PostgreSQL, Apicurio)..."
 podman-compose -p eip -f "$INFRA_DIR/compose.yaml" up -d
 
 echo "==> Waiting for base services to become healthy..."
-services=(eip-kafka eip-redis eip-postgres eip-apicurio eip-pulsar)
-for svc in "${services[@]}"; do
+wait_healthy() {
+  local svc=$1
+  local svc_timeout=${2:-120}
   printf "    %-20s " "$svc"
-  timeout=120
   while ! podman inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null | grep -q healthy; do
     sleep 2
-    timeout=$((timeout - 2))
-    if [[ $timeout -le 0 ]]; then
+    svc_timeout=$((svc_timeout - 2))
+    if [[ $svc_timeout -le 0 ]]; then
       echo "TIMEOUT"
-      echo "ERROR: $svc did not become healthy within 120s"
+      echo "ERROR: $svc did not become healthy within the timeout"
       exit 1
     fi
   done
   echo "healthy"
-done
+}
+
+wait_healthy eip-kafka    120
+wait_healthy eip-redis    120
+wait_healthy eip-postgres 120
+wait_healthy eip-apicurio 120
+wait_healthy eip-pulsar   180
 
 echo "==> Base stack ready."
 echo "    Kafka UI:    http://localhost:8090"
@@ -42,21 +61,9 @@ if $LGTM; then
   echo "==> Starting LGTM observability stack..."
   podman-compose -p eip -f "$INFRA_DIR/compose.yaml" -f "$INFRA_DIR/compose.lgtm.yaml" up -d
 
-  lgtm_services=(eip-loki eip-tempo eip-mimir eip-otel-collector eip-grafana)
   echo "==> Waiting for LGTM services..."
-  for svc in "${lgtm_services[@]}"; do
-    printf "    %-20s " "$svc"
-    timeout=120
-    while ! podman inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null | grep -q healthy; do
-      sleep 2
-      timeout=$((timeout - 2))
-      if [[ $timeout -le 0 ]]; then
-        echo "TIMEOUT"
-        echo "ERROR: $svc did not become healthy within 120s"
-        exit 1
-      fi
-    done
-    echo "healthy"
+  for svc in eip-loki eip-tempo eip-mimir eip-otel-collector eip-grafana; do
+    wait_healthy "$svc" 120
   done
 
   echo "==> LGTM stack ready."

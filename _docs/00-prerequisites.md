@@ -2,15 +2,15 @@
 title: "Prerequisites & Setup"
 order: 0
 part: getting-started
-description: "Install Java 21, JBang, the Camel CLI, Maven, Podman, and the tools you need to run every example locally."
+description: "Install Java 25, JBang, the Camel CLI, Maven, Podman, and the tools you need to run every example locally."
 duration: "30 minutes"
 ---
 
 Before you write a single route, you need a working development environment. This chapter walks you through every tool — Java, JBang, the Camel CLI, Maven, Podman, an IDE — and finishes with a smoke test that proves the whole stack is healthy. If you already have these tools installed, skim the version checks and jump to the stack verification at the end.
 
-## Java 21
+## Java 25
 
-Every example in this tutorial runs on **Java 21** (the current long-term-support release). Camel 4.x requires a minimum of Java 17, but we target 21 for its virtual threads, pattern matching, and record patterns — features that make integration code cleaner and more expressive.
+Every example in this tutorial runs on **Java 25** (the current long-term-support release). Camel 4.x requires a minimum of Java 17, but we target 25 for its virtual threads without pinning (JDK 24+ fixed `synchronized` monitor pinning), ScopedValue for context propagation, pattern matching, and record patterns — features that make integration code cleaner and more expressive.
 
 ### Installing with SDKMAN
 
@@ -21,24 +21,24 @@ curl -s "https://get.sdkman.io" | bash
 source "$HOME/.sdkman/bin/sdkman-init.sh"
 ```
 
-Then install Java 21:
+Then install Java 25:
 
 ```bash
-sdk install java 21.0.7-tem
+sdk install java 25.0.2-tem
 ```
 
-This installs the Temurin (Eclipse Adoptium) distribution — a solid, well-tested OpenJDK build. Other distributions work too (`21.0.7-graal`, `21.0.7-amzn`, etc.); the runtime is the same OpenJDK underneath.
+This installs the Temurin (Eclipse Adoptium) distribution — a solid, well-tested OpenJDK build. Other distributions work too (`25.0.2-graal`, `25.0.2-amzn`, etc.); the runtime is the same OpenJDK underneath.
 
 Verify:
 
 ```bash
 java -version
-# openjdk version "21.0.7" ...
+# openjdk version "25.0.2" ...
 ```
 
-### Why not Java 22+ or GraalVM native?
+### Why Java 25?
 
-Java 22 and later work fine with Camel 4.20, but we pin to 21 because it's the LTS — the version you'll use in production. Quarkus *does* support GraalVM native compilation, and several Camel components have native support, but native builds add compilation time and reduce the set of components available at runtime. We'll use JVM mode throughout this tutorial and note where native is an option.
+Java 25 is the current LTS release (after 21), and brings meaningful improvements for integration workloads: JDK 24 eliminated `synchronized` monitor pinning for virtual threads, JDK 25 finalized `ScopedValue` for lightweight context propagation, and the overall runtime is faster and leaner. Quarkus 3.31+ fully supports Java 25. We target the LTS because it's the version you'll use in production. Quarkus *does* support GraalVM native compilation, and several Camel components have native support, but native builds add compilation time and reduce the set of components available at runtime. We'll use JVM mode throughout this tutorial and note where native is an option.
 
 ## JBang & the Camel CLI
 
@@ -128,13 +128,13 @@ Verify:
 ```bash
 mvn -version
 # Apache Maven 3.9.x ...
-# Java version: 21.0.x
+# Java version: 25.0.x
 ```
 
-Make sure Maven reports the Java 21 JDK you just installed. If it picks up an older JDK, set `JAVA_HOME` explicitly:
+Make sure Maven reports the Java 25 JDK you just installed. If it picks up an older JDK, set `JAVA_HOME` explicitly:
 
 ```bash
-export JAVA_HOME=$(sdk home java 21.0.7-tem)
+export JAVA_HOME=$(sdk home java 25.0.2-tem)
 ```
 
 ### Maven settings for this tutorial
@@ -145,7 +145,7 @@ No special `settings.xml` is needed. All dependencies come from Maven Central, a
 |-----------|---------|
 | Apache Camel | 4.20.0 |
 | Camel Quarkus | 3.36.0 |
-| Quarkus | 3.36.3 |
+| Quarkus | 3.37.0 |
 | Camel CLI (JBang) | 4.20.0 |
 | Drools | 10.2.0 |
 
@@ -235,7 +235,7 @@ cd enterprise-integration-patterns-with-camel
 
 ## IDE setup
 
-Any IDE with Java 21 support will work. We recommend either **VS Code** or **IntelliJ IDEA** — both have excellent Quarkus extensions that provide live reload, configuration assistance, and route visualization.
+Any IDE with Java 25 support will work. We recommend either **VS Code** or **IntelliJ IDEA** — both have excellent Quarkus extensions that provide live reload, configuration assistance, and route visualization.
 
 ### VS Code
 
@@ -267,7 +267,7 @@ Import the project as a Maven project. IntelliJ will resolve dependencies and in
 ### IDE-independent settings
 
 Regardless of your IDE:
-- Set the project SDK to Java 21.
+- Set the project SDK to Java 25.
 - Make sure Maven uses the same JDK (check IDE Maven settings).
 - Enable annotation processing (Quarkus uses it for CDI bean generation).
 
@@ -357,7 +357,7 @@ podman-compose -f examples/_infra/compose.yaml down -v
 
 ## What you learned
 
-- Java 21 via SDKMAN, Maven 3.9+, and how to ensure they're wired together.
+- Java 25 via SDKMAN, Maven 3.9+, and how to ensure they're wired together.
 - JBang and the Camel CLI — the fastest way to run, inspect, and prototype Camel routes from single files.
 - The tutorial workflow: prototype with `camel run --dev`, inspect with `camel get` / `camel trace`, promote with `camel export --runtime=quarkus`.
 - Podman and podman-compose for rootless container management.
@@ -368,5 +368,5 @@ Next, we'll meet the shipping domain that drives every example in this tutorial 
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — infrastructure stack verified against Podman, Quarkus 3.36.3, Camel 4.20.0 (2026-07-11).*
+*Verification status: <span class="status status--verified">verified</span> — infrastructure stack verified against Podman, Quarkus 3.37.0, Camel 4.20.0 (2026-07-11).*
 Confirm: SDKMAN install commands work on a clean machine; `setup-stack.sh` brings all containers to healthy on Podman 5.x; PostgreSQL init-schemas.sql creates all five schemas; Apicurio health endpoint responds at 8081.*

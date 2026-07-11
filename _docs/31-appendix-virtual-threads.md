@@ -86,7 +86,7 @@ Apache Camel supports virtual threads as an opt-in feature. Add one property to 
 camel.main.virtualThreadsEnabled=true
 ```
 
-When this property is set (and you are running on JDK 21+), Camel's `DefaultThreadPoolFactory` changes its behavior:
+When this property is set (and you are running on JDK 25+), Camel's `DefaultThreadPoolFactory` changes its behavior:
 
 | Pool type | Platform threads | Virtual threads |
 |-----------|-----------------|-----------------|

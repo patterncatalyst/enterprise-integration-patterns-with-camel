@@ -281,4 +281,4 @@ This completes Part 6 — Message Transformation (7 patterns across 2 chapters).
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*

@@ -366,4 +366,4 @@ Next: structural transformation — Aggregator, Normalizer, and Canonical Data M
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*

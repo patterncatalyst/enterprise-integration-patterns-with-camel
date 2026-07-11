@@ -57,12 +57,14 @@ services:
   pulsar:
     image: docker.io/apachepulsar/pulsar:latest
     container_name: eip-pulsar
-    command: bin/pulsar standalone
+    command: bin/pulsar standalone --advertised-address localhost
     ports:
       - "6650:6650"
       - "8080:8080"
     environment:
       - PULSAR_MEM=-Xms512m -Xmx1024m -XX:MaxDirectMemorySize=512m
+      - PULSAR_PREFIX_advertisedAddress=localhost
+      - PULSAR_STANDALONE_USE_ZOOKEEPER=0
     volumes:
       - pulsar-data:/pulsar/data:Z
     devices:
@@ -135,7 +137,6 @@ services:
       - "8081:8080"
     environment:
       - QUARKUS_HTTP_PORT=8080
-      - APICURIO_STORAGE_KIND=mem
     mem_limit: 512m
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost:8080/health/ready"]

@@ -399,4 +399,4 @@ from("kafka:eip.shipping.rate-requests?brokers=localhost:9092&groupId=carrier-sc
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
