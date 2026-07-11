@@ -57,7 +57,7 @@ pres.author = "Robert Sedor";
   PAGE += 1;
   s.background = { color: COLOR.ink };
   try {
-    s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: H });
+    s.addImage({ path: `${ASSETS}/section-panel.png`, x: 0, y: 0, w: W, h: H });
   } catch (e) { /* ok */ }
 
   s.addText("Enterprise Integration Patterns", {
@@ -2330,7 +2330,7 @@ divider(pres, "10", "Closing",
   PAGE += 1;
   s.background = { color: COLOR.ink };
   try {
-    s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: H });
+    s.addImage({ path: `${ASSETS}/section-panel.png`, x: 0, y: 0, w: W, h: H });
   } catch (e) { /* ok */ }
 
   s.addText("Thank You", {

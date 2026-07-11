@@ -146,3 +146,25 @@ claims made in the tutorial chapters.
 | Chapter footer update | Replace "unverified" status footers with "verified" and verification date |
 | LGTM stack verification | Confirm observability stack starts, traces flow through, dashboards render |
 | Reconciliation plan | Complete the reconciliation checklist in `_plans/reconciliation-plan.md` |
+
+
+## Iteration 8 — Visual Overhaul & New Appendices
+
+**Status:** Planned
+
+Restyle all diagrams with EIP stencil icons (canonical Hohpe/Woolf visual
+vocabulary), improve slide visual ratio, and add Kafka operational appendices
+sourced from Strimzi blog posts.
+
+| Deliverable | Detail |
+|---|---|
+| Diagram palette fix | Improve text contrast in all 47 diagrams — band labels and notes changed from `#888` to `#555` |
+| EIP stencil integration | Add `channel`, `endpoint`, `pattern` node types to `generate_diagram.py` with embedded SVG icons |
+| Stencil-restyled diagrams | Priority diagrams (request-reply, routing-patterns, aggregator, scatter-gather, loan-broker, etc.) reworked with EIP stencil icons |
+| Slide cover fix | Replace `cover-panel.png` with `section-panel.png` on cover/thank-you slides in both decks for readable text |
+| eip-201 visual conversion | Import and use 5 visual slide helpers; convert ~15-20 bullet slides to visual layouts |
+| Chapter 31 | Appendix M — Kafka Consumer Tuning: fetch settings, offset management, rebalance minimization, transactional consumers ([source](https://strimzi.io/blog/2021/01/07/consumer-tuning/)) |
+| Chapter 32 | Appendix N — Kafka Producer Tuning: durability (acks, ISR), ordering, throughput vs latency, batching, compression ([source](https://strimzi.io/blog/2020/10/15/producer-tuning/)) |
+| Chapter 33 | Appendix O — Kafka Share Groups (KIP-932): queue semantics via share groups, KafkaShareConsumer API, delivery states ([source](https://strimzi.io/blog/2025/08/20/queues-for-kafka/)) |
+| Chapter 34 | Appendix P — Kafka Diagnostics on Kubernetes: thread/heap dumps, additional volumes in Strimzi, flame graphs ([source](https://strimzi.io/blog/2025/03/20/collecting-diagnostic-data/)) |
+| Chapter 35 | Appendix Q — Managing Kafka Connect Offsets: list/alter/reset offsets via Strimzi CRDs, MirrorMaker 2 support ([source](https://strimzi.io/blog/2024/11/04/managing-connector-offsets/)) |

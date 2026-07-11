@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="10" y="10" width="860" height="200" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="22" y="30" font-size="12" font-weight="700" fill="#888">Price Pipeline</text>
+<text x="22" y="30" font-size="12" font-weight="700" fill="#555555">Price Pipeline</text>
 <rect x="10" y="220" width="520" height="190" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="22" y="240" font-size="12" font-weight="700" fill="#888">Trade Validation</text>
+<text x="22" y="240" font-size="12" font-weight="700" fill="#555555">Trade Validation</text>
 <rect x="540" y="220" width="330" height="190" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="552" y="240" font-size="12" font-weight="700" fill="#888">Desk Distribution</text>
+<text x="552" y="240" font-size="12" font-weight="700" fill="#555555">Desk Distribution</text>
 <rect x="30" y="40" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="95.0" y="57.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.feed.raw</text>
 <text x="95.0" y="74.0" font-size="11.5" fill="#555555" text-anchor="middle">.bloomberg</text>
@@ -37,23 +37,23 @@
 <rect x="200" y="250" width="160" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="280.0" y="273.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Trade Validator</text>
 <text x="280.0" y="290.0" font-size="11.5" fill="#555555" text-anchor="middle">idempotent + validate</text>
-<rect x="200" y="330" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="200" y="330" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="265.0" y="354.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.audit.log</text>
 <rect x="400" y="260" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="465.0" y="284.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">.validated</text>
-<rect x="200" y="380" width="120" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="200" y="380" width="120" height="35" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="260.0" y="395.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">rejected</text>
 <text x="260.0" y="412.5" font-size="11.5" fill="#555555" text-anchor="middle">(logged only)</text>
 <rect x="560" y="250" width="155" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="637.5" y="273.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Desk Distributor</text>
 <text x="637.5" y="290.0" font-size="11.5" fill="#555555" text-anchor="middle">multicast + filter</text>
-<rect x="740" y="240" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="740" y="240" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="805.0" y="257.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">desk-a</text>
 <text x="805.0" y="274.0" font-size="11.5" fill="#555555" text-anchor="middle">(government)</text>
-<rect x="740" y="285" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="740" y="285" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="805.0" y="302.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">desk-b</text>
 <text x="805.0" y="319.0" font-size="11.5" fill="#555555" text-anchor="middle">(corporate)</text>
-<rect x="740" y="330" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="740" y="330" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="805.0" y="347.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">desk-c</text>
 <text x="805.0" y="364.0" font-size="11.5" fill="#555555" text-anchor="middle">(all bonds)</text>
 <path d="M160,58 L190,58" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>

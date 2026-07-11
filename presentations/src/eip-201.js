@@ -9,6 +9,7 @@ const {
   addFooter, addContentTitle, addBullets, addTwoColBullets, addStatusTable,
   addCaption, addPerfCallout,
   addDiagramSlide, addCodeSlide, addLangChip, addSectionDivider, addNotes,
+  addPatternCard, addComparisonSlide, addIconGrid, addFlowSlide, addKeyValueSlide,
 } = require("./deck-helpers.js");
 
 const pres = newDeck();
@@ -49,7 +50,7 @@ function bsub(items) {
     out.push({
       text: ln.sub,
       options: {
-        bullet: false, color: COLOR.caption, fontSize: 13,
+        bullet: false, color: COLOR.body, fontSize: 13,
         indentLevel: 1, paraSpaceAfter: 12, breakLine: true,
       },
     });
@@ -66,7 +67,7 @@ function bsub(items) {
   const s = pres.addSlide();
   s.background = { color: COLOR.ink };
   try {
-    s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: H });
+    s.addImage({ path: `${ASSETS}/section-panel.png`, x: 0, y: 0, w: W, h: H });
   } catch (e) { /* ok */ }
   s.addText("Enterprise Integration Patterns", {
     x: 6.20, y: 1.60, w: 6.60, h: 2.00,
@@ -179,15 +180,14 @@ divider("01", "The Camel\nRuntime", "Apache Camel 4.x — the integration framew
 // Slide 6: CamelContext
 {
   const s = S();
-  addContentTitle(s, "THE CAMEL RUNTIME", "CamelContext — The Runtime Container");
-  addBullets(s, bsub([
-    { text: "The CamelContext is the runtime container", sub: "It manages the lifecycle of all routes, components, endpoints, and type converters" },
-    { text: "Auto-configured by Quarkus", sub: "No manual CamelContext creation — Quarkus CDI handles it via camel-quarkus-core" },
-    { text: "Route lifecycle management", sub: "start(), stop(), suspend(), resume() — control individual routes at runtime" },
-    { text: "Registry integration", sub: "Camel's registry bridges to CDI — any @ApplicationScoped bean is auto-discoverable" },
-    { text: "Component auto-discovery", sub: "Add a Maven dependency, Camel discovers the component — no manual registration" },
-    { text: "Thread pool management", sub: "Manages thread pools for parallel processing, SEDA queues, and async operations" },
-  ]));
+  addKeyValueSlide(s, "THE CAMEL RUNTIME", "CamelContext — The Runtime Container", [
+    { key: "Runtime Container", value: "Manages the lifecycle of all routes, components, endpoints, and type converters" },
+    { key: "Auto-configured", value: "No manual CamelContext creation — Quarkus CDI handles it via camel-quarkus-core" },
+    { key: "Route Lifecycle", value: "start(), stop(), suspend(), resume() — control individual routes at runtime" },
+    { key: "Registry Integration", value: "Camel's registry bridges to CDI — any @ApplicationScoped bean is auto-discoverable" },
+    { key: "Component Discovery", value: "Add a Maven dependency, Camel discovers the component — no manual registration" },
+    { key: "Thread Pools", value: "Manages thread pools for parallel processing, SEDA queues, and async operations" },
+  ]);
   addNotes(s, "The CamelContext is the brain of the operation. It is the runtime container that owns and manages every route, component, and endpoint in your application. In traditional Camel you had to manually create and start the CamelContext. With Quarkus, this is completely automatic — the camel-quarkus-core extension creates the context, discovers your RouteBuilder classes via CDI, and starts everything at boot time. The registry integration is particularly powerful: any CDI bean you define with @ApplicationScoped is automatically available to Camel routes via the bean: component. Component auto-discovery means you just add a Maven dependency like camel-quarkus-kafka and the kafka: component is immediately usable in endpoint URIs. No XML configuration, no manual wiring.");
 }
 
@@ -225,32 +225,30 @@ divider("01", "The Camel\nRuntime", "Apache Camel 4.x — the integration framew
 // Slide 8: Processors — the processing pipeline
 {
   const s = S();
-  addContentTitle(s, "THE CAMEL RUNTIME", "Processors — The Processing Pipeline");
-  addBullets(s, bsub([
-    { text: "Exchange — the message wrapper", sub: "Carries the In message, optional Out message, headers, properties, and exception state" },
-    { text: "Message — the payload", sub: "Body (any Java object) + headers (String→Object map) — travels through the pipeline" },
-    { text: "Headers — metadata that travels with the message", sub: "CamelKafkaTopic, CamelKafkaOffset, correlationId, contentType — routing hints" },
-    { text: "Processor interface", sub: "void process(Exchange exchange) — the fundamental processing unit, stateless by design" },
-    { text: "Bean binding", sub: ".bean(MyService.class) — Camel auto-maps Exchange body/headers to method parameters" },
-    { text: "Type-safe with generics", sub: "exchange.getIn().getBody(Order.class) — automatic type conversion via Camel converters" },
-  ]));
+  addKeyValueSlide(s, "THE CAMEL RUNTIME", "Processors — The Processing Pipeline", [
+    { key: "Exchange", value: "Carries the In message, optional Out message, headers, properties, and exception state" },
+    { key: "Message", value: "Body (any Java object) + headers (String→Object map) — travels through the pipeline" },
+    { key: "Headers", value: "CamelKafkaTopic, CamelKafkaOffset, correlationId, contentType — routing hints" },
+    { key: "Processor", value: "void process(Exchange exchange) — the fundamental processing unit, stateless by design" },
+    { key: "Bean Binding", value: ".bean(MyService.class) — Camel auto-maps Exchange body/headers to method parameters" },
+    { key: "Type-safe Generics", value: "exchange.getIn().getBody(Order.class) — automatic type conversion via Camel converters" },
+  ]);
   addNotes(s, "The Exchange is the central abstraction in Camel's processing model. Think of it as an envelope that wraps the actual message. The Exchange carries an In message — the current payload — plus headers that act as metadata. Headers are key-value pairs where the key is always a String. Kafka-specific headers like CamelKafkaTopic and CamelKafkaOffset are set automatically by the Kafka component. The Processor interface is the lowest-level way to process a message: you get the Exchange and can read or modify anything on it. In practice, you rarely implement Processor directly — instead you use .bean() to delegate to a CDI bean, and Camel automatically maps the exchange body and headers to your method parameters. This bean binding is remarkably smart: if your method takes an Order parameter, Camel will convert the body to Order automatically.");
 }
 
 // Slide 9: Components — connecting to the world
 {
   const s = S();
-  addContentTitle(s, "THE CAMEL RUNTIME", "Components — Connecting to the World");
-  addBullets(s, bsub([
-    { text: "kafka:", sub: "Produce/consume Kafka topics — consumer groups, partitions, serializers, exactly-once" },
-    { text: "direct:", sub: "Synchronous in-memory call between routes — like a method call, same thread" },
-    { text: "seda:", sub: "Asynchronous in-memory queue between routes — decoupled, different thread" },
-    { text: "timer: / quartz:", sub: "Trigger routes on a schedule — polling consumers, batch processing" },
-    { text: "rest:", sub: "Expose REST APIs — auto-generates OpenAPI, supports GET/POST/PUT/DELETE" },
-    { text: "bean:", sub: "Invoke CDI beans — Camel handles parameter binding and type conversion" },
-    { text: "sql: / jpa:", sub: "Database access — queries, inserts, stored procedures, JPA entity management" },
-    { text: "platform-http:", sub: "Quarkus-native HTTP server — uses Vert.x under the hood, no extra servlet container" },
-  ]));
+  addIconGrid(s, "THE CAMEL RUNTIME", "Components — Connecting to the World", [
+    { icon: "message-channel", label: "kafka:", desc: "Produce/consume Kafka topics — consumer groups, partitions, serializers, exactly-once" },
+    { icon: "pipes-and-filters", label: "direct:", desc: "Synchronous in-memory call between routes — like a method call, same thread" },
+    { icon: "message-channel", label: "seda:", desc: "Asynchronous in-memory queue between routes — decoupled, different thread" },
+    { icon: "polling-consumer", label: "timer: / quartz:", desc: "Trigger routes on a schedule — polling consumers, batch processing" },
+    { icon: "messaging-gateway", label: "rest:", desc: "Expose REST APIs — auto-generates OpenAPI, supports GET/POST/PUT/DELETE" },
+    { icon: "service-activator", label: "bean:", desc: "Invoke CDI beans — Camel handles parameter binding and type conversion" },
+    { icon: "message-store", label: "sql: / jpa:", desc: "Database access — queries, inserts, stored procedures, JPA entity management" },
+    { icon: "channel-adapter", label: "platform-http:", desc: "Quarkus-native HTTP server — Vert.x under the hood, no extra servlet container" },
+  ], { cols: 4, cellH: 1.75, iconSize: 0.48 });
   addNotes(s, "Camel components are the connectors that let your routes talk to the outside world. Each component provides a scheme for endpoint URIs. The kafka: component is our workhorse — it handles producing and consuming messages with full support for consumer groups, partition assignment, and serialization. The direct: and seda: components are critical for internal routing — direct: is synchronous (same thread, like a method call) while seda: is asynchronous (different thread, with an internal queue). The rest: component lets you expose REST APIs that feed into Camel routes, which is how the Loan Broker example accepts HTTP requests and converts them into message flows. The bean: component bridges to your CDI beans. In Quarkus, platform-http: replaces the traditional servlet-based HTTP component with a Vert.x-based one that is much faster.");
 }
 
@@ -401,28 +399,24 @@ divider("02", "Infrastructure\nStack", "Kafka, Pulsar, Redis, PostgreSQL on Podm
 // Slide 19: Redis
 {
   const s = S();
-  addContentTitle(s, "INFRASTRUCTURE STACK", "Redis — Caching, Idempotency, and Pub/Sub");
-  addBullets(s, bsub([
-    { text: "Idempotent Repository", sub: "Store processed message IDs in Redis — deduplication across restarts and replicas" },
-    { text: "Claim Check store", sub: "Store large payloads in Redis, pass a claim key through the route — retrieve later" },
-    { text: "Distributed cache", sub: "Cache enrichment data — credit scores, customer profiles, product catalogs" },
-    { text: "Pub/Sub for lightweight messaging", sub: "Redis Pub/Sub for real-time notifications — lower latency than Kafka for ephemeral messages" },
-    { text: "camel-quarkus-redis component", sub: "Full CRUD operations, Pub/Sub, and idempotent consumer support in a single dependency" },
-  ]));
+  addIconGrid(s, "INFRASTRUCTURE STACK", "Redis — Caching, Idempotency, and Pub/Sub", [
+    { icon: "idempotent-consumer", label: "Idempotent Repository", desc: "Store processed message IDs in Redis — deduplication across restarts and replicas" },
+    { icon: "claim-check", label: "Claim Check Store", desc: "Store large payloads in Redis, pass a claim key through the route — retrieve later" },
+    { icon: "content-enricher", label: "Distributed Cache", desc: "Cache enrichment data — credit scores, customer profiles, product catalogs" },
+    { icon: "publish-subscribe-channel", label: "Pub/Sub Messaging", desc: "Redis Pub/Sub for real-time notifications — lower latency than Kafka for ephemeral messages" },
+  ], { cols: 2, cellH: 2.20 });
   addNotes(s, "Redis plays three distinct roles in our integration architecture. First, as an idempotent repository: when we need to ensure a message is processed only once — even across application restarts or multiple replicas — we store the message ID in Redis and check it before processing. The RedisIdempotentRepository is a Camel built-in that handles this automatically. Second, as a claim check store: when a message payload is too large to send through Kafka efficiently, we store the payload in Redis and send just a claim key through the route. The downstream consumer retrieves the full payload using that key. Third, Redis provides a distributed cache for enrichment data — caching credit scores or customer profiles so the content enricher pattern does not hit the database on every message. Redis Pub/Sub is also useful for lightweight real-time notifications where Kafka's durability overhead is unnecessary.");
 }
 
 // Slide 20: PostgreSQL
 {
   const s = S();
-  addContentTitle(s, "INFRASTRUCTURE STACK", "PostgreSQL — Outbox Pattern and Message Stores");
-  addBullets(s, bsub([
-    { text: "Transactional Outbox pattern", sub: "Write domain event + business data in a single DB transaction — then relay to Kafka" },
-    { text: "Message Store for audit", sub: "Persist every exchange for replay, debugging, and compliance — JPA entity mapping" },
-    { text: "Saga state persistence", sub: "Store saga state in PostgreSQL — survive restarts, enable distributed coordination" },
-    { text: "Aggregation Repository", sub: "JDBC-backed aggregation repository — survive restarts during long-running aggregations" },
-    { text: "Dev Services integration", sub: "Quarkus auto-starts PostgreSQL in dev mode — zero configuration, auto-schema creation" },
-  ]));
+  addIconGrid(s, "INFRASTRUCTURE STACK", "PostgreSQL — Outbox Pattern and Message Stores", [
+    { icon: "transactional-client", label: "Transactional Outbox", desc: "Write domain event + business data in a single DB transaction — then relay to Kafka" },
+    { icon: "message-store", label: "Message Store", desc: "Persist every exchange for replay, debugging, and compliance — JPA entity mapping" },
+    { icon: "saga", label: "Saga Persistence", desc: "Store saga state in PostgreSQL — survive restarts, enable distributed coordination" },
+    { icon: "aggregator", label: "Aggregation Repository", desc: "JDBC-backed aggregation repository — survive restarts during long-running aggregations" },
+  ], { cols: 2, cellH: 2.20 });
   addNotes(s, "PostgreSQL is the durable state store that makes several EIP patterns production-safe. The Transactional Outbox pattern is perhaps the most important: when a service processes an order, it writes the updated order state AND the outbound event to the same database transaction. A separate process — either Debezium CDC or a polling route — reads the outbox table and relays events to Kafka. This guarantees that the event is published if and only if the business operation succeeded. The message store pattern uses PostgreSQL to persist every exchange for audit and replay. The JDBC-backed aggregation repository ensures that in-progress aggregations survive application restarts — critical for the scatter-gather and aggregator patterns that collect responses over time. Quarkus Dev Services starts a PostgreSQL container automatically in dev mode.");
 }
 
@@ -455,15 +449,13 @@ divider("02", "Infrastructure\nStack", "Kafka, Pulsar, Redis, PostgreSQL on Podm
 // Slide 22: Running an example
 {
   const s = S();
-  addContentTitle(s, "INFRASTRUCTURE STACK", "Running an Example");
-  addBullets(s, bsub([
-    { text: "Start the infrastructure stack", sub: "./scripts/setup-stack.sh — Kafka, Pulsar, Redis, PostgreSQL in containers" },
-    { text: "Navigate to an example", sub: "cd examples/09-routing-fundamentals — each chapter has its own Maven project" },
-    { text: "Launch with Quarkus Dev Mode", sub: "mvn quarkus:dev — live reload, Dev Services, continuous testing" },
-    { text: "Observe the output", sub: "Camel logs route startups, message processing, and any errors to the console" },
-    { text: "Modify and iterate", sub: "Edit a route Java file, save — Quarkus reloads in milliseconds, no restart needed" },
-    { text: "Run tests", sub: "Press 'r' in Dev Mode to re-run tests — or enable continuous testing with 'o'" },
-  ]));
+  addFlowSlide(s, "INFRASTRUCTURE STACK", "Running an Example", [
+    { label: "Start Stack", desc: "./scripts/setup-stack.sh\n\nKafka, Pulsar, Redis, PostgreSQL in containers" },
+    { label: "Navigate", desc: "cd examples/<name>\n\nEach chapter has its own Maven project" },
+    { label: "Launch", desc: "mvn quarkus:dev\n\nLive reload, Dev Services, continuous testing" },
+    { label: "Observe", desc: "Camel logs route startups, message flow, and errors to console" },
+    { label: "Iterate", desc: "Edit a Java file, save — Quarkus reloads in milliseconds" },
+  ]);
   addPerfCallout(s, "Dev Mode startup: ~1.2s including route initialization. Live reload: ~200ms. Compare to traditional app server: 15-30s restart.");
   addNotes(s, "Here is the workflow for running any tutorial example end to end. First, start the infrastructure stack with setup-stack.sh — this is a one-time step that stays running in the background. Then navigate to the specific example directory. Each chapter has its own self-contained Maven project with its own pom.xml and application.properties. Run mvn quarkus:dev to start the application in Dev Mode. You will see Camel log each route starting up, and then messages flowing through the routes. The key power of Dev Mode is iteration speed: edit any Java file, save it, and Quarkus hot-reloads your changes in about 200 milliseconds. You do not restart the JVM. Press 'r' to run your test suite, or 'o' to enable continuous testing where tests automatically re-run on every save. This tight feedback loop makes it practical to experiment with different pattern implementations.");
 }
@@ -569,14 +561,13 @@ divider("03", "Channel Patterns\nin Code", "Point-to-Point, Pub/Sub, Dead Letter
 // Slide 28: Guaranteed Delivery
 {
   const s = S();
-  addContentTitle(s, "CHANNEL PATTERNS", "Guaranteed Delivery — Kafka Acks and Transactions");
-  addBullets(s, bsub([
-    { text: "Producer acknowledgments (acks)", sub: "acks=all — wait for all in-sync replicas to confirm the write before proceeding" },
-    { text: "Idempotent producer", sub: "enable.idempotence=true — Kafka deduplicates producer retries using sequence numbers" },
-    { text: "Transactional producer", sub: "Produce to multiple topics atomically — all messages committed or none" },
-    { text: "Consumer offset management", sub: "autoCommitEnable=false — commit offsets only after successful processing" },
-    { text: "At-least-once vs exactly-once", sub: "At-least-once: commit after processing. Exactly-once: Kafka transactions + idempotent consumer" },
-  ]));
+  addKeyValueSlide(s, "CHANNEL PATTERNS", "Guaranteed Delivery — Kafka Acks and Transactions", [
+    { key: "Producer Acks", value: "acks=all — wait for all in-sync replicas to confirm the write before proceeding" },
+    { key: "Idempotent Producer", value: "enable.idempotence=true — Kafka deduplicates retries using sequence numbers" },
+    { key: "Transactional Producer", value: "Produce to multiple topics atomically — all messages committed or none" },
+    { key: "Offset Management", value: "autoCommitEnable=false — commit offsets only after successful processing" },
+    { key: "Delivery Guarantees", value: "At-least-once: commit after processing. Exactly-once: Kafka transactions + idempotent consumer" },
+  ], { rowH: 0.65 });
   addPerfCallout(s, "acks=all adds ~5ms latency per produce but eliminates data loss. Always use acks=all in production.");
   addNotes(s, "Guaranteed delivery is not a single setting — it is a combination of producer and consumer configurations that together ensure no message is lost. On the producer side, acks=all means the broker does not acknowledge the write until all in-sync replicas have received the message. The idempotent producer setting prevents duplicates from producer retries — if the network drops the acknowledgment and the producer retries, Kafka deduplicates using a sequence number. On the consumer side, setting autoCommitEnable=false means you control when offsets are committed — you commit after successful processing, not before. If the consumer crashes before committing, the message will be redelivered. This gives you at-least-once semantics. For exactly-once, you combine Kafka transactions with idempotent consumers — we cover the idempotent consumer pattern in Section 07.");
 }
@@ -755,14 +746,13 @@ divider("04", "Message\nConstruction", "Commands, Events, Documents — as Java 
 // Slide 38: Return Address
 {
   const s = S();
-  addContentTitle(s, "MESSAGE CONSTRUCTION", "Return Address — Routing Replies Back");
-  addBullets(s, bsub([
-    { text: "replyTo header", sub: "The requestor sets a header telling the replier where to send the response" },
-    { text: "Dynamic reply channels", sub: "Each requestor can specify a different reply channel — unique temp topics or direct: endpoints" },
-    { text: "Camel convention", sub: "CamelReplyTo header is recognized by request-reply components (JMS, Kafka, direct)" },
-    { text: "Kafka reply topics", sub: "Use a dedicated reply topic with partition assignment — or per-requestor topics" },
-    { text: "Combining with Correlation ID", sub: "Return address says WHERE to reply; correlation ID says WHICH request it answers" },
-  ]));
+  addKeyValueSlide(s, "MESSAGE CONSTRUCTION", "Return Address — Routing Replies Back", [
+    { key: "replyTo Header", value: "The requestor sets a header telling the replier where to send the response" },
+    { key: "Dynamic Channels", value: "Each requestor can specify a different reply channel — unique temp topics or direct: endpoints" },
+    { key: "Camel Convention", value: "CamelReplyTo header is recognized by request-reply components (JMS, Kafka, direct)" },
+    { key: "Kafka Reply Topics", value: "Use a dedicated reply topic with partition assignment — or per-requestor topics" },
+    { key: "With Correlation ID", value: "Return address says WHERE to reply; correlation ID says WHICH request it answers" },
+  ]);
   addNotes(s, "The return address pattern complements the correlation identifier. While the correlation ID tells the requestor which request a reply corresponds to, the return address tells the replier where to send the reply. In Camel, the CamelReplyTo header is the conventional way to specify the return address. For direct: and JMS components, Camel handles this automatically when you use InOut exchange patterns. For Kafka, you typically set a custom replyTo header with the name of a reply topic. In more sophisticated setups, each requestor instance has its own reply topic partition, so replies go directly to the right instance without needing to filter. The return address is most valuable in distributed systems where the requestor and replier are in different applications or even different data centers.");
 }
 
@@ -1052,29 +1042,23 @@ divider("05", "Routing Patterns\nin Code", "Content-based router, splitter, aggr
 // Slide 52: Process Manager — saga
 {
   const s = S();
-  addContentTitle(s, "ROUTING PATTERNS", "Process Manager — Stateful Routing with Saga");
-  addBullets(s, bsub([
-    { text: "The Process Manager coordinates multi-step workflows", sub: "Maintains state, handles compensations, survives restarts — the stateful router" },
-    { text: "Camel Saga — distributed transactions without 2PC", sub: "saga().compensation() defines rollback actions; saga().completion() defines success actions" },
-    { text: "Order fulfillment as a saga", sub: "Reserve inventory → charge payment → ship order — each step has a compensation" },
-    { text: "Compensation actions", sub: "Release inventory, refund payment, cancel shipment — invoked automatically on failure" },
-    { text: "Saga state in PostgreSQL", sub: "Persist saga state for durability — survive application restarts during long-running workflows" },
-  ]));
+  addPatternCard(s, "ROUTING PATTERNS", "Process Manager — Stateful Routing with Saga",
+    "process-manager",
+    "Multi-step workflows require coordination across services. Each step may need to be undone if a later step fails. Without a process manager, partial failures leave the system in an inconsistent state — inventory reserved but payment never charged.",
+    "The Camel Saga pattern coordinates multi-step workflows without two-phase commit. Each step defines a compensation action: reserve inventory → charge payment → ship order. On failure, compensations fire automatically (release inventory, refund payment). Saga state persists in PostgreSQL to survive restarts."
+  );
   addNotes(s, "The process manager is the most complex routing pattern. It maintains state across multiple processing steps and handles compensations when steps fail. In traditional distributed systems, you would use two-phase commit — but that does not work with messaging systems. Instead, Camel's saga pattern implements the Saga pattern from microservices: each step defines a compensation action that undoes its work. If the payment step succeeds but the shipping step fails, the saga automatically invokes the payment compensation (refund) and the inventory compensation (release reservation). The saga state is persisted to PostgreSQL so it survives application restarts. This is essential for long-running workflows that might span minutes or hours. The process manager pattern appears in our shipping domain for the full order fulfillment workflow: reserve → pay → ship, with compensations at each step.");
 }
 
 // Slide 53: Composed Message Processor
 {
   const s = S();
-  addContentTitle(s, "ROUTING PATTERNS", "Composed Message Processor — Split, Route, Aggregate");
-  addBullets(s, bsub([
-    { text: "The compound pattern: Splitter + Router + Aggregator", sub: "Split a composite message, route each piece individually, then reassemble the results" },
-    { text: "Order processing example", sub: "Split order into items → route each to the right warehouse → aggregate fulfillment results" },
-    { text: "Splitter does the decomposition", sub: ".split(body().tokenize(',')) or .split(simple('${body.items}'))" },
-    { text: "Each piece is routed independently", sub: "Content-based router inside the split block sends items to different processing paths" },
-    { text: "Aggregator reassembles", sub: ".split(...).aggregationStrategy(new ReassemblyStrategy()) — automatic aggregation after split" },
-    { text: "Camel shortcut", sub: "Splitter with a built-in aggregation strategy — no separate aggregate() needed" },
-  ]));
+  addFlowSlide(s, "ROUTING PATTERNS", "Composed Message Processor — Split, Route, Aggregate", [
+    { label: "Split", desc: "Decompose composite message into parts\n\n.split(simple('${body.items}'))" },
+    { label: "Route", desc: "Each piece is routed independently via content-based router" },
+    { label: "Process", desc: "Individual processing per piece — warehouse lookup, validation" },
+    { label: "Aggregate", desc: "Reassemble results with AggregationStrategy — automatic after split" },
+  ]);
   addNotes(s, "The composed message processor is a pattern that combines three other patterns: splitter, router, and aggregator. It is so common that Camel provides a shortcut — the split() method accepts an AggregationStrategy parameter that automatically aggregates the results after all split pieces have been processed. The canonical example is order processing: an order with five line items is split into five individual messages, each routed to the appropriate warehouse based on product category, and then the fulfillment results are aggregated back into a single order status. Without this compound pattern, you would need to wire up the splitter, router, and aggregator separately with correlation and completion logic. With Camel's built-in support, it is a single split() call with a strategy parameter.");
 }
 
@@ -1381,15 +1365,11 @@ divider("06", "Transformation\nin Code", "Translators, enrichers, claim checks, 
 // Slide 66: Resequencer
 {
   const s = S();
-  addContentTitle(s, "TRANSFORMATION", "Resequencer — Reordering by Sequence Number");
-  addBullets(s, bsub([
-    { text: "Stream resequencer", sub: "Continuously reorders messages using a sliding window — low latency, bounded memory" },
-    { text: "Batch resequencer", sub: "Collects N messages, sorts, releases — higher latency but simpler semantics" },
-    { text: "Sequence expression", sub: ".resequence(header('seqNum')) — any Camel expression that produces a comparable value" },
-    { text: "Timeout for gaps", sub: "If a message in the sequence never arrives, the timeout releases the window to prevent stalls" },
-    { text: "Capacity limit", sub: ".capacity(100) — bounds memory usage by limiting the resequencer's buffer size" },
-    { text: "Use case: tracking updates", sub: "Carrier tracking events arrive out of order — resequencer restores chronological order" },
-  ]));
+  addPatternCard(s, "TRANSFORMATION", "Resequencer — Reordering by Sequence Number",
+    "resequencer",
+    "Messages arrive out of order due to parallel processing, network jitter, or multiple producers. Downstream consumers need messages in their original sequence to maintain causal consistency — tracking event 3 before event 2 breaks the timeline.",
+    "Camel offers two resequencer modes: Stream (sliding window, low latency) and Batch (collect N, sort, release). Use .resequence(header('seqNum')) with any comparable expression. Timeout prevents stalls when gaps occur; .capacity(100) bounds memory usage."
+  );
   addNotes(s, "The resequencer pattern restores message ordering when messages arrive out of sequence. This is a transformation pattern because it changes the order in which messages appear to downstream consumers. The stream resequencer works like a jitter buffer in audio streaming: it holds messages in a small window and releases them in order as the window advances. If message 3 arrives before message 2, the stream resequencer holds message 3 until message 2 arrives (or the timeout expires). The batch resequencer is simpler: it collects a batch of messages, sorts them by sequence number, and releases the sorted batch. The stream variant is better for continuous flows; the batch variant is better for periodic batch processing. The capacity limit prevents memory exhaustion if a producer sends messages much faster than the resequencer can release them.");
 }
 
@@ -1532,15 +1512,14 @@ divider("07", "Endpoint Patterns\nin Code", "Gateways, consumers, idempotent rec
 // Slide 74: Competing Consumers
 {
   const s = S();
-  addContentTitle(s, "ENDPOINT PATTERNS", "Competing Consumers — Kafka Consumer Group Parallelism");
-  addBullets(s, bsub([
-    { text: "Same groupId = competing consumers", sub: "Kafka assigns partitions across consumers — each message processed by exactly one consumer" },
-    { text: "Horizontal scaling", sub: "Add more consumers (replicas) to increase throughput — up to the number of partitions" },
-    { text: "Automatic rebalancing", sub: "Consumer joins or leaves → Kafka reassigns partitions automatically" },
-    { text: "Max parallelism = partition count", sub: "6 partitions means at most 6 consumers can be active — design partition count for peak load" },
-    { text: "Consumer lag monitoring", sub: "Track how far behind consumers are — critical for capacity planning" },
-    { text: "Camel configuration", sub: "consumersCount=3 in the endpoint URI to run multiple consumer threads in one JVM" },
-  ]));
+  addKeyValueSlide(s, "ENDPOINT PATTERNS", "Competing Consumers — Kafka Consumer Group Parallelism", [
+    { key: "Same groupId", value: "Kafka assigns partitions across consumers — each message processed by exactly one" },
+    { key: "Horizontal Scaling", value: "Add more consumers (replicas) to increase throughput — up to the partition count" },
+    { key: "Auto Rebalancing", value: "Consumer joins or leaves → Kafka reassigns partitions automatically" },
+    { key: "Max Parallelism", value: "6 partitions = at most 6 active consumers — design partition count for peak load" },
+    { key: "Lag Monitoring", value: "Track how far behind consumers are — critical for capacity planning" },
+    { key: "Camel Config", value: "consumersCount=3 in the endpoint URI to run multiple consumer threads in one JVM" },
+  ], { rowH: 0.55 });
   addPerfCallout(s, "Rule of thumb: set partition count = 2x to 3x your expected max consumer count. Partitions cannot be reduced later.");
   addNotes(s, "Competing consumers is how you scale message processing horizontally. In Kafka, all consumers with the same groupId share the workload — each partition is assigned to exactly one consumer in the group. When you deploy three replicas of your order-processing service (all with groupId=order-processor), Kafka distributes the partitions across them. If a replica crashes, Kafka reassigns its partitions to the surviving replicas within seconds. The critical design decision is the partition count: if you have 6 partitions, you can run at most 6 consumer instances. More consumers than partitions means some sit idle. Fewer consumers than partitions means each consumer handles multiple partitions. You cannot reduce partition count later without recreating the topic, so plan for peak load at topic creation time. Camel also supports in-JVM parallelism with the consumersCount parameter.");
 }
@@ -1603,15 +1582,11 @@ divider("07", "Endpoint Patterns\nin Code", "Gateways, consumers, idempotent rec
 // Slide 77: Durable Subscriber
 {
   const s = S();
-  addContentTitle(s, "ENDPOINT PATTERNS", "Durable Subscriber — Kafka with Committed Offsets");
-  addBullets(s, bsub([
-    { text: "Kafka consumer groups ARE durable subscribers", sub: "Each group tracks its offset position — missed messages are delivered on reconnect" },
-    { text: "Offset persistence", sub: "Committed offsets survive consumer restarts — resume from last committed position" },
-    { text: "autoCommitEnable=false for reliability", sub: "Commit offsets explicitly after successful processing — prevent message loss" },
-    { text: "autoOffsetReset=earliest for new subscribers", sub: "New consumer groups start from the beginning of the topic — see historical messages" },
-    { text: "Manual offset management", sub: "Use allowManualCommit=true and KafkaManualCommit for fine-grained control" },
-    { text: "Non-durable alternative", sub: "Set autoOffsetReset=latest — new consumers only see messages published after they start" },
-  ]));
+  addPatternCard(s, "ENDPOINT PATTERNS", "Durable Subscriber — Kafka with Committed Offsets",
+    "durable-subscriber",
+    "Subscribers disconnect for maintenance, restarts, or failures. Without durable subscriptions, all messages published during the outage are lost forever. The subscriber resumes but has a gap in its message history.",
+    "Kafka consumer groups are inherently durable — committed offsets survive restarts and resume from the last position. Set autoCommitEnable=false for reliability (commit after processing), autoOffsetReset=earliest for new subscribers to replay history, or allowManualCommit=true for fine-grained control."
+  );
   addNotes(s, "The durable subscriber pattern ensures that a subscriber receives all messages, even those published while the subscriber was disconnected. In Kafka, every consumer group is inherently a durable subscriber — Kafka persists each group's committed offset, and when the consumer reconnects, it resumes from that position. The key configuration is autoCommitEnable: setting it to false means you control exactly when offsets are committed. This prevents the scenario where Kafka commits the offset (marking the message as consumed) before your processing code finishes — which would lose the message if the consumer crashes mid-processing. For new subscribers, autoOffsetReset=earliest starts from the beginning of the topic, giving the subscriber access to the full message history (up to the retention period). This is how event sourcing works — new services can replay the entire event log to build their state from scratch.");
 }
 
@@ -1633,15 +1608,14 @@ divider("08", "System Management\nin Code", "Control bus, wire tap, message hist
 // Slide 79: Managing the messaging system
 {
   const s = S();
-  addContentTitle(s, "SYSTEM MANAGEMENT", "Managing the Messaging System");
-  addBullets(s, bsub([
-    { text: "Observability is not optional", sub: "In production messaging, you need to see every message flow, every failure, every bottleneck" },
-    { text: "Control Bus — runtime route management", sub: "Start, stop, suspend routes dynamically — respond to load, failures, deployments" },
-    { text: "Wire Tap — non-intrusive monitoring", sub: "Copy messages to an audit channel without disrupting the main flow" },
-    { text: "Message History — breadcrumb trail", sub: "Track every route a message has visited — invaluable for debugging complex flows" },
-    { text: "Test Message — canary messages", sub: "Inject test messages into production flows to verify end-to-end health" },
-    { text: "Detour — conditional bypass", sub: "Route messages through a debug/monitoring step only when a flag is enabled" },
-  ]));
+  addIconGrid(s, "SYSTEM MANAGEMENT", "Managing the Messaging System", [
+    { icon: "control-bus", label: "Control Bus", desc: "Start, stop, suspend routes dynamically — respond to load, failures, deployments" },
+    { icon: "wire-tap", label: "Wire Tap", desc: "Copy messages to an audit channel without disrupting the main flow" },
+    { icon: "message-history", label: "Message History", desc: "Track every route a message has visited — invaluable for debugging complex flows" },
+    { icon: "test-message", label: "Test Message", desc: "Inject canary messages into production flows to verify end-to-end health" },
+    { icon: "detour", label: "Detour", desc: "Route messages through a debug/monitoring step only when a flag is enabled" },
+    { icon: null, label: "Observability", desc: "In production messaging, you need to see every message flow, failure, and bottleneck" },
+  ], { cols: 3, cellH: 2.10 });
   addNotes(s, "System management patterns are what separate a prototype from a production system. You need to observe what is happening — which messages are flowing, which are failing, where are the bottlenecks. You need to control the system at runtime — stop a route that is overwhelming a downstream service, suspend processing during a maintenance window. You need to audit — capture a copy of every message for compliance, debugging, or analytics without slowing down the main processing pipeline. And you need to test — inject canary messages into production to verify that the end-to-end flow is healthy. These patterns are often overlooked during initial development and then added in a panic during the first production incident. Build them in from the start.");
 }
 
@@ -1999,15 +1973,14 @@ divider("09", "Observability\n& Production", "OpenTelemetry, metrics, health che
 // Slide 97: Dev Mode power features
 {
   const s = S();
-  addContentTitle(s, "OBSERVABILITY & PRODUCTION", "Dev Mode Power Features");
-  addBullets(s, bsub([
-    { text: "Live reload", sub: "Edit a route → save → Quarkus reloads in ~200ms — no JVM restart, no lost state" },
-    { text: "Dev Services", sub: "Quarkus auto-starts Kafka, Redis, PostgreSQL in containers — zero-config development" },
-    { text: "Continuous testing", sub: "Press 'o' in Dev Mode — tests re-run automatically on every save" },
-    { text: "Dev UI", sub: "http://localhost:8080/q/dev-ui — browse routes, endpoints, health, metrics in a web UI" },
-    { text: "Camel Dev Console", sub: "Inspect running routes, exchanges in flight, and component configuration" },
-    { text: "Remote dev mode", sub: "mvn quarkus:remote-dev — live reload against a remote Kubernetes pod" },
-  ]));
+  addIconGrid(s, "OBSERVABILITY & PRODUCTION", "Dev Mode Power Features", [
+    { icon: null, label: "Live Reload", desc: "Edit a route, save — Quarkus reloads in ~200ms. No JVM restart, no lost state." },
+    { icon: null, label: "Dev Services", desc: "Quarkus auto-starts Kafka, Redis, PostgreSQL in containers — zero-config development." },
+    { icon: null, label: "Continuous Testing", desc: "Press 'o' in Dev Mode — tests re-run automatically on every save." },
+    { icon: null, label: "Dev UI", desc: "localhost:8080/q/dev-ui — browse routes, endpoints, health, and metrics in a web UI." },
+    { icon: null, label: "Camel Dev Console", desc: "Inspect running routes, exchanges in flight, and component configuration." },
+    { icon: null, label: "Remote Dev Mode", desc: "mvn quarkus:remote-dev — live reload against a remote Kubernetes pod." },
+  ], { cols: 3, cellH: 2.10 });
   addNotes(s, "Quarkus Dev Mode transforms the development experience for Camel routes. Live reload means your feedback loop is measured in milliseconds, not minutes. When you save a file, Quarkus detects the change, recompiles the affected classes, re-registers the routes, and resumes processing — typically in under 200ms. Dev Services eliminate the infrastructure setup burden: add the Kafka extension and Quarkus automatically starts a Kafka container using Testcontainers. You do not write a docker-compose file or configure connection URLs — it just works. Continuous testing re-runs your test suite on every save, giving you instant feedback on whether your changes broke anything. The Dev UI provides a web-based view of your running application: browse routes, inspect endpoints, check health, and view metrics. Remote dev mode extends live reload to a Kubernetes cluster — edit locally, see changes immediately on a remote pod.");
 }
 
@@ -2029,15 +2002,13 @@ divider("10", "Case Study\nLoan Broker", "13 EIP patterns working together",
 // Slide 99: Architecture overview
 {
   const s = S();
-  addContentTitle(s, "CASE STUDY: LOAN BROKER", "Architecture: Five Routes, 13 Patterns");
-  addBullets(s, bsub([
-    { text: "GatewayRoute", sub: "REST endpoint → Kafka — channel adapter, messaging gateway, request-reply" },
-    { text: "EnricherRoute", sub: "Credit score lookup — content enricher, message translator" },
-    { text: "RecipientListRoute", sub: "Fan out to banks — recipient list, correlation identifier" },
-    { text: "BankRoutes", sub: "Simulated bank services — service activator, message filter" },
-    { text: "AggregatorRoute", sub: "Collect best rate — aggregator, scatter-gather, content-based router" },
-    { text: "DemoRoute", sub: "Generate test requests — test message, timer" },
-  ]));
+  addFlowSlide(s, "CASE STUDY: LOAN BROKER", "Architecture: Five Routes, 13 Patterns", [
+    { label: "Gateway", desc: "REST → Kafka\n\nChannel adapter, messaging gateway" },
+    { label: "Enricher", desc: "Credit score lookup\n\nContent enricher, translator" },
+    { label: "Recipient List", desc: "Fan out to banks\n\nRecipient list, correlation ID" },
+    { label: "Bank Services", desc: "Rate calculation\n\nService activator, filter" },
+    { label: "Aggregator", desc: "Collect best rate\n\nScatter-gather, CBR" },
+  ]);
   addNotes(s, "The Loan Broker is structured as six route classes, each implementing a stage of the workflow. The GatewayRoute accepts HTTP requests and converts them into Kafka messages — this is the channel adapter and messaging gateway patterns. The EnricherRoute looks up the customer's credit score and adds it to the loan request — the content enricher pattern. The RecipientListRoute fans the enriched request out to multiple banks — the recipient list pattern with correlation identifiers for tracking responses. Each BankRoute is a simulated service that calculates a rate based on the credit score and loan parameters — the service activator pattern. The AggregatorRoute collects all bank responses, selects the best rate, and returns it — the aggregator pattern as part of a scatter-gather. The DemoRoute generates periodic test requests so you can see the system working without a REST client.");
 }
 
@@ -2257,15 +2228,14 @@ divider("11", "Case Study\nBond Trading", "16 EIP patterns in a financial market
 // Slide 109: Market data distribution
 {
   const s = S();
-  addContentTitle(s, "CASE STUDY: BOND TRADING", "Market Data Distribution — Three Feed Sources");
-  addBullets(s, bsub([
-    { text: "Bloomberg feed", sub: "JSON format, field names: TICKER, BID_PRICE, ASK_PRICE, LAST_UPDATE" },
-    { text: "Reuters feed", sub: "JSON format, field names: ric, bid, ask, timestamp — different naming convention" },
-    { text: "Exchange direct feed", sub: "JSON format, field names: symbol, bidPrice, askPrice, tradeTime — yet another format" },
-    { text: "The normalization challenge", sub: "Three sources, three formats, one canonical model needed for downstream processing" },
-    { text: "Real-time requirements", sub: "Market data arrives at ~100-1000 updates per second — must process with low latency" },
-    { text: "Reliability requirements", sub: "Missed or duplicated price updates can lead to incorrect trading decisions" },
-  ]));
+  addIconGrid(s, "CASE STUDY: BOND TRADING", "Market Data Distribution — Three Feed Sources", [
+    { icon: "channel-adapter", label: "Bloomberg Feed", desc: "JSON format\nFields: TICKER, BID_PRICE, ASK_PRICE, LAST_UPDATE" },
+    { icon: "channel-adapter", label: "Reuters Feed", desc: "JSON format\nFields: ric, bid, ask, timestamp — different naming" },
+    { icon: "channel-adapter", label: "Exchange Direct", desc: "JSON format\nFields: symbol, bidPrice, askPrice, tradeTime" },
+    { icon: "normalizer", label: "Normalization", desc: "Three sources, three formats, one canonical BondQuote model" },
+    { icon: null, label: "Real-Time", desc: "~100-1000 updates/sec — must process with low latency" },
+    { icon: null, label: "Reliability", desc: "Missed or duplicated prices lead to incorrect trading decisions" },
+  ], { cols: 3, cellH: 2.10 });
   addNotes(s, "Financial market data is a classic integration challenge. Each data provider uses its own format, naming conventions, and delivery mechanisms. Bloomberg uses all-caps field names. Reuters uses lowercase with its own identifiers (RIC codes). Exchange direct feeds have their own conventions. The downstream trading desks should not care about these differences — they need a single, consistent price format. This is exactly the normalizer pattern at scale. The performance requirements are demanding: market data arrives at high frequency, and each update must be processed with minimal latency because stale prices lead to bad trading decisions. The reliability requirements are equally demanding: duplicate prices could trigger duplicate trades, and missed prices could cause traders to act on outdated information. These requirements make this case study an excellent test of Camel's throughput and reliability patterns.");
 }
 
@@ -2538,15 +2508,14 @@ divider("12", "Closing\n& Appendices", "Key takeaways, reference catalogs, and r
 // Slide 122: Resources
 {
   const s = S();
-  addContentTitle(s, "CLOSING", "Resources for Continued Learning");
-  addBullets(s, bsub([
-    { text: "Enterprise Integration Patterns — Hohpe & Woolf", sub: "The definitive book: 65 patterns for messaging-based integration" },
-    { text: "Tutorial site", sub: "GitHub Pages site with all chapters, diagrams, and code walkthroughs" },
-    { text: "GitHub repository", sub: "All source code, examples, infrastructure, and presentation sources" },
-    { text: "Apache Camel documentation", sub: "camel.apache.org — component reference, DSL guide, enterprise patterns catalog" },
-    { text: "Quarkus guides", sub: "quarkus.io/guides — getting started, Kafka, Redis, PostgreSQL, OpenTelemetry" },
-    { text: "Camel Quarkus extensions", sub: "camel.apache.org/camel-quarkus — 300+ extensions with Quarkus-specific documentation" },
-  ]));
+  addKeyValueSlide(s, "CLOSING", "Resources for Continued Learning", [
+    { key: "Hohpe & Woolf", value: "Enterprise Integration Patterns — the definitive book: 65 patterns for messaging" },
+    { key: "Tutorial Site", value: "GitHub Pages site with all chapters, diagrams, and code walkthroughs" },
+    { key: "GitHub Repository", value: "All source code, examples, infrastructure, and presentation sources" },
+    { key: "Camel Docs", value: "camel.apache.org — component reference, DSL guide, enterprise patterns catalog" },
+    { key: "Quarkus Guides", value: "quarkus.io/guides — getting started, Kafka, Redis, PostgreSQL, OpenTelemetry" },
+    { key: "Camel Quarkus", value: "camel.apache.org/camel-quarkus — 300+ extensions with Quarkus-specific docs" },
+  ]);
   addNotes(s, "For continued learning, start with the tutorial site — it walks through every pattern with explanations, diagrams, and code samples at a depth that slides cannot match. The GitHub repository has all the source code including the runnable examples, infrastructure compose files, and diagram sources. The Hohpe and Woolf book remains the definitive reference for understanding the patterns at a conceptual level. The Apache Camel documentation at camel.apache.org is comprehensive — every component, every DSL method, every pattern has detailed documentation with examples. The Quarkus guides cover the runtime and its extensions. And the Camel Quarkus extensions catalog lists all 300+ available extensions with Quarkus-specific configuration notes. Between these resources and the runnable examples, you have everything you need to build production-grade integrations with Camel on Quarkus.");
 }
 
@@ -2555,7 +2524,7 @@ divider("12", "Closing\n& Appendices", "Key takeaways, reference catalogs, and r
   const s = pres.addSlide();
   s.background = { color: COLOR.ink };
   try {
-    s.addImage({ path: `${ASSETS}/cover-panel.png`, x: 0, y: 0, w: W, h: H });
+    s.addImage({ path: `${ASSETS}/section-panel.png`, x: 0, y: 0, w: W, h: H });
   } catch (e) { /* ok */ }
   s.addText("Thank You", {
     x: 6.20, y: 1.80, w: 6.60, h: 1.40,

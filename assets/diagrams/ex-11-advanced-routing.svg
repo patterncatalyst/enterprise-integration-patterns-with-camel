@@ -1,25 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 440" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="10" y="10" width="860" height="80" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="22" y="30" font-size="12" font-weight="700" fill="#888">Dynamic Router</text>
+<text x="22" y="30" font-size="12" font-weight="700" fill="#555555">Dynamic Router</text>
 <rect x="10" y="100" width="540" height="80" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="22" y="120" font-size="12" font-weight="700" fill="#888">Wire Tap</text>
+<text x="22" y="120" font-size="12" font-weight="700" fill="#555555">Wire Tap</text>
 <rect x="560" y="100" width="310" height="80" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="572" y="120" font-size="12" font-weight="700" fill="#888">Resequencer</text>
+<text x="572" y="120" font-size="12" font-weight="700" fill="#555555">Resequencer</text>
 <rect x="10" y="190" width="540" height="90" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="22" y="210" font-size="12" font-weight="700" fill="#888">Composed Message Processor</text>
+<text x="22" y="210" font-size="12" font-weight="700" fill="#555555">Composed Message Processor</text>
 <rect x="560" y="190" width="310" height="90" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="572" y="210" font-size="12" font-weight="700" fill="#888">Load Balancer</text>
+<text x="572" y="210" font-size="12" font-weight="700" fill="#555555">Load Balancer</text>
 <rect x="30" y="35" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="95.0" y="59.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">eip.orders.placed</text>
 <rect x="190" y="28" width="150" height="45" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="265.0" y="48.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Dynamic Router</text>
 <text x="265.0" y="65.5" font-size="11.5" fill="#555555" text-anchor="middle">OrderRoutingBean</text>
-<rect x="370" y="33" width="80" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="370" y="33" width="80" height="35" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="410.0" y="56.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">validate</text>
-<rect x="470" y="33" width="80" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="470" y="33" width="80" height="35" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="510.0" y="56.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">inventory</text>
-<rect x="570" y="33" width="80" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="570" y="33" width="80" height="35" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="610.0" y="56.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">shipping</text>
 <rect x="680" y="35" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="745.0" y="59.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">.dynamic-routed</text>
@@ -41,7 +41,7 @@
 <text x="95.0" y="244.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">.composed</text>
 <rect x="180" y="215" width="110" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="235.0" y="240.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Split items</text>
-<rect x="320" y="215" width="110" height="40" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="320" y="215" width="110" height="40" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="375.0" y="240.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Process each</text>
 <rect x="320" y="260" width="110" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="375.0" y="285.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Aggregate</text>
@@ -49,9 +49,9 @@
 <text x="525.0" y="254.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">.enriched</text>
 <rect x="580" y="220" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="645.0" y="244.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">.loadbalanced</text>
-<rect x="730" y="210" width="100" height="30" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="730" y="210" width="100" height="30" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="780.0" y="230.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">East / NYC</text>
-<rect x="730" y="245" width="100" height="30" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="730" y="245" width="100" height="30" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="780.0" y="265.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Central / CHI</text>
 <path d="M160,55 L190,55" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
 <path d="M340,55 L370,55" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>

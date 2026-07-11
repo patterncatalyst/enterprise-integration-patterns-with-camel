@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="10" y="10" width="860" height="300" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="22" y="30" font-size="12" font-weight="700" fill="#888">Order Fulfillment Workflow (Serverless Workflow spec)</text>
+<text x="22" y="30" font-size="12" font-weight="700" fill="#555555">Order Fulfillment Workflow (Serverless Workflow spec)</text>
 <rect x="30" y="60" width="130" height="45" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="95.0" y="80.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">ValidateOrder</text>
 <text x="95.0" y="97.5" font-size="11.5" fill="#555555" text-anchor="middle">operation</text>
@@ -23,7 +23,7 @@
 <rect x="750" y="120" width="120" height="40" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
 <text x="810.0" y="138.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">PaymentFailed</text>
 <text x="810.0" y="155.0" font-size="11.5" fill="#dddddd" text-anchor="middle">end state</text>
-<rect x="30" y="200" width="130" height="40" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="30" y="200" width="130" height="40" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="95.0" y="218.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">CDI Beans</text>
 <text x="95.0" y="235.0" font-size="11.5" fill="#555555" text-anchor="middle">service functions</text>
 <rect x="200" y="200" width="150" height="45" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
