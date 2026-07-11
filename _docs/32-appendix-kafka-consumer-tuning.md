@@ -8,6 +8,8 @@ duration: "20 minutes"
 
 Appendix B introduced Kafka's core concepts — partitions, consumer groups, offsets, and exactly-once semantics. This appendix focuses on the consumer side: the configuration properties that control throughput, latency, data safety, and rebalance behavior. Every property is shown in the context of Camel's Kafka component, with guidance for the shipping domain's workload profiles.
 
+The code is in `examples/32-kafka-consumer-tuning/`. The `README.md` there covers how to run it.
+
 ## The consumer lifecycle
 
 A Kafka consumer cycles through three operations: **fetch** (pull batches from the broker), **poll** (deliver records to application code), and **commit** (acknowledge processed offsets). Each operation has configuration knobs that trade off throughput against latency and safety.

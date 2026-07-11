@@ -8,6 +8,8 @@ duration: "20 minutes"
 
 Appendix N covered the consumer side — fetch sizes, poll intervals, and offset commits. This appendix covers the producer: how Camel's Kafka component batches, compresses, and delivers messages, and which configuration properties control the tradeoffs between throughput, latency, and durability.
 
+The code is in `examples/33-kafka-producer-tuning/`. The `README.md` there covers how to run it.
+
 ## The producer pipeline
 
 A Kafka producer doesn't send each message individually. Messages pass through a pipeline of buffering, batching, and (optionally) compression before they reach the network:

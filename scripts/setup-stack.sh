@@ -23,6 +23,16 @@ if $CLEAN; then
   echo "    Volumes removed."
 fi
 
+# Pulsar's embedded BookKeeper corrupts its ledger data across dirty shutdowns.
+# If Pulsar exited with an error, wipe its volume before restarting.
+pulsar_status=$(podman inspect --format='{{.State.Status}}' eip-pulsar 2>/dev/null || echo "absent")
+if [[ "$pulsar_status" == "exited" ]] || [[ "$pulsar_status" == "dead" ]]; then
+  echo "==> Detected crashed Pulsar container — cleaning volume to prevent ledger corruption..."
+  podman rm eip-pulsar 2>/dev/null || true
+  podman volume rm eip-pulsar-data 2>/dev/null || true
+  echo "    Pulsar volume cleaned."
+fi
+
 echo "==> Starting EIP base stack (Kafka, Pulsar, Redis, PostgreSQL, Apicurio)..."
 podman-compose -p eip -f "$INFRA_DIR/compose.yaml" up -d
 
