@@ -2523,17 +2523,21 @@ divider("12", "Closing\n& Appendices", "Key takeaways, reference catalogs, and r
   const s = S();
   addContentTitle(s, "CLOSING", "The Runnable Examples Catalog");
   addStatusTable(s, [
-    { code: "01", name: "05-reliability",           purpose: "Dead letter, guaranteed delivery, retry — 4 patterns", codeColor: COLOR.svc },
-    { code: "02", name: "06-messaging-bridge",       purpose: "Kafka ↔ Pulsar bridge — 3 patterns", codeColor: COLOR.svc },
-    { code: "03", name: "09-routing-fundamentals",   purpose: "CBR, filter, splitter, aggregator — 8 patterns", codeColor: COLOR.data },
-    { code: "04", name: "11-transformation",         purpose: "Translator, enricher, claim check — 6 patterns", codeColor: COLOR.data },
-    { code: "05", name: "13-aggregation",            purpose: "Aggregator, scatter-gather, resequencer — 5 patterns", codeColor: COLOR.platform },
-    { code: "06", name: "14-endpoints",              purpose: "Gateway, idempotent, competing consumers — 7 patterns", codeColor: COLOR.platform },
-    { code: "07", name: "16-management",             purpose: "Control bus, wire tap, history — 6 patterns", codeColor: COLOR.govern },
-    { code: "08", name: "loan-broker",               purpose: "Full case study — 13 patterns composed end-to-end", codeColor: COLOR.govern },
-    { code: "09", name: "bond-trading",              purpose: "Full case study — 16 patterns for market data processing", codeColor: COLOR.red },
-  ], { colW: [0.80, 2.80, 8.49], rowH: 0.45 });
-  addNotes(s, "This table catalogs all nine runnable example projects in the tutorial repository. Each example is a self-contained Quarkus application that you can start with mvn quarkus:dev. The examples are organized by chapter, starting with reliability patterns and progressing through routing, transformation, endpoints, and management. The two case studies — Loan Broker and Bond Trading — are the capstone examples that compose many patterns into complete applications. Every example includes unit and integration tests, application.properties with sensible defaults, and a DemoRoute that generates test data. The shared domain-model module provides the canonical records used across all examples. To run any example, start the infrastructure with setup-stack.sh, navigate to the example directory, and run mvn quarkus:dev. The tutorial site at the companion GitHub Pages repository provides detailed walkthrough documentation for each example.");
+    { code: "01", name: "04-channel-types",          purpose: "P2P, Pub/Sub, Datatype — Kafka + Pulsar + Redis", codeColor: COLOR.svc },
+    { code: "02", name: "05-reliability",             purpose: "Dead letter channel, guaranteed delivery", codeColor: COLOR.svc },
+    { code: "03", name: "06-channel-infra",           purpose: "Channel adapter, Kafka↔Pulsar bridge, message bus", codeColor: COLOR.svc },
+    { code: "04", name: "07/08-messages",             purpose: "Command/Document/Event, correlation, sequence, expiration", codeColor: COLOR.data },
+    { code: "05", name: "09-routing-fundamentals",    purpose: "CBR, filter, splitter, recipient list", codeColor: COLOR.data },
+    { code: "06", name: "10/11-composed+advanced",    purpose: "Scatter-gather, routing slip, dynamic router, resequencer", codeColor: COLOR.data },
+    { code: "07", name: "12-transformation",          purpose: "Translator, enricher (Redis), content filter", codeColor: COLOR.platform },
+    { code: "08", name: "13-aggregator",              purpose: "Aggregator (in-memory + PostgreSQL JDBC), normalizer", codeColor: COLOR.platform },
+    { code: "09", name: "14-consumer-patterns",       purpose: "Polling (Kafka + SQL), event-driven (Pulsar), competing", codeColor: COLOR.platform },
+    { code: "10", name: "15-endpoints",               purpose: "Idempotent (JDBC), outbox (PostgreSQL), durable sub (Pulsar)", codeColor: COLOR.govern },
+    { code: "11", name: "16/17/18-management",        purpose: "Gateway, control bus, message store (PostgreSQL), testing", codeColor: COLOR.govern },
+    { code: "12", name: "loan-broker",                purpose: "Case study — 13 patterns composed end-to-end", codeColor: COLOR.govern },
+    { code: "13", name: "bond-trading",               purpose: "Case study — 16 patterns for market data processing", codeColor: COLOR.red },
+  ], { colW: [0.80, 2.80, 8.49], rowH: 0.38 });
+  addNotes(s, "This table catalogs all seventeen runnable example projects in the tutorial repository. Each example is a self-contained Quarkus application that you can start with mvn quarkus:dev. The examples use the full Podman infrastructure stack: Kafka for the messaging backbone, Pulsar for multi-tenant messaging, PostgreSQL for JDBC aggregation, idempotent repositories, and the outbox pattern, and Redis for content enrichment caching and Pub/Sub. The two case studies — Loan Broker and Bond Trading — are the capstone examples that compose many patterns into complete applications. To run any example, start the infrastructure with setup-stack.sh, navigate to the example directory, and run mvn quarkus:dev.");
 }
 
 // Slide 122: Resources
