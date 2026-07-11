@@ -7,6 +7,7 @@ Demonstrates three fundamental messaging channel patterns with Apache Camel on Q
 - **Datatype Channel** — incoming orders are routed by `status` field to dedicated topics (`eip.orders.placed.typed`, `eip.orders.cancelled`, `eip.orders.refunded`), each carrying a single event type
 - **Pulsar P2P** — same Point-to-Point pattern on Apache Pulsar with a `Shared` subscription
 - **Pulsar Pub/Sub** — fan-out to three independent `Exclusive` subscriptions on Pulsar
+- **Redis Pub/Sub** — fire-and-forget notifications via Redis Pub/Sub (no persistence, real-time only)
 
 ## Running
 
@@ -18,7 +19,7 @@ mvn quarkus:dev
 
 ## Infrastructure
 
-Requires the full Podman stack (Kafka + Pulsar):
+Requires the full Podman stack (Kafka + Pulsar + Redis):
 
 ```bash
 cd examples/_infra && ./../../scripts/setup-stack.sh
@@ -31,7 +32,8 @@ In the logs you will see:
 1. **Demo data generator** producing orders every 5 seconds to both Kafka and Pulsar
 2. **Point-to-Point** — each order consumed once and forwarded to `eip.orders.processed` (Kafka) and logged (Pulsar)
 3. **Pub/Sub fan-out** — the same order event logged by all three subscribers on both Kafka and Pulsar
-4. **Datatype routing** — orders sorted into type-specific topics, with dedicated consumers confirming receipt
+4. **Redis Pub/Sub** — shipping notifications published to Redis every 8 seconds, received by the subscriber in real-time
+5. **Datatype routing** — orders sorted into type-specific topics, with dedicated consumers confirming receipt
 
 ## Kafka topics
 

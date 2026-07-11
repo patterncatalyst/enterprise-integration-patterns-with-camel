@@ -1,11 +1,15 @@
 package com.example.eip.transform;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.apache.camel.builder.RouteBuilder;
 import java.util.*;
 
 @ApplicationScoped
 public class ContentEnricherRoute extends RouteBuilder {
+
+    @Inject
+    RedisProductCatalog productCatalog;
 
     @Override
     public void configure() {
@@ -13,28 +17,29 @@ public class ContentEnricherRoute extends RouteBuilder {
             .routeId("content-enricher")
             .unmarshal().json()
             .log("Enriching order ${body[order_id]}")
-            .enrich("direct:address-lookup", (oldExchange, newExchange) -> {
+            .enrich("direct:redis-product-lookup", (oldExchange, newExchange) -> {
                 var order = oldExchange.getIn().getBody(Map.class);
-                var address = newExchange.getIn().getBody(Map.class);
+                var product = newExchange.getIn().getBody(Map.class);
                 var enriched = new LinkedHashMap<>(order);
-                enriched.put("destination_address", address.get("formatted_address"));
-                enriched.put("shipping_zone", address.get("zone"));
-                enriched.put("postal_code", address.get("postal_code"));
+                enriched.put("product_name", product.get("name"));
+                enriched.put("product_category", product.get("category"));
+                enriched.put("weight_kg", product.get("weight_kg"));
+                enriched.put("shipping_zone", product.get("shipping_zone"));
                 oldExchange.getIn().setBody(enriched);
                 return oldExchange;
             })
-            .log("Enriched: zone=${body[shipping_zone]}, address=${body[destination_address]}")
+            .log("Enriched from Redis: ${body[item_sku]} → ${body[product_name]} (${body[shipping_zone]})")
             .marshal().json()
             .to("kafka:eip.orders.enriched?brokers={{kafka.brokers}}");
 
-        from("direct:address-lookup")
-            .routeId("address-lookup-stub")
+        from("direct:redis-product-lookup")
+            .routeId("redis-product-lookup")
             .process(exchange -> {
-                exchange.getIn().setBody(Map.of(
-                    "formatted_address", "123 Main St, Springfield, IL 62701",
-                    "zone", "ZONE-3",
-                    "postal_code", "62701"
-                ));
+                @SuppressWarnings("unchecked")
+                var order = exchange.getIn().getBody(Map.class);
+                String sku = (String) order.get("item_sku");
+                Map<String, String> product = productCatalog.lookup(sku);
+                exchange.getIn().setBody(product);
             });
     }
 }

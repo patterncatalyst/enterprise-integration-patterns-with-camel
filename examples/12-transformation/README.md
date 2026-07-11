@@ -3,7 +3,7 @@
 Demonstrates message transformation patterns with Apache Camel on Quarkus:
 
 - **Message Translator** — converts external order format (orderNumber, clientRef, productCode) to canonical format (order_id, customer_id, item_sku)
-- **Content Enricher** — augments orders with address data from a lookup service
+- **Content Enricher** — augments orders with product data from a Redis-backed catalog (SKU → product name, category, weight, shipping zone)
 - **Content Filter** — strips PII fields, keeping only analytics-safe data
 
 ## Running
@@ -14,14 +14,18 @@ cd ../12-transformation
 mvn quarkus:dev
 ```
 
+## Infrastructure
+
+Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCatalog` seeds product data into Redis hashes (`product:SKU-*`).
+
 ## Data flow
 
 ```
 eip.orders.external → [Translator] → eip.orders.placed
                                           ↓
-                                     [Enricher] → eip.orders.enriched
-                                                       ↓
-                                                  [Filter] → eip.orders.analytics
+                                     [Enricher (Redis)] → eip.orders.enriched
+                                                               ↓
+                                                          [Filter] → eip.orders.analytics
 ```
 
 ## How to test

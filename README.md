@@ -36,7 +36,7 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 
 | Example | Patterns | Chapter |
 |---------|----------|---------|
-| `examples/04-channel-types` | Point-to-Point, Publish-Subscribe, Datatype Channel (Kafka + Pulsar) | Ch 4 |
+| `examples/04-channel-types` | Point-to-Point, Publish-Subscribe, Datatype Channel (Kafka + Pulsar + Redis Pub/Sub) | Ch 4 |
 | `examples/05-reliability` | Dead Letter Channel, Guaranteed Delivery | Ch 5 |
 | `examples/06-channel-infra` | Channel Adapter (REST→PostgreSQL→Kafka), Kafka↔Pulsar Bridge, Message Bus | Ch 6 |
 | `examples/07-message-types` | Command, Document, Event Message | Ch 7 |
@@ -44,7 +44,7 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | `examples/09-routing-fundamentals` | Content-Based Router, Filter, Splitter, Recipient List | Ch 9 |
 | `examples/10-composed-routing` | Scatter-Gather, Routing Slip | Ch 10 |
 | `examples/11-advanced-routing` | Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, Load Balancer | Ch 11 |
-| `examples/12-transformation` | Message Translator, Content Enricher, Content Filter | Ch 12 |
+| `examples/12-transformation` | Message Translator, Content Enricher (Redis), Content Filter | Ch 12 |
 | `examples/13-aggregator` | Aggregator (in-memory + PostgreSQL JDBC), Normalizer | Ch 13 |
 | `examples/14-consumer-patterns` | Polling Consumer (Kafka + PostgreSQL), Event-Driven Consumer (Kafka + Pulsar), Competing Consumers, Message Dispatcher | Ch 14 |
 | `examples/15-endpoints` | Idempotent Receiver (JDBC), Outbox Pattern (PostgreSQL), Durable Subscriber (Pulsar), Service Activator | Ch 15 |

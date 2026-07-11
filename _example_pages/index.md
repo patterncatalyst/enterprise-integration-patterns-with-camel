@@ -26,7 +26,7 @@ mvn quarkus:dev
 
 | Example | Patterns | Infrastructure | Chapter |
 |---------|----------|----------------|---------|
-| [04-channel-types](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/04-channel-types) | Point-to-Point, Publish-Subscribe, Datatype Channel | Kafka + Pulsar | Ch 4 |
+| [04-channel-types](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/04-channel-types) | Point-to-Point, Publish-Subscribe, Datatype Channel, Redis Pub/Sub | Kafka + Pulsar + Redis | Ch 4 |
 | [05-reliability](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/05-reliability) | Dead Letter Channel, Guaranteed Delivery | Kafka | Ch 5 |
 | [06-channel-infra](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/06-channel-infra) | Channel Adapter, Messaging Bridge, Message Bus | Kafka + Pulsar + PostgreSQL | Ch 6 |
 | [07-message-types](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/07-message-types) | Command, Document, Event Message | Kafka | Ch 7 |
@@ -34,7 +34,7 @@ mvn quarkus:dev
 | [09-routing-fundamentals](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/09-routing-fundamentals) | Content-Based Router, Filter, Splitter, Recipient List | Kafka | Ch 9 |
 | [10-composed-routing](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) | Scatter-Gather, Routing Slip | Kafka | Ch 10 |
 | [11-advanced-routing](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/11-advanced-routing) | Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, Load Balancer | Kafka | Ch 11 |
-| [12-transformation](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/12-transformation) | Message Translator, Content Enricher, Content Filter | Kafka | Ch 12 |
+| [12-transformation](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/12-transformation) | Message Translator, Content Enricher (Redis), Content Filter | Kafka + Redis | Ch 12 |
 | [13-aggregator](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) | Aggregator (in-memory + PostgreSQL JDBC), Normalizer | Kafka + PostgreSQL | Ch 13 |
 | [14-consumer-patterns](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/14-consumer-patterns) | Polling Consumer (Kafka + PostgreSQL), Event-Driven Consumer (Kafka + Pulsar), Competing Consumers, Message Dispatcher | Kafka + Pulsar + PostgreSQL | Ch 14 |
 | [15-endpoints](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/15-endpoints) | Idempotent Receiver (JDBC), Outbox Pattern (PostgreSQL), Durable Subscriber (Pulsar), Service Activator | Kafka + Pulsar + PostgreSQL | Ch 15 |
