@@ -45,4 +45,4 @@ There are no REST endpoints. All three routes are timer-driven and begin produci
 
 ---
 
-*Verification status: unverified.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

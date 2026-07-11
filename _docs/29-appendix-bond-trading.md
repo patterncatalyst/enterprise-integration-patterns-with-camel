@@ -392,5 +392,4 @@ Two case studies, two different shapes of the same patterns — proving that EIP
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Camel `multicast().parallelProcessing()` fans out to multiple endpoints; `aggregate()` with `completionInterval()` creates time-windowed aggregation; `idempotentConsumer()` with `MemoryIdempotentRepository` deduplicates by key; `routingSlip()` accepts a comma-separated header; `wireTap()` sends a copy without blocking the main flow; Kafka partition-by-key guarantees ordering within a partition.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

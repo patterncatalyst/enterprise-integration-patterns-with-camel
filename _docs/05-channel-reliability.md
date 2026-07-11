@@ -247,5 +247,4 @@ Next, we look at the infrastructure-level channel patterns: Channel Adapter, Mes
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Camel deadLetterChannel builder API matches 4.20; `useOriginalMessage()` behavior is as described; `breakOnFirstError` parameter exists on the Kafka component; `allowManualCommit`/`KafkaManualCommit` API is current in camel-kafka 4.20; Pulsar dead letter topic parameter names are correct.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

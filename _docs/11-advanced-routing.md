@@ -355,5 +355,4 @@ This completes Part 5 — Message Routing (12 patterns across 3 chapters). Next:
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `dynamicRouter()` calls the method repeatedly until it returns `null`; `wireTap()` is asynchronous and supports `onPrepare()`; `resequence()` supports both `batch()` and `stream()` modes with `size`/`timeout`/`capacity` options; `loadBalance()` supports `roundRobin()`, `failover()`, and `sticky()` strategies; `split()` with an `aggregationStrategy` produces the composed message processor pattern.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

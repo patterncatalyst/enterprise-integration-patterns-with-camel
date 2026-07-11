@@ -399,5 +399,4 @@ from("kafka:eip.shipping.rate-requests?brokers=localhost:9092&groupId=carrier-sc
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Camel `recipientList()` accepts a comma-separated list of endpoint URIs; `aggregate()` with `completionSize()` and `completionTimeout()` works as shown; `AggregationStrategy.aggregate()` receives null for the first exchange; Kafka key-based correlation works with `simple("${body.requestId}")` as correlation expression; `platform-http` path parameters use `{paramName}` syntax.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

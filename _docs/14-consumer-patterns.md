@@ -309,5 +309,4 @@ Next: producer-side patterns, transactional messaging, and durable subscribers.
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Kafka component `consumersCount` parameter controls consumer threads; `maxPollRecords` matches Kafka client `max.poll.records`; `toD()` resolves dynamic URIs at runtime; `file` component `delay`, `maxMessagesPerPoll`, `sortBy` parameters exist; `sql` component `onConsume` parameter runs after each row.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

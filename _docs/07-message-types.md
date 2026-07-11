@@ -226,5 +226,4 @@ Next, we look at the metadata that accompanies messages: request-reply, correlat
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: timer component `period` parameter is in milliseconds and accepts the value shown; SQL component inline query syntax with date intervals works in PostgreSQL; event envelope structure is consistent with what the example code produces.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

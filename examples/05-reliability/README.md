@@ -44,4 +44,4 @@ Open Kafka UI at [http://localhost:8090](http://localhost:8090) to inspect the `
 
 ---
 
-*Verification status: unverified.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

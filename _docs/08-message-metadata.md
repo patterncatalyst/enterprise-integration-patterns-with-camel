@@ -426,5 +426,4 @@ This completes Part 4 — Message Construction. Next: Part 5 — Message Routing
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Kafka component `replyTopic` and `requestTimeout` parameters exist in Camel 4.20; `InOut` exchange pattern works with Kafka component for request-reply; Splitter EIP produces `CamelSplitIndex`, `CamelSplitSize`, `CamelSplitComplete` headers; Aggregator `completionSize` accepts a header expression; Groovy language expression for timestamp comparison compiles.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

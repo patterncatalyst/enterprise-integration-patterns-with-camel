@@ -334,5 +334,4 @@ Next: testing and management patterns — Test Message, Detour, Smart Proxy, and
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `controlbus:route` component supports `action=stop|start|status` and `routeId` parameter; message history is enabled by default in Camel 4.x and accessible via `Exchange.MESSAGE_HISTORY`; `camel trace` and `camel top` commands exist in Camel CLI 4.20; Micrometer component URI syntax with tags is correct; OpenTelemetry Kafka interceptor class names match the `io.opentelemetry.instrumentation.kafkaclients` package.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

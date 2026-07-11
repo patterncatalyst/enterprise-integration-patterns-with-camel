@@ -215,5 +215,4 @@ This completes Part 3 — Messaging Channels. Next, we move inside the message i
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: REST DSL syntax matches Camel 4.20 `platform-http`; Pulsar component `subscriptionType`, `subscriptionName`, `producerName` parameters are valid; component-level properties in `application.properties` are inherited by Kafka endpoints as described.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

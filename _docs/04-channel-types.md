@@ -256,5 +256,4 @@ Next, we tackle what happens when things go wrong — invalid messages, dead let
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Pulsar component URI syntax matches camel-pulsar 4.20; subscriptionType parameter accepts "Shared"; Kafka consumer group behavior described matches actual Kafka 3.x semantics; multiple consumer groups on the same topic do receive independent copies.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

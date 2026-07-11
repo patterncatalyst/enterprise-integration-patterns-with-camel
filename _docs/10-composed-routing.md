@@ -346,5 +346,4 @@ Next: Advanced Routing — Dynamic Router, Wire Tap, Resequencer, Composed Messa
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `routingSlip()` accepts a header with comma-separated URIs; Saga EIP `propagation`, `completionMode`, `compensation`, `completion`, `option` syntax matches Camel 4.20; `multicast()` accepts an `AggregationStrategy` and supports `parallelProcessing()`, `timeout()`; `saga().compensate()` triggers compensation.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

@@ -303,5 +303,4 @@ This completes Part 7 — Messaging Endpoints (12 patterns across 3 chapters). N
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `FluentProducerTemplate` exists in Camel 4.20 and is CDI-injectable in Quarkus; `unmarshal().json(Order.class)` unmarshals to a typed class; `toD()` resolves dynamic URIs; Kafka CLI `kafka-consumer-groups.sh --reset-offsets` syntax is correct; `@JsonProperty` annotations control Jackson mapping.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

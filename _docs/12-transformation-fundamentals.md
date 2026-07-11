@@ -366,5 +366,4 @@ Next: structural transformation — Aggregator, Normalizer, and Canonical Data M
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `enrich()` EIP accepts an expression resolving to an endpoint URI and an `AggregationStrategy`; `jacksonXml()` data format is available in Camel 4.20; JOLT component URI pattern is `jolt:specFile`; `pollEnrich()` exists for polling-based enrichment; content filter is purely application-level in Camel (no dedicated EIP — implemented via processor).*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

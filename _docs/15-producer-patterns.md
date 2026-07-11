@@ -292,5 +292,4 @@ Next: endpoint lifecycle and management — Messaging Gateway, Channel Purger, a
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `idempotentConsumer()` EIP exists with `MemoryIdempotentRepository`, `JdbcMessageIdRepository`, and Redis repository options; `transacted()` EIP integrates with JTA/Narayana in Quarkus; Kafka component `allowManualCommit` and `autoCommitEnable` parameters exist; `bean()` calls CDI beans by name with method selection.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

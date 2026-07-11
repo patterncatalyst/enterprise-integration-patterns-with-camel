@@ -65,4 +65,4 @@ Follow the message through all three stages: `eip.orders.placed` (translated), `
 Each key is a Redis hash with fields: `name`, `price`, `category`, `weight_kg`, `shipping_zone`. Unknown SKUs return defaults: "Unknown Product", General, 1.0kg, ZONE-1.
 
 ---
-*Verification status: unverified.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

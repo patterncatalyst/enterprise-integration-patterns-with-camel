@@ -281,5 +281,4 @@ This completes Part 6 — Message Transformation (7 patterns across 2 chapters).
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `aggregate()` EIP supports `completionPredicate`, `completionTimeout`, `completionSize`, `completionInterval`, `forceCompletionOnStop`; `JdbcAggregationRepository` exists in Camel 4.20; Apicurio Registry Avro serializer/deserializer class names match the `io.apicurio.registry.serde.avro` package; `avro` data format `instanceClassName` parameter is correct.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

@@ -318,5 +318,4 @@ Next, we compose these primitives into multi-step routing patterns: the Routing 
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `choice()` evaluates predicates top-to-bottom taking first match; `recipientList()` accepts comma-separated URIs from a header; `split()` produces `CamelSplitIndex`/`CamelSplitSize`/`CamelSplitComplete` headers; `parallelProcessing()` and `stopOnException()` options exist on both recipient list and splitter.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*

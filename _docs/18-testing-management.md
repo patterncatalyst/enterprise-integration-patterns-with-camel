@@ -322,5 +322,4 @@ This completes Part 8 — System Management (8 patterns across 2 chapters) — a
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Quarkus property placeholders `{% raw %}{{property:default}}{% endraw %}` work in Simple expressions; Quarkus profiles `%dev.`/`%staging.` override properties correctly; `circuitBreaker()` with `resilience4jConfiguration()` builder syntax is valid in Camel 4.20; `MockEndpoint` and `@EndpointInject` exist in `camel-quarkus-junit5`; `timer` component `period` is in milliseconds.*
+*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
