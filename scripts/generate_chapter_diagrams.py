@@ -837,4 +837,44 @@ g.emit("17-purger-proxy", 880, 300,
 )
 
 
-print(f"Done — 29 chapter diagram pairs generated in {g.OUT}")
+# -- Virtual Threads -----------------------------------------------------------
+g.emit("31-virtual-threads", 900, 340,
+    bands=[
+        band(20, 20, 400, 300, "Platform Threads (1:1)"),
+        band(460, 20, 420, 300, "Virtual Threads (M:N)", fill="#fff8ef"),
+    ],
+    nodes=[
+        node(50, 70, ["OS Thread 1"], "muted", w=120, h=40),
+        node(50, 120, ["OS Thread 2"], "muted", w=120, h=40),
+        node(50, 170, ["OS Thread 3"], "muted", w=120, h=40),
+        node(220, 70, ["JVM Thread 1", "Kafka consumer"], "ink", w=150, h=40),
+        node(220, 120, ["JVM Thread 2", "HTTP handler"], "ink", w=150, h=40),
+        node(220, 170, ["JVM Thread 3", "JDBC query"], "ink", w=150, h=40),
+        node(490, 70, ["Carrier Pool", "ForkJoinPool"], "accent", w=140, h=55),
+        node(490, 160, ["VT 1", "mounted"], "info", w=70, h=35),
+        node(570, 160, ["VT 2", "mounted"], "info", w=70, h=35),
+        node(490, 210, ["VT 3", "parked"], "muted", w=70, h=35),
+        node(570, 210, ["VT 4", "parked"], "muted", w=70, h=35),
+        node(650, 160, ["VT 5", "parked"], "muted", w=70, h=35),
+        node(650, 210, ["VT 6", "parked"], "muted", w=70, h=35),
+        node(730, 160, ["VT 7", "parked"], "muted", w=70, h=35),
+        node(730, 210, ["VT 8", "parked"], "muted", w=70, h=35),
+        node(490, 265, ["~1KB stack", "per thread"], "box", w=100, h=35),
+        node(650, 265, ["I/O → park", "unmount"], "box", w=100, h=35),
+    ],
+    edges=[
+        edge(170, 90, 220, 90, label="1:1"),
+        edge(170, 140, 220, 140, label="1:1"),
+        edge(170, 190, 220, 190, label="1:1"),
+        edge(560, 125, 525, 160, amber=True, label="mount"),
+        edge(560, 125, 605, 160, amber=True),
+    ],
+    notes=[
+        note(210, 240, "~1MB stack per thread", anchor="middle"),
+        note(210, 260, "Limited by OS resources", anchor="middle"),
+        note(640, 125, "2 carriers run many VTs", anchor="middle"),
+    ],
+)
+
+
+print(f"Done — 30 chapter diagram pairs generated in {g.OUT}")
