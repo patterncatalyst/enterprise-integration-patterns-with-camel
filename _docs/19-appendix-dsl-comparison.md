@@ -32,6 +32,7 @@ Apache Camel's core — the route engine, EIP processors, components, and Java D
 
 In Camel Spring Boot, `RouteBuilder` classes are Spring components discovered by component scanning:
 
+{% raw %}
 ```java
 @Component
 public class OrderRoutes extends RouteBuilder {
@@ -54,17 +55,19 @@ public class OrderRoutes extends RouteBuilder {
     }
 }
 ```
+{% endraw %}
 
 Key Spring-isms:
 - `@Component` makes the route discoverable via Spring scanning.
 - `@Autowired` injects Spring beans.
-- `{{kafka.brokers}}` resolves from Spring's `Environment` (application.properties/yml).
+- `{% raw %}{{kafka.brokers}}{% endraw %}` resolves from Spring's `Environment` (application.properties/yml).
 - The `CamelAutoConfiguration` starter wires everything: creates the `CamelContext`, discovers routes, starts them.
 
 ### Quarkus (this tutorial)
 
 In Camel Quarkus, `RouteBuilder` classes are CDI beans:
 
+{% raw %}
 ```java
 @ApplicationScoped
 public class OrderRoutes extends RouteBuilder {
@@ -87,11 +90,12 @@ public class OrderRoutes extends RouteBuilder {
     }
 }
 ```
+{% endraw %}
 
 Key CDI-isms:
 - `@ApplicationScoped` makes the route a CDI bean (singleton scope).
 - `@Inject` replaces `@Autowired`.
-- `{{kafka.brokers}}` resolves from MicroProfile Config (also `application.properties`).
+- `{% raw %}{{kafka.brokers}}{% endraw %}` resolves from MicroProfile Config (also `application.properties`).
 - Camel Quarkus auto-discovers `RouteBuilder` beans via CDI, creates the `CamelContext`, starts routes.
 
 **The route body is identical.** Only the DI annotations differ.
@@ -184,6 +188,7 @@ Both support type-safe configuration classes — Spring's `@ConfigurationPropert
 
 Spring Boot has a unique DSL that Quarkus does not: routes defined as Spring XML beans. This is the oldest Camel route definition format, dating back to Camel 1.x:
 
+{% raw %}
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
@@ -214,6 +219,7 @@ Spring Boot has a unique DSL that Quarkus does not: routes defined as Spring XML
   <bean id="orderValidator" class="com.example.OrderValidator"/>
 </beans>
 ```
+{% endraw %}
 
 ### What Spring XML DSL offers
 

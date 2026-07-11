@@ -6,6 +6,8 @@ description: "Connecting disparate systems — channel adapters, messaging bridg
 duration: "30 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/06-channel-infra/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/06-channel-infra) — run it with `mvn quarkus:dev` against the local stack.
+
 The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world — how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.
 
 {% include excalidraw.html file="06-messaging-bridge" alt="Messaging Bridge connecting Kafka to Pulsar" caption="Figure 6.1 — A Camel Messaging Bridge forwards events from Kafka to Pulsar for cross-system integration." %}

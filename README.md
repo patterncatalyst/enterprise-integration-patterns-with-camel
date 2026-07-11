@@ -8,7 +8,7 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 
 - **31 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 12 deep-dive appendices.
 - **26 Excalidraw diagrams** — visual architecture and pattern flow diagrams embedded throughout.
-- **9 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
+- **17 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
 
@@ -36,13 +36,21 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 
 | Example | Patterns | Chapter |
 |---------|----------|---------|
+| `examples/04-channel-types` | Point-to-Point, Publish-Subscribe, Datatype Channel | Ch 4 |
 | `examples/05-reliability` | Dead Letter Channel, Guaranteed Delivery | Ch 5 |
+| `examples/06-channel-infra` | Channel Adapter, Messaging Bridge, Message Bus | Ch 6 |
+| `examples/07-message-types` | Command, Document, Event Message | Ch 7 |
+| `examples/08-message-metadata` | Correlation ID, Message Sequence, Expiration, Format Indicator | Ch 8 |
 | `examples/09-routing-fundamentals` | Content-Based Router, Filter, Splitter, Recipient List | Ch 9 |
 | `examples/10-composed-routing` | Scatter-Gather, Routing Slip | Ch 10 |
+| `examples/11-advanced-routing` | Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, Load Balancer | Ch 11 |
 | `examples/12-transformation` | Message Translator, Content Enricher, Content Filter | Ch 12 |
 | `examples/13-aggregator` | Aggregator, Normalizer | Ch 13 |
+| `examples/14-consumer-patterns` | Polling Consumer, Event-Driven Consumer, Competing Consumers, Message Dispatcher | Ch 14 |
 | `examples/15-endpoints` | Idempotent Receiver, Service Activator | Ch 15 |
+| `examples/16-endpoint-management` | Messaging Gateway, Selective Consumer, Channel Purger, Messaging Mapper | Ch 16 |
 | `examples/17-observability` | Control Bus, Wire Tap, Message History | Ch 17 |
+| `examples/18-testing-management` | Test Message, Detour, Smart Proxy, Circuit Breaker | Ch 18 |
 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) | Appendix J |
 | `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |
 

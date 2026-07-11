@@ -6,6 +6,8 @@ description: "Test Message, Detour, Smart Proxy, and Channel Adapter management 
 duration: "35 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/18-testing-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) — run it with `mvn quarkus:dev` against the local stack.
+
 The previous chapter covered observability — knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
 
 {% include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1 — Test Message injection and Detour toggle" %}
@@ -131,6 +133,7 @@ A **Detour** is a conditional bypass in a route. When enabled, messages skip one
 
 ### How Camel models it
 
+{% raw %}
 ```java
 // Detour: bypass enrichment based on a configuration flag
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=detour-example")
@@ -146,6 +149,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=detour-example")
     .end()
     .to("direct:process-order");
 ```
+{% endraw %}
 
 ### Feature flags with Quarkus
 
@@ -181,6 +185,7 @@ A **Smart Proxy** sits between the caller and the target service. It can:
 
 ### How Camel models it
 
+{% raw %}
 ```java
 // Smart proxy: route to real or mock payment gateway
 from("direct:payment-gateway")
@@ -215,6 +220,7 @@ from("direct:payment-gateway")
     .wireTap("direct:log-payment-response")
     .log("Payment result: ${body[status]} (txn: ${body[transaction_id]})");
 ```
+{% endraw %}
 
 ### Smart proxy and Quarkus profiles
 

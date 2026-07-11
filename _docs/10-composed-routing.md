@@ -6,6 +6,8 @@ description: "Routing Slip, Process Manager, and Scatter-Gather — multi-step r
 duration: "45 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/10-composed-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) — run it with `mvn quarkus:dev` against the local stack.
+
 The previous chapter covered the building blocks: content-based router, filter, recipient list, and splitter. Each makes a single routing decision. But real workflows involve *sequences* of decisions: this order needs to go through fraud check, *then* inventory reservation, *then* payment — but the specific sequence depends on the order type, the customer tier, and the product category. The sequence isn't hardcoded; it's determined at runtime.
 
 {% include excalidraw.html file="10-scatter-gather" alt="Scatter-Gather pattern" caption="Figure 10.1 — Scatter-Gather fans out to multiple recipients and aggregates their replies." %}

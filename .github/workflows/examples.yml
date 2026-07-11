@@ -15,13 +15,21 @@ jobs:
     strategy:
       matrix:
         example:
+          - 04-channel-types
           - 05-reliability
+          - 06-channel-infra
+          - 07-message-types
+          - 08-message-metadata
           - 09-routing-fundamentals
           - 10-composed-routing
+          - 11-advanced-routing
           - 12-transformation
           - 13-aggregator
+          - 14-consumer-patterns
           - 15-endpoints
+          - 16-endpoint-management
           - 17-observability
+          - 18-testing-management
           - loan-broker
           - bond-trading
       fail-fast: false

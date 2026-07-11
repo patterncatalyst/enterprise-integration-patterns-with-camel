@@ -6,6 +6,8 @@ description: "Aggregator, Normalizer, and Canonical Data Model — patterns that
 duration: "40 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/13-aggregator/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) — run it with `mvn quarkus:dev` against the local stack.
+
 The previous chapter transformed individual messages — translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
 
 {% include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1 — The Aggregator collects correlated messages and emits a single combined result." %}

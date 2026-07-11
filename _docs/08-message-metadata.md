@@ -6,6 +6,8 @@ description: "Request-reply, correlation identifiers, return addresses, message 
 duration: "45 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/08-message-metadata/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/08-message-metadata) — run it with `mvn quarkus:dev` against the local stack.
+
 A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations — without coupling sender and receiver.
 
 {% include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1 — Request-Reply using separate channels and a Correlation Identifier to match replies." %}

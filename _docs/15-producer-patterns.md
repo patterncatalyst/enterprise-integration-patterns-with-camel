@@ -6,6 +6,8 @@ description: "Durable Subscriber, Idempotent Receiver, Transactional Client, and
 duration: "40 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/15-endpoints/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/15-endpoints) — run it with `mvn quarkus:dev` against the local stack.
+
 The previous chapter covered how consumers receive messages. This chapter covers the other side: how producers send messages durably, how consumers guarantee exactly-once processing, how transactions span messaging and database operations, and how messaging integrates with service-oriented application code.
 
 {% include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1 — The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." %}

@@ -6,6 +6,8 @@ description: "Control Bus, Message Store, Message History, and Wire Tap (for mon
 duration: "40 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/17-observability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/17-observability) — run it with `mvn quarkus:dev` against the local stack.
+
 A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
 
 {% include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1 — The Control Bus manages routes at runtime and exports metrics to observability tools." %}

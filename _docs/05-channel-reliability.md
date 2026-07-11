@@ -6,6 +6,8 @@ description: "Handling failure gracefully — invalid message channels, dead let
 duration: "35 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/05-reliability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/05-reliability) — run it with `mvn quarkus:dev` against the local stack.
+
 The previous chapter covered how messages are delivered — to one consumer or to all. This chapter covers what happens when delivery *fails*. Messages can be malformed, consumers can crash mid-processing, brokers can go down, and networks can partition. The three patterns here — Invalid Message Channel, Dead Letter Channel, and Guaranteed Delivery — are the safety nets that keep a messaging system reliable in the face of real-world failures.
 
 {% include excalidraw.html file="05-reliability-patterns" alt="Dead Letter Channel and Guaranteed Delivery flow" caption="Figure 5.1 — Guaranteed Delivery with Dead Letter Channel as the fallback for exhausted retries." %}

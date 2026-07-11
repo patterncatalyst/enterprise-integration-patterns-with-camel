@@ -6,6 +6,8 @@ description: "Content-Based Router, Message Filter, Recipient List, and Splitter
 duration: "45 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/09-routing-fundamentals/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/09-routing-fundamentals) — run it with `mvn quarkus:dev` against the local stack.
+
 Message Routing is where integration gets interesting. So far, messages flow in straight lines — from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
 
 {% include excalidraw.html file="09-routing-patterns" alt="Content-Based Router, Splitter, and Recipient List" caption="Figure 9.1 — Three fundamental routing patterns: route by content, split into parts, fan out to a dynamic list." %}

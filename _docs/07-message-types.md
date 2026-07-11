@@ -6,6 +6,8 @@ description: "Command, document, and event messages — the three semantic types
 duration: "30 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/07-message-types/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/07-message-types) — run it with `mvn quarkus:dev` against the local stack.
+
 So far, we've treated messages as generic packets of data. But messages carry intent — they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types — command, document, and event — fundamentally shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
 
 {% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1 — The three message types and their channel/consumer affinities." %}

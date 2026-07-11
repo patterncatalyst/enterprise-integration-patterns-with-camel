@@ -59,15 +59,23 @@ done
 
 | # | Example | Patterns |
 |---|---------|----------|
-| 1 | `examples/05-reliability` | Dead Letter Channel, Guaranteed Delivery |
-| 2 | `examples/09-routing-fundamentals` | Content-Based Router, Filter, Splitter, Recipient List |
-| 3 | `examples/10-composed-routing` | Scatter-Gather, Routing Slip |
-| 4 | `examples/12-transformation` | Message Translator, Content Enricher, Content Filter |
-| 5 | `examples/13-aggregator` | Aggregator, Normalizer |
-| 6 | `examples/15-endpoints` | Idempotent Receiver, Service Activator |
-| 7 | `examples/17-observability` | Control Bus, Wire Tap, Message History |
-| 8 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) |
-| 9 | `examples/bond-trading` | Market data normalization (16 patterns) |
+| 1 | `examples/04-channel-types` | Point-to-Point, Publish-Subscribe, Datatype Channel |
+| 2 | `examples/05-reliability` | Dead Letter Channel, Guaranteed Delivery |
+| 3 | `examples/06-channel-infra` | Channel Adapter, Messaging Bridge, Message Bus |
+| 4 | `examples/07-message-types` | Command, Document, Event Message |
+| 5 | `examples/08-message-metadata` | Correlation ID, Message Sequence, Expiration, Format Indicator |
+| 6 | `examples/09-routing-fundamentals` | Content-Based Router, Filter, Splitter, Recipient List |
+| 7 | `examples/10-composed-routing` | Scatter-Gather, Routing Slip |
+| 8 | `examples/11-advanced-routing` | Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, Load Balancer |
+| 9 | `examples/12-transformation` | Message Translator, Content Enricher, Content Filter |
+| 10 | `examples/13-aggregator` | Aggregator, Normalizer |
+| 11 | `examples/14-consumer-patterns` | Polling Consumer, Event-Driven Consumer, Competing Consumers, Message Dispatcher |
+| 12 | `examples/15-endpoints` | Idempotent Receiver, Service Activator |
+| 13 | `examples/16-endpoint-management` | Messaging Gateway, Selective Consumer, Channel Purger, Messaging Mapper |
+| 14 | `examples/17-observability` | Control Bus, Wire Tap, Message History |
+| 15 | `examples/18-testing-management` | Test Message, Detour, Smart Proxy, Circuit Breaker |
+| 16 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) |
+| 17 | `examples/bond-trading` | Market data normalization (16 patterns) |
 
 ## Tutorial site
 

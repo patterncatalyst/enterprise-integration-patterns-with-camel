@@ -6,6 +6,8 @@ description: "Message Translator, Envelope Wrapper, Content Enricher, and Conten
 duration: "40 minutes"
 ---
 
+> **Runnable example:** The code from this chapter is in [`examples/12-transformation/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/12-transformation) — run it with `mvn quarkus:dev` against the local stack.
+
 Messages rarely arrive in exactly the format the receiver needs. An external partner sends XML; your services expect JSON. Kafka events carry order IDs but not customer names — you need to look up the name before sending a notification. An audit log needs the full order, but a summary report needs only the total and status. Messages need to be translated, enriched, stripped down, wrapped, and unwrapped as they flow between systems.
 
 {% include excalidraw.html file="12-transformation-flow" alt="Message transformation pipeline" caption="Figure 12.1 — A transformation pipeline: translate, enrich from external data, filter out PII, produce canonical output." %}
