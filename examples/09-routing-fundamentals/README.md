@@ -1,29 +1,52 @@
 # Chapter 9: Routing Fundamentals
 
-Demonstrates four core routing patterns with Apache Camel on Quarkus:
+Demonstrates four core routing patterns with Apache Camel on Quarkus. A timer-driven generator publishes orders to Kafka every five seconds, cycling through destination countries and occasionally flagging hazardous materials. Downstream routes show how Camel's fluent Java DSL routes, filters, splits, and fans out messages based on content.
 
-- **Content-Based Router** — routes orders by hazmat status and destination country
-- **Message Filter** — filters orders above $100 to a high-value topic
-- **Splitter** — splits batch orders into individual items
-- **Recipient List** — dynamically selects notification channels (email, SMS, VIP desk)
-
-## Prerequisites
-
-Start the infrastructure stack:
-
-```bash
-cd examples/_infra
-./../../scripts/setup-stack.sh
-```
+- **Content-Based Router** -- routes orders by `contains_hazmat` flag and `destination_country` using `.choice()` to hazmat, international, or domestic topics.
+- **Message Filter** -- filters to keep only high-value orders (amount >= $100) using `.filter()`.
+- **Splitter** -- splits a batch order containing an `items[]` array into individual order messages via `.split(jsonpath("$.items[*]"))`.
+- **Recipient List** -- dynamically builds a notification channel list (email always, SMS if phone present, VIP desk if amount >= $500) using `.recipientList()` with parallel processing.
 
 ## Running
 
 ```bash
+# From repository root
+./scripts/setup-stack.sh
+
 cd examples/09-routing-fundamentals
 mvn quarkus:dev
 ```
 
-The demo data generator creates a new order every 5 seconds and publishes to `eip.orders.placed`. Watch the logs to see orders routed to different topics.
+## Infrastructure
+
+- **Kafka (KRaft)** -- all routing patterns produce to and consume from Kafka topics.
+
+## Data flow
+
+```
+Timer (5s) --> eip.orders.placed --+-> [Content-Based Router] --+-> eip.orders.hazmat
+                                   |                            +-> eip.orders.international
+                                   |                            +-> eip.orders.domestic
+                                   |
+                                   +-> [Message Filter] --> (amount >= $100) --> eip.orders.high-value
+
+eip.orders.batch --> [Splitter] --> split items[] --> eip.orders.individual
+
+eip.orders.shipped --> [Recipient List] --+-> notify-email (always)
+                                          +-> notify-sms (if phone present)
+                                          +-> notify-vip-desk (if amount >= $500)
+```
+
+## What to observe
+
+1. **Content-Based Router** -- watch orders route to `eip.orders.hazmat` (every 7th order), `eip.orders.international` (CA/GB/DE/JP), or `eip.orders.domestic` (US) based on the order content.
+2. **Message Filter** -- only orders with `amount >= 100` appear on `eip.orders.high-value`; lower-value orders are silently dropped.
+3. **Splitter** -- bulk orders from `eip.orders.batch` are split into individual items on `eip.orders.individual`, each carrying the original item data.
+4. **Recipient List** -- shipped orders fan out to `notify-email` (always), `notify-sms` (conditionally), and `notify-vip-desk` (for high-value orders >= $500). Check the log for which channels are selected per order.
+
+## How to test
+
+There are no REST endpoints. The demo data generator starts automatically and produces orders every 5 seconds with cycling `destination_country` values (US, CA, GB, DE, JP) and a `contains_hazmat` flag on every 7th order. Open Kafka UI at [http://localhost:8090](http://localhost:8090) to watch messages arrive on the different output topics based on order content.
 
 ## Kafka topics
 
@@ -34,13 +57,10 @@ The demo data generator creates a new order every 5 seconds and publishes to `ei
 | `eip.orders.international` | International orders |
 | `eip.orders.hazmat` | Hazardous materials orders |
 | `eip.orders.high-value` | Orders >= $100 (filtered) |
-| `eip.orders.batch` | Batch orders (for splitter demo) |
+| `eip.orders.batch` | Batch orders for splitter demo |
 | `eip.orders.individual` | Individual items from split batches |
-
-## Verification
-
-Open Kafka UI at [http://localhost:8080](http://localhost:8080) and observe messages flowing to the different output topics based on order content.
+| `eip.orders.shipped` | Shipped orders for recipient list demo |
 
 ---
 
-*Verification status: unverified — code compiles but has not been run against the infrastructure stack.*
+*Verification status: unverified.*

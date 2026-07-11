@@ -2,19 +2,52 @@
 
 Demonstrates channel-level infrastructure patterns with Apache Camel on Quarkus:
 
-- **Channel Adapter** — inbound REST endpoint persists orders to PostgreSQL and publishes to Kafka; outbound consumer dispatches fulfilled orders to an external system (simulated)
-- **Messaging Bridge** — bidirectional Kafka↔Pulsar bridge: partner orders flow from Pulsar to Kafka, shipping events flow from Kafka to Pulsar
-- **Message Bus** — multiple independent services (inventory, payment, notification, fulfillment) consume from shared Kafka topics with separate consumer groups
+- **Channel Adapter (Inbound)** — REST endpoint accepts HTTP orders, persists to PostgreSQL, publishes to Kafka — bridges non-messaging to messaging
+- **Channel Adapter (Outbound)** — Kafka consumer dispatches fulfilled orders to an external shipping API (simulated)
+- **Messaging Bridge** — bidirectional Kafka↔Pulsar bridge: partner orders flow Pulsar→Kafka, shipping events flow Kafka→Pulsar
+- **Message Bus** — Kafka as shared bus with three independent consumer groups (inventory, payment, notification) subscribing to the same topic
 
 ## Running
 
 ```bash
-cd examples/_infra && ./../../scripts/setup-stack.sh
-cd ../06-channel-infra
+# Start the infrastructure stack (Kafka + Pulsar + PostgreSQL required)
+./scripts/setup-stack.sh
+
+cd examples/06-channel-infra
 mvn quarkus:dev
 ```
 
-Orders are generated automatically every 5 seconds. You can also submit orders via the inbound channel adapter:
+## Infrastructure
+
+Requires Kafka, Pulsar, and PostgreSQL from the Podman stack.
+
+## Data flow
+
+```
+Timer/REST --> eip.orders.incoming --+--> [Inventory Service]     (Message Bus)
+                                    +--> [Payment Service]       (Message Bus)
+                                    +--> [Notification Service]  (Message Bus)
+                                    +--> eip.orders.bridged --> [Fulfillment] --> eip.orders.fulfilled
+                                                                                        |
+                                                                                [Outbound Adapter]
+
+Pulsar:partner.orders --> [Bridge] --> Kafka:eip.orders.placed
+Kafka:eip.shipping.scheduled --> [Bridge] --> Pulsar:eip.shipping.scheduled
+```
+
+## What to observe
+
+1. **Demo data generator** producing orders every 5 seconds to `eip.orders.incoming`
+2. **Message Bus** — inventory, payment, and notification services each consuming independently
+3. **Fulfillment** consuming bridged orders and producing to `eip.orders.fulfilled`
+4. **Outbound Adapter** dispatching fulfilled orders to the external shipping API
+5. **Messaging Bridge** forwarding partner orders from Pulsar to Kafka and shipping events from Kafka to Pulsar
+
+Open Kafka UI at [http://localhost:8090](http://localhost:8090) to inspect topics and consumer groups.
+
+## How to test
+
+Submit an order via the inbound channel adapter:
 
 ```bash
 curl -X POST http://localhost:8082/api/orders \
@@ -22,38 +55,28 @@ curl -X POST http://localhost:8082/api/orders \
   -d '{"order_id": 999, "item": "WIDGET-042", "quantity": 3, "status": "NEW"}'
 ```
 
-## Infrastructure
+## Kafka topics
 
-Requires the full Podman stack (Kafka + Pulsar + PostgreSQL):
+| Topic | Description |
+|-------|-------------|
+| `eip.orders.incoming` | Orders from REST adapter or timer |
+| `eip.orders.fulfilled` | Fulfilled orders from fulfillment service |
+| `eip.orders.bridged` | Orders after Pulsar-to-Kafka bridge |
+| `eip.orders.placed` | Partner orders bridged from Pulsar |
+| `eip.shipping.scheduled` | Shipping events bridged to Pulsar |
 
-```bash
-cd examples/_infra && ./../../scripts/setup-stack.sh
-```
+## Pulsar topics
 
-## Topics and services
+| Topic | Description |
+|-------|-------------|
+| `persistent://public/default/partner.orders.placed` | Inbound from partner systems |
+| `persistent://public/default/eip.shipping.scheduled` | Outbound to partner systems |
 
-| System | Topic/Table | Description |
-|--------|-------------|-------------|
-| Kafka | `eip.orders.incoming` | Orders arriving via REST adapter or timer |
-| Kafka | `eip.orders.fulfilled` | Orders marked fulfilled by fulfillment service |
-| Kafka | `eip.shipping.scheduled` | Shipping events bridged to Pulsar |
-| Pulsar | `partner.orders.placed` | Partner orders bridged to Kafka |
-| PostgreSQL | `orders.orders` | Orders persisted by inbound channel adapter |
+## PostgreSQL tables
 
-## Data flow
-
-```
-Timer / REST  -->  eip.orders.incoming  --+--> inventory-service   (Message Bus)
-                                          +--> payment-service     (Message Bus)
-                                          +--> notification-service(Message Bus)
-                                          +--> Messaging Bridge  -->  eip.orders.bridged
-                                                                        |
-                                                                   fulfillment-service
-                                                                        |
-                                                                   eip.orders.fulfilled
-                                                                        |
-                                                                   Outbound Channel Adapter
-```
+| Table | Description |
+|-------|-------------|
+| `orders.orders` | Orders persisted by inbound channel adapter |
 
 ---
 

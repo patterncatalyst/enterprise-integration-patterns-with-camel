@@ -1,29 +1,60 @@
 # Chapter 8: Message Metadata
 
-Demonstrates four message metadata patterns with Apache Camel on Quarkus:
+Demonstrates four message metadata patterns with Apache Camel on Quarkus. Two timer-driven generators feed orders into Kafka, where downstream routes stamp, inspect, split, aggregate, and expire messages based on header metadata -- showing how metadata travels with the message body and drives routing decisions.
 
-- **Correlation Identifier** — stamps a UUID on each order and carries it through validation, enrichment, and reply stages
-- **Message Sequence** — splits bulk orders into sequenced line items (CamelSplitIndex/CamelSplitSize), then aggregates them back by bulk-order ID
-- **Message Expiration** — sets creation/expiration timestamps; consumer drops expired messages to a dead topic
-- **Format Indicator** — tags messages with a contentType header; consumer uses choice() to unmarshal based on the declared format
-
-## Prerequisites
-
-Start the infrastructure stack:
-
-```bash
-cd examples/_infra
-./../../scripts/setup-stack.sh
-```
+- **Correlation Identifier** -- stamps a UUID `X-Correlation-ID` header that travels through validate, enrich, and output stages, enabling end-to-end request tracking.
+- **Message Sequence** -- splits a bulk order into individual line items carrying `CamelSplitIndex` and `CamelSplitSize` headers, then aggregates them back by `BulkOrderId`.
+- **Message Expiration** -- stamps `messageCreatedAt` and `messageExpiresAt` (30-second TTL); the consumer drops expired messages to a dead topic.
+- **Format Indicator** -- tags messages with `contentType` and `schemaVersion` headers; the consumer dispatches by format (JSON/XML/unknown to dead).
 
 ## Running
 
 ```bash
+# From repository root
+./scripts/setup-stack.sh
+
 cd examples/08-message-metadata
 mvn quarkus:dev
 ```
 
-The demo data generator creates individual orders every 5 seconds and bulk orders every 15 seconds. Watch the logs to see metadata patterns in action.
+## Infrastructure
+
+- **Kafka (KRaft)** -- all metadata patterns produce to and consume from Kafka topics.
+
+## Data flow
+
+```
+Timer (5s) --> eip.metadata.orders --+-> [Correlation ID] --> validate --> enrich --> eip.metadata.orders.correlated
+                                     |
+                                     +-> [Format Indicator] --> tag with contentType --> eip.metadata.orders.tagged
+                                     |                                                        |
+                                     |                                                  [Format Consumer]
+                                     |                                                  JSON --> processed
+                                     |                                                  unknown --> dead
+                                     |
+                                     +-> [Expiration] --> stamp TTL --> eip.metadata.orders.expiring
+                                                                              |
+                                                                         [TTL Check]
+                                                                         valid --> fulfilled
+                                                                         expired --> dead
+
+Timer (15s) --> eip.metadata.bulk-orders --> [Splitter] --> eip.metadata.line-items
+                                                                  |
+                                                            [Aggregator]
+                                                                  |
+                                                         eip.metadata.orders.reassembled
+```
+
+## What to observe
+
+1. **Correlation ID** -- messages on `eip.metadata.orders.correlated` carry the `X-Correlation-ID` header through all three stages (validate, enrich, output).
+2. **Message Sequence** -- `eip.metadata.line-items` messages have `CamelSplitIndex` and `CamelSplitSize` headers; `eip.metadata.orders.reassembled` contains the aggregated result grouped by `BulkOrderId`.
+3. **Message Expiration** -- orders processed within 30 seconds land on `eip.metadata.orders.fulfilled`; expired ones are routed to `eip.metadata.orders.dead`.
+4. **Format Indicator** -- `eip.metadata.orders.tagged` messages carry `contentType` and `schemaVersion` headers; JSON-format messages proceed to `processed`, unknown formats go to `dead`.
+
+## How to test
+
+There are no REST endpoints. Both timers start automatically. Open Kafka UI at [http://localhost:8090](http://localhost:8090) to inspect message headers on each topic. Check the `X-Correlation-ID`, `CamelSplitIndex`, `messageExpiresAt`, and `contentType` headers directly in the Kafka UI message detail view.
 
 ## Kafka topics
 
@@ -35,20 +66,11 @@ The demo data generator creates individual orders every 5 seconds and bulk order
 | `eip.metadata.line-items` | Individual line items (split from bulk) |
 | `eip.metadata.orders.reassembled` | Aggregated line items |
 | `eip.metadata.orders.expiring` | Orders with expiration timestamps |
-| `eip.metadata.orders.fulfilled` | Non-expired orders processed successfully |
+| `eip.metadata.orders.fulfilled` | Non-expired orders processed |
 | `eip.metadata.orders.tagged` | Orders tagged with format indicator |
 | `eip.metadata.orders.processed` | Orders processed after format detection |
 | `eip.metadata.orders.dead` | Expired or unknown-format messages |
 
-## Verification
-
-Open Kafka UI at [http://localhost:8080](http://localhost:8080) and observe:
-
-1. **Correlation ID** — messages on `eip.metadata.orders.correlated` carry the `X-Correlation-ID` header
-2. **Message Sequence** — `eip.metadata.line-items` messages have `CamelSplitIndex` and `CamelSplitSize` headers; `eip.metadata.orders.reassembled` has the aggregated result
-3. **Message Expiration** — orders processed quickly land on `eip.metadata.orders.fulfilled`; delayed ones go to `eip.metadata.orders.dead`
-4. **Format Indicator** — `eip.metadata.orders.tagged` messages carry `contentType` and `schemaVersion` headers
-
 ---
 
-*Verification status: unverified — code compiles but has not been run against the infrastructure stack.*
+*Verification status: unverified.*

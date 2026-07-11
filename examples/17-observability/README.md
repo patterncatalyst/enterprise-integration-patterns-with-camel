@@ -1,6 +1,6 @@
 # Chapter 17: System Management
 
-Demonstrates system management and observability patterns with Apache Camel on Quarkus:
+Demonstrates system management and observability patterns with Apache Camel on Quarkus. These patterns provide runtime visibility, auditing, and administrative control over running integration routes.
 
 - **Control Bus** — exposes REST endpoints to start, stop, and query the status of routes at runtime via the `controlbus` component
 - **Wire Tap** — taps order processing to send a copy of each message to an audit log topic without affecting the main flow
@@ -10,28 +10,43 @@ Demonstrates system management and observability patterns with Apache Camel on Q
 ## Running
 
 ```bash
-cd examples/_infra && ./../../scripts/setup-stack.sh
-cd ../17-observability
-mvn quarkus:dev
+# From the repository root
+./scripts/setup-stack.sh
+
+cd examples/17-observability && mvn quarkus:dev
 ```
+
+## Infrastructure
+
+Requires **Kafka** and **PostgreSQL** from the Podman stack.
 
 ## Data flow
 
 ```
-eip.orders.placed → [Wire Tap Processor] → eip.orders.processed
-                           ↓
-                    eip.orders.audit
+eip.orders.placed → [Wire Tap Processor] ──→ eip.orders.processed
+                          └──→ [Audit Log] → eip.orders.audit
 
 eip.orders.incoming → [Validate] → [Enrich] → [Log History] → eip.orders.processed
+                          └── wireTap ──→ [Message Store] → PostgreSQL:system.message_store
 
 REST /control/status/{routeId} → [Control Bus] → route status
 REST /control/stop/{routeId}   → [Control Bus] → stop route
 REST /control/start/{routeId}  → [Control Bus] → start route
 ```
 
+## What to observe
+
+1. Wire tap copies appearing on `eip.orders.audit` for every order processed through `eip.orders.placed`
+2. Message history headers in the logs showing the full route path (e.g., `message-history-demo → history-validate → history-enrich → history-logger`)
+3. Message store rows accumulating in the `system.message_store` PostgreSQL table
+4. Control Bus REST responses reflecting the current status of managed routes
+5. The main processing flow on `eip.orders.processed` remaining unaffected by wire tap and message store side-channels
+
 ## How to test
 
-**Wire Tap** — produce an order to `eip.orders.placed`:
+There is no demo data generator — messages must be produced manually to Kafka.
+
+**Wire Tap** — produce an order to `eip.orders.placed` (via Kafka UI at [http://localhost:8090](http://localhost:8090)):
 
 ```json
 {"order_id": 7001, "customer_id": "C-400", "item_sku": "SKU-WW", "quantity": 1, "amount": 59.99}
@@ -45,7 +60,7 @@ The order flows to `eip.orders.processed` and a copy appears on `eip.orders.audi
 {"order_id": 7002, "customer_id": "C-401", "item_sku": "SKU-HH", "quantity": 3, "amount": 99.99}
 ```
 
-Watch the logs for the full route path (e.g., `message-history-demo@... -> history-validate@... -> history-enrich@... -> history-logger@...`).
+Watch the logs for the full route path (e.g., `message-history-demo → history-validate → history-enrich → history-logger`).
 
 **Control Bus** — query and manage routes via REST:
 
@@ -60,9 +75,15 @@ curl -X POST http://localhost:8082/control/start/wiretap-order-processor
 | Topic | Description |
 |-------|-------------|
 | `eip.orders.placed` | Incoming orders for wire tap demo |
-| `eip.orders.processed` | Successfully processed orders |
+| `eip.orders.incoming` | Incoming orders for message history and message store demos |
+| `eip.orders.processed` | Successfully processed orders (output from wire tap and message history) |
 | `eip.orders.audit` | Audit log copies via wire tap |
-| `eip.orders.incoming` | Incoming orders for message history demo + message store |
+
+## PostgreSQL tables
+
+| Table | Columns |
+|-------|---------|
+| `system.message_store` | `message_id`, `route_id`, `timestamp`, `payload` |
 
 ---
 

@@ -1,43 +1,80 @@
-# Chapter 12: Transformation Fundamentals
+# Chapter 12: Transformation
 
-Demonstrates message transformation patterns with Apache Camel on Quarkus:
+Demonstrates the three core transformation patterns as a connected pipeline: translate external formats to canonical, enrich with product data from Redis, then filter sensitive fields for analytics.
 
-- **Message Translator** — converts external order format (orderNumber, clientRef, productCode) to canonical format (order_id, customer_id, item_sku)
-- **Content Enricher** — augments orders with product data from a Redis-backed catalog (SKU → product name, category, weight, shipping zone)
-- **Content Filter** — strips PII fields, keeping only analytics-safe data
+- **Message Translator** — converts external partner order format (`orderNumber`/`clientRef`/`productCode`) to canonical internal format (`order_id`/`customer_id`/`item_sku`)
+- **Content Enricher** — uses `.enrich("direct:redis-product-lookup", strategy)` to look up product details from Redis by SKU and merge `product_name`, `category`, `weight_kg`, `shipping_zone` into the order
+- **Content Filter** — strips PII fields, keeping only an allowlist (`order_id`, `item_sku`, `quantity`, `amount`, `destination_country`, `shipping_priority`, `status`) for analytics
 
 ## Running
 
 ```bash
-cd examples/_infra && ./../../scripts/setup-stack.sh
-cd ../12-transformation
-mvn quarkus:dev
+# From repo root — start the infrastructure stack
+./scripts/setup-stack.sh
+
+# Run the example
+cd examples/12-transformation && mvn quarkus:dev
 ```
 
 ## Infrastructure
 
-Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCatalog` seeds product data into Redis hashes (`product:SKU-*`).
+Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCatalog` CDI `@Startup` bean seeds product data into Redis hashes.
 
 ## Data flow
 
 ```
-eip.orders.external → [Translator] → eip.orders.placed
-                                          ↓
-                                     [Enricher (Redis)] → eip.orders.enriched
-                                                               ↓
-                                                          [Filter] → eip.orders.analytics
+eip.orders.external → [Message Translator] → eip.orders.placed
+                                                    ↓
+                                             [Content Enricher]
+                                              (Redis lookup by SKU)
+                                                    ↓
+                                             eip.orders.enriched
+                                                    ↓
+                                             [Content Filter]
+                                              (strip PII)
+                                                    ↓
+                                             eip.orders.analytics
 ```
+
+## What to observe
+
+1. External-format orders arriving on `eip.orders.external` with partner field names (`orderNumber`, `clientRef`, `productCode`)
+2. Message translator converting to canonical format (`order_id`, `customer_id`, `item_sku`) and publishing to `eip.orders.placed`
+3. Content enricher calling `direct:redis-product-lookup` to fetch product details by SKU from Redis
+4. Enriched orders on `eip.orders.enriched` now containing `product_name`, `category`, `weight_kg`, and `shipping_zone`
+5. Content filter stripping PII and producing analytics-safe records on `eip.orders.analytics`
 
 ## How to test
 
-Produce an external-format order to `eip.orders.external`:
+Produce an external-format order to `eip.orders.external` via Kafka UI at [localhost:8090](http://localhost:8090):
 
 ```json
-{"orderNumber": 42, "clientRef": "C-100", "productCode": "SKU-ABC", "qty": 2, "totalValue": 149.99}
+{"orderNumber": 42, "clientRef": "C-100", "productCode": "SKU-ABC-42", "qty": 2, "totalValue": 149.99}
 ```
 
-Watch it transform through all three stages.
+Follow the message through all three stages: `eip.orders.placed` (translated), `eip.orders.enriched` (with product data), and `eip.orders.analytics` (PII stripped).
+
+## Kafka topics
+
+| Topic | Description |
+|-------|-------------|
+| `eip.orders.external` | External-format orders (input to translator) |
+| `eip.orders.placed` | Canonical orders (translator output, enricher input) |
+| `eip.orders.enriched` | Orders enriched with Redis product data (enricher output, filter input) |
+| `eip.orders.analytics` | Analytics-safe orders with PII stripped (filter output) |
+
+## Redis keys
+
+| Key | Description |
+|-----|-------------|
+| `product:SKU-ABC-42` | Wireless Headphones, Electronics, 0.3kg, ZONE-1 |
+| `product:SKU-DEF-77` | Running Shoes, Footwear, 1.2kg, ZONE-2 |
+| `product:SKU-GHI-13` | Coffee Maker, Appliances, 4.5kg, ZONE-3 |
+| `product:SKU-US-1` | USB-C Cable, Electronics, 0.1kg, ZONE-1 |
+| `product:SKU-CA-2` | Maple Syrup, Food, 0.8kg, ZONE-2 |
+| `product:SKU-GB-3` | Tea Set, Kitchen, 2.0kg, ZONE-3 |
+
+Each key is a Redis hash with fields: `name`, `price`, `category`, `weight_kg`, `shipping_zone`. Unknown SKUs return defaults: "Unknown Product", General, 1.0kg, ZONE-1.
 
 ---
-
 *Verification status: unverified.*

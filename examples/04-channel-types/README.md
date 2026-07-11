@@ -1,39 +1,58 @@
 # Chapter 4: Channel Types
 
-Demonstrates three fundamental messaging channel patterns with Apache Camel on Quarkus:
+Demonstrates six messaging channel patterns with Apache Camel on Quarkus, showing the same Point-to-Point and Publish-Subscribe concepts implemented across Kafka, Pulsar, and Redis:
 
-- **Point-to-Point Channel** — a single consumer group (`p2p-order-processor`) ensures each order is processed by exactly one consumer (competing consumers model)
-- **Publish-Subscribe Channel** — one `eip.orders.events` topic with three independent consumer groups (`subscriber-inventory`, `subscriber-notification`, `subscriber-analytics`) so every subscriber receives every message
-- **Datatype Channel** — incoming orders are routed by `status` field to dedicated topics (`eip.orders.placed.typed`, `eip.orders.cancelled`, `eip.orders.refunded`), each carrying a single event type
-- **Pulsar P2P** — same Point-to-Point pattern on Apache Pulsar with a `Shared` subscription
-- **Pulsar Pub/Sub** — fan-out to three independent `Exclusive` subscriptions on Pulsar
-- **Redis Pub/Sub** — fire-and-forget notifications via Redis Pub/Sub (no persistence, real-time only)
+- **Point-to-Point Channel** — a single consumer group (`p2p-order-processor`) ensures each order is processed by exactly one consumer
+- **Publish-Subscribe Channel** — three independent consumer groups (`subscriber-inventory`, `subscriber-notification`, `subscriber-analytics`) on the same topic, each receives every message
+- **Datatype Channel** — routes inbound orders by `status` field to dedicated type-specific topics (`placed`, `cancelled`, `refunded`)
+- **Pulsar P2P** — `Shared` subscription distributes messages round-robin across consumers
+- **Pulsar Pub/Sub** — three `Exclusive` subscriptions each receive every message independently
+- **Redis Pub/Sub** — fire-and-forget real-time notifications with no persistence or durability
 
 ## Running
 
 ```bash
-cd examples/_infra && ./../../scripts/setup-stack.sh
-cd ../04-channel-types
+# Start the full infrastructure stack (Kafka + Pulsar + Redis required)
+./scripts/setup-stack.sh
+
+cd examples/04-channel-types
 mvn quarkus:dev
 ```
 
 ## Infrastructure
 
-Requires the full Podman stack (Kafka + Pulsar + Redis):
+Requires Kafka, Pulsar, and Redis from the Podman stack.
 
-```bash
-cd examples/_infra && ./../../scripts/setup-stack.sh
+## Data flow
+
+```
+Demo Timer (5s) --> kafka:eip.orders.placed --+--> [P2P Consumer] --> eip.orders.processed
+                                              +--> [Datatype Router] --+--> eip.orders.placed.typed
+                                                                       +--> eip.orders.cancelled
+                                                                       +--> eip.orders.refunded
+
+kafka:eip.orders.processed --> [Pub/Sub Publisher] --> eip.orders.events
+                                                           +--> subscriber-inventory
+                                                           +--> subscriber-notification
+                                                           +--> subscriber-analytics
+
+Pulsar Timer (5s) --> pulsar:eip.orders.placed --> [P2P Pulsar Consumer]
+                  --> pulsar:eip.orders.events --+--> pulsar-subscriber-inventory
+                                                 +--> pulsar-subscriber-notification
+                                                 +--> pulsar-subscriber-analytics
+
+Redis Timer (8s) --> redis:eip.orders.notifications --> [Redis Subscriber]
 ```
 
 ## What to observe
 
-In the logs you will see:
-
-1. **Demo data generator** producing orders every 5 seconds to both Kafka and Pulsar
+1. **Demo data generators** producing orders every 5 seconds to both Kafka and Pulsar
 2. **Point-to-Point** — each order consumed once and forwarded to `eip.orders.processed` (Kafka) and logged (Pulsar)
 3. **Pub/Sub fan-out** — the same order event logged by all three subscribers on both Kafka and Pulsar
 4. **Redis Pub/Sub** — shipping notifications published to Redis every 8 seconds, received by the subscriber in real-time
-5. **Datatype routing** — orders sorted into type-specific topics, with dedicated consumers confirming receipt
+5. **Datatype routing** — orders sorted into type-specific topics by status field
+
+Open Kafka UI at [http://localhost:8090](http://localhost:8090) to inspect topics and consumer groups.
 
 ## Kafka topics
 
@@ -45,6 +64,20 @@ In the logs you will see:
 | `eip.orders.placed.typed` | Datatype | Orders with status `placed` |
 | `eip.orders.cancelled` | Datatype | Orders with status `cancelled` |
 | `eip.orders.refunded` | Datatype | Orders with status `refunded` |
+| `eip.orders.unknown` | Datatype | Orders with unrecognized status |
+
+## Pulsar topics
+
+| Topic | Pattern | Description |
+|-------|---------|-------------|
+| `persistent://public/default/eip.orders.placed` | P2P | Shared subscription |
+| `persistent://public/default/eip.orders.events` | Pub/Sub | 3 Exclusive subscriptions |
+
+## Redis
+
+| Channel | Description |
+|---------|-------------|
+| `eip.orders.notifications` | Fire-and-forget Pub/Sub notifications |
 
 ---
 
