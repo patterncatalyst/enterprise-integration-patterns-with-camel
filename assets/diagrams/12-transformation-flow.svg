@@ -1,23 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 260" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="20" y="20" width="840" height="220" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="40" font-size="12" font-weight="700" fill="#888">Transformation Pipeline</text>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#555555">Transformation Pipeline</text>
 <rect x="50" y="70" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
 <text x="115.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Raw Order</text>
 <text x="115.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">external format</text>
-<rect x="230" y="70" width="130" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="295.0" y="93.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Translator</text>
-<text x="295.0" y="110.0" font-size="11.5" fill="#dddddd" text-anchor="middle">normalize</text>
-<rect x="410" y="70" width="130" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="475.0" y="93.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Enricher</text>
-<text x="475.0" y="110.0" font-size="11.5" fill="#dddddd" text-anchor="middle">add address</text>
-<rect x="590" y="70" width="130" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="655.0" y="93.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Filter</text>
-<text x="655.0" y="110.0" font-size="11.5" fill="#dddddd" text-anchor="middle">remove PII</text>
+<rect x="230" y="70" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(280.0,74) scale(0.25)"><!-- Message Translator -->
+  <polygon points="84.2,46.0 84.2,74.0 60.0,88.0 35.8,74.0 35.8,46.0 60.0,32.0" fill="#FFF8F0" stroke="#151515"/></g>
+<text x="295.0" y="111.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Translator</text>
+<text x="295.0" y="128.0" font-size="11.5" fill="#555555" text-anchor="middle">normalize</text>
+<rect x="410" y="70" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(460.0,74) scale(0.25)"><!-- Content Enricher -->
+  <rect x="38" y="38" width="44" height="34" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <line x1="52" y1="55" x2="68" y2="55" stroke="#EE0000" stroke-width="2.5"/>
+  <line x1="60" y1="47" x2="60" y2="63" stroke="#EE0000" stroke-width="2.5"/>
+  <line x1="5" y1="55" x2="38" y2="55" stroke="#151515"/>
+  <polyline points="33.0,57.5 38,55 33.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="82" y1="55" x2="115" y2="55" stroke="#151515"/>
+  <polyline points="110.0,57.5 115,55 110.0,52.5" stroke="#151515" fill="none"/></g>
+<text x="475.0" y="111.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Enricher</text>
+<text x="475.0" y="128.0" font-size="11.5" fill="#555555" text-anchor="middle">add address</text>
+<rect x="590" y="70" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(640.0,74) scale(0.25)"><!-- Content Filter -->
+  <rect x="38" y="38" width="44" height="34" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <line x1="50" y1="55" x2="70" y2="55" stroke="#EE0000" stroke-width="2.5"/>
+  <line x1="5" y1="55" x2="38" y2="55" stroke="#151515"/>
+  <polyline points="33.0,57.5 38,55 33.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="82" y1="55" x2="115" y2="55" stroke="#151515"/>
+  <polyline points="110.0,57.5 115,55 110.0,52.5" stroke="#151515" fill="none"/></g>
+<text x="655.0" y="111.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Filter</text>
+<text x="655.0" y="128.0" font-size="11.5" fill="#555555" text-anchor="middle">remove PII</text>
 <rect x="750" y="70" width="100" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="800.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Canonical</text>
 <text x="800.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">Order</text>
-<rect x="410" y="170" width="130" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="410" y="170" width="130" height="50" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="475.0" y="193.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Address DB</text>
 <text x="475.0" y="210.0" font-size="11.5" fill="#555555" text-anchor="middle">external lookup</text>
 <path d="M180,95 L230,95" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
@@ -27,5 +44,5 @@
 <path d="M475,120 L475,170" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <text x="481.0" y="139.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">lookup</text>
 <text x="481.0" y="139.0" font-size="11" fill="#555" text-anchor="middle">lookup</text>
-<text x="450" y="50" font-size="11" fill="#888" text-anchor="middle">Pipes and Filters — each step transforms the message</text>
+<text x="450" y="50" font-size="11" fill="#555555" text-anchor="middle">Pipes and Filters — each step transforms the message</text>
 </svg>

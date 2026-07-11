@@ -1,12 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="20" y="20" width="410" height="240" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="40" font-size="12" font-weight="700" fill="#888">Test Message</text>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#555555">Test Message</text>
 <rect x="460" y="20" width="400" height="240" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="472" y="40" font-size="12" font-weight="700" fill="#888">Detour Pattern</text>
+<text x="472" y="40" font-size="12" font-weight="700" fill="#555555">Detour Pattern</text>
 <rect x="50" y="80" width="120" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
-<text x="110.0" y="103.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Test Injector</text>
-<text x="110.0" y="120.0" font-size="11.5" fill="#555555" text-anchor="middle">synthetic msg</text>
+<g transform="translate(95.0,84) scale(0.25)"><!-- Test Message -->
+  <rect x="42" y="38" width="36" height="24" fill="#FFF8F0" stroke="#151515" rx="1"/>
+  <polyline points="42,38 60,52 78,38" fill="none" stroke="#151515"/>
+  <polyline points="48,52 56,60 74,42" fill="none" stroke="#EE0000" stroke-width="2.5"/></g>
+<text x="110.0" y="121.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Test Injector</text>
+<text x="110.0" y="138.0" font-size="11.5" fill="#555555" text-anchor="middle">synthetic msg</text>
 <rect x="220" y="80" width="130" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="285.0" y="103.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Normal Route</text>
 <text x="285.0" y="120.0" font-size="11.5" fill="#555555" text-anchor="middle">process msg</text>
@@ -19,9 +23,16 @@
 <rect x="660" y="60" width="130" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="725.0" y="78.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Main Flow</text>
 <text x="725.0" y="95.0" font-size="11.5" fill="#555555" text-anchor="middle">always runs</text>
-<rect x="660" y="120" width="130" height="40" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
-<text x="725.0" y="138.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Debug Step</text>
-<text x="725.0" y="155.0" font-size="11.5" fill="#555555" text-anchor="middle">toggled on/off</text>
+<rect x="660" y="120" width="130" height="40" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(713.0,124) scale(0.2)"><!-- Detour -->
+  <line x1="15" y1="60" x2="40" y2="60" stroke="#151515"/>
+  <path d="M 40,60 Q 40,30 60,30 Q 80,30 80,60" fill="none" stroke="#EE0000" stroke-dasharray="4,2"/>
+  <circle cx="40" cy="60" r="4" fill="#FFF8F0" stroke="#151515"/>
+  <circle cx="80" cy="60" r="4" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="84" y1="60" x2="105" y2="60" stroke="#151515"/>
+  <rect x="48" y="22" width="24" height="16" fill="#FFF8F0" stroke="#151515" rx="3"/></g>
+<text x="725.0" y="153.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Debug Step</text>
+<text x="725.0" y="170.0" font-size="11.5" fill="#555555" text-anchor="middle">toggled on/off</text>
 <rect x="660" y="180" width="130" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="725.0" y="198.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Continue</text>
 <text x="725.0" y="215.0" font-size="11.5" fill="#555555" text-anchor="middle">processing</text>
@@ -37,6 +48,6 @@
 <text x="646.0" y="116.5" font-size="11" fill="#555" text-anchor="middle">if enabled</text>
 <path d="M790,80 L790,180" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <path d="M790,160 L790,180" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
-<text x="220" y="245" font-size="11" fill="#888" text-anchor="middle">Verify system health</text>
-<text x="700" y="225" font-size="11" fill="#888" text-anchor="middle">Toggle via config/feature flag</text>
+<text x="220" y="245" font-size="11" fill="#555555" text-anchor="middle">Verify system health</text>
+<text x="700" y="225" font-size="11" fill="#555555" text-anchor="middle">Toggle via config/feature flag</text>
 </svg>

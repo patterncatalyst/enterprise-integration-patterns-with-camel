@@ -1,14 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="20" y="10" width="860" height="300" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="30" font-size="12" font-weight="700" fill="#888">Messaging System</text>
+<text x="32" y="30" font-size="12" font-weight="700" fill="#555555">Messaging System</text>
 <rect x="40" y="60" width="120" height="55" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
 <text x="100.0" y="85.5" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Sender</text>
 <text x="100.0" y="102.5" font-size="11.5" fill="#dddddd" text-anchor="middle">Application</text>
 <rect x="40" y="160" width="120" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
-<text x="100.0" y="183.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Endpoint</text>
-<text x="100.0" y="200.0" font-size="11.5" fill="#555555" text-anchor="middle">(producer)</text>
-<rect x="220" y="110" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(85.0,164) scale(0.25)"><!-- Message Endpoint -->
+  <rect x="40" y="40" width="30" height="30" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <line x1="70" y1="55" x2="100" y2="55" stroke="#151515"/>
+  <polyline points="95.0,57.5 100,55 95.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="20" y1="55" x2="40" y2="55" stroke="#151515"/></g>
+<text x="100.0" y="201.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Endpoint</text>
+<text x="100.0" y="218.0" font-size="11.5" fill="#555555" text-anchor="middle">(producer)</text>
+<rect x="220" y="118" width="130" height="34" fill="#f4f4f4" stroke="none"/>
+<ellipse cx="285.0" cy="118" rx="65.0" ry="8" fill="#f4f4f4" stroke="#555555" stroke-width="1.5"/>
+<ellipse cx="285.0" cy="152" rx="65.0" ry="8" fill="#f4f4f4" stroke="#555555" stroke-width="1.5"/>
+<line x1="220" y1="118" x2="220" y2="152" stroke="#555555" stroke-width="1.5"/>
+<line x1="350" y1="118" x2="350" y2="152" stroke="#555555" stroke-width="1.5"/>
 <text x="285.0" y="133.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Channel</text>
 <text x="285.0" y="150.0" font-size="11.5" fill="#555555" text-anchor="middle">topic / queue</text>
 <rect x="400" y="60" width="100" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
@@ -20,21 +29,37 @@
 <rect x="640" y="60" width="100" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="690.0" y="83.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Filter 3</text>
 <text x="690.0" y="100.0" font-size="11.5" fill="#555555" text-anchor="middle">enrich</text>
-<rect x="520" y="160" width="100" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
-<text x="570.0" y="183.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Router</text>
-<text x="570.0" y="200.0" font-size="11.5" fill="#555555" text-anchor="middle">choice()</text>
-<rect x="400" y="240" width="100" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
-<text x="450.0" y="263.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Translator</text>
-<text x="450.0" y="280.0" font-size="11.5" fill="#555555" text-anchor="middle">marshal</text>
+<rect x="520" y="160" width="100" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(555.0,164) scale(0.25)"><!-- Content-Based Router -->
+  <polygon points="60,30 85,55 60,80 35,55" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="8" y1="55" x2="35" y2="55" stroke="#151515"/>
+  <polyline points="30.0,57.5 35,55 30.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="112" y2="35" stroke="#151515"/>
+  <polyline points="109.5,40.0 112,35 106.5,36.0" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="112" y2="55" stroke="#151515"/>
+  <polyline points="107.0,57.5 112,55 107.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="112" y2="75" stroke="#151515"/>
+  <polyline points="106.5,74.0 112,75 109.5,70.0" stroke="#151515" fill="none"/>
+  <text x="60" y="60" text-anchor="middle" font-size="14" font-family="sans-serif" fill="#EE0000" stroke="none">?</text></g>
+<text x="570.0" y="201.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Router</text>
+<text x="570.0" y="218.0" font-size="11.5" fill="#555555" text-anchor="middle">choice()</text>
+<rect x="400" y="240" width="100" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(435.0,244) scale(0.25)"><!-- Message Translator -->
+  <polygon points="84.2,46.0 84.2,74.0 60.0,88.0 35.8,74.0 35.8,46.0 60.0,32.0" fill="#FFF8F0" stroke="#151515"/></g>
+<text x="450.0" y="281.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Translator</text>
+<text x="450.0" y="298.0" font-size="11.5" fill="#555555" text-anchor="middle">marshal</text>
 <rect x="740" y="160" width="120" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
-<text x="800.0" y="183.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Endpoint</text>
-<text x="800.0" y="200.0" font-size="11.5" fill="#555555" text-anchor="middle">(consumer)</text>
+<g transform="translate(785.0,164) scale(0.25)"><!-- Message Endpoint -->
+  <rect x="40" y="40" width="30" height="30" fill="#FFF8F0" stroke="#151515" rx="2"/>
+  <line x1="70" y1="55" x2="100" y2="55" stroke="#151515"/>
+  <polyline points="95.0,57.5 100,55 95.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="20" y1="55" x2="40" y2="55" stroke="#151515"/></g>
+<text x="800.0" y="201.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Endpoint</text>
+<text x="800.0" y="218.0" font-size="11.5" fill="#555555" text-anchor="middle">(consumer)</text>
 <rect x="740" y="240" width="120" height="55" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
 <text x="800.0" y="265.5" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Receiver</text>
 <text x="800.0" y="282.5" font-size="11.5" fill="#dddddd" text-anchor="middle">Application</text>
 <path d="M100,115 L100,160" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<text x="140.0" y="131.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">Message</text>
-<text x="140.0" y="131.5" font-size="11" fill="#b8650a" text-anchor="middle">Message</text>
 <path d="M160,185 L220,140" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
 <path d="M350,130 L400,90" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <text x="360.0" y="100.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">pipe</text>
@@ -49,6 +74,7 @@
 <text x="516.0" y="233.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">route B</text>
 <text x="516.0" y="233.0" font-size="11" fill="#555" text-anchor="middle">route B</text>
 <path d="M800,210 L800,240" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<text x="450" y="30" font-size="14" fill="#111" text-anchor="middle" font-weight="700">The Six Building Blocks</text>
-<text x="460" y="140" font-size="10" fill="#888" text-anchor="middle">Pipes &amp; Filters</text>
+<text x="140" y="131" font-size="11" fill="#555555" text-anchor="middle">Message</text>
+<text x="450" y="30" font-size="14" fill="#555555" text-anchor="middle" font-weight="700">The Six Building Blocks</text>
+<text x="460" y="140" font-size="10" fill="#555555" text-anchor="middle">Pipes &amp; Filters</text>
 </svg>

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 280" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="20" y="20" width="840" height="240" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="40" font-size="12" font-weight="700" fill="#888">Reliability Patterns</text>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#555555">Reliability Patterns</text>
 <rect x="50" y="70" width="140" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
 <text x="120.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Producer</text>
 <text x="120.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">acks=all</text>
@@ -14,12 +14,19 @@
 <rect x="660" y="70" width="160" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="740.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Process</text>
 <text x="740.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">business logic</text>
-<rect x="460" y="180" width="140" height="50" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<rect x="460" y="180" width="140" height="50" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
 <text x="530.0" y="203.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Retry</text>
 <text x="530.0" y="220.0" font-size="11.5" fill="#555555" text-anchor="middle">3 attempts</text>
-<rect x="660" y="180" width="160" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="740.0" y="203.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Dead Letter</text>
-<text x="740.0" y="220.0" font-size="11.5" fill="#dddddd" text-anchor="middle">Channel (DLQ)</text>
+<rect x="660" y="180" width="160" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(725.0,184) scale(0.25)"><!-- Dead Letter Channel -->
+  <ellipse cx="20" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="20" y1="45" x2="100" y2="45" stroke="#151515"/>
+  <line x1="20" y1="63" x2="100" y2="63" stroke="#151515"/>
+  <ellipse cx="100" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="52" y1="48" x2="68" y2="62" stroke="#EE0000" stroke-width="2.5"/>
+  <line x1="68" y1="48" x2="52" y2="62" stroke="#EE0000" stroke-width="2.5"/></g>
+<text x="740.0" y="221.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Dead Letter</text>
+<text x="740.0" y="238.0" font-size="11.5" fill="#555555" text-anchor="middle">Channel (DLQ)</text>
 <path d="M190,95 L240,95" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
 <text x="221.0" y="89.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">guaranteed</text>
 <text x="221.0" y="89.0" font-size="11" fill="#b8650a" text-anchor="middle">guaranteed</text>
@@ -36,5 +43,5 @@
 <path d="M460,205 L460,120" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <text x="466.0" y="156.5" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">reprocess</text>
 <text x="466.0" y="156.5" font-size="11" fill="#555" text-anchor="middle">reprocess</text>
-<text x="740" y="245" font-size="11" fill="#888" text-anchor="middle">After all retries exhausted</text>
+<text x="740" y="245" font-size="11" fill="#555555" text-anchor="middle">After all retries exhausted</text>
 </svg>

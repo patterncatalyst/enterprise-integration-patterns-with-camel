@@ -1,13 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 360" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
 <rect x="20" y="20" width="860" height="320" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="40" font-size="12" font-weight="700" fill="#888">Message Routing Patterns</text>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#555555">Message Routing Patterns</text>
 <rect x="50" y="70" width="140" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
 <text x="120.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Incoming</text>
 <text x="120.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">Order Message</text>
-<rect x="240" y="70" width="140" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="310.0" y="93.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Content-Based</text>
-<text x="310.0" y="110.0" font-size="11.5" fill="#dddddd" text-anchor="middle">Router (choice)</text>
+<rect x="240" y="70" width="140" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(295.0,74) scale(0.25)"><!-- Content-Based Router -->
+  <polygon points="60,30 85,55 60,80 35,55" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="8" y1="55" x2="35" y2="55" stroke="#151515"/>
+  <polyline points="30.0,57.5 35,55 30.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="112" y2="35" stroke="#151515"/>
+  <polyline points="109.5,40.0 112,35 106.5,36.0" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="112" y2="55" stroke="#151515"/>
+  <polyline points="107.0,57.5 112,55 107.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="112" y2="75" stroke="#151515"/>
+  <polyline points="106.5,74.0 112,75 109.5,70.0" stroke="#151515" fill="none"/>
+  <text x="60" y="60" text-anchor="middle" font-size="14" font-family="sans-serif" fill="#EE0000" stroke="none">?</text></g>
+<text x="310.0" y="111.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Content-Based</text>
+<text x="310.0" y="128.0" font-size="11.5" fill="#555555" text-anchor="middle">Router (choice)</text>
 <rect x="440" y="50" width="130" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
 <text x="505.0" y="75.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Domestic</text>
 <rect x="440" y="100" width="130" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
@@ -15,9 +26,21 @@
 <rect x="50" y="180" width="140" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
 <text x="120.0" y="203.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Batch Order</text>
 <text x="120.0" y="220.0" font-size="11.5" fill="#555555" text-anchor="middle">[3 items]</text>
-<rect x="240" y="180" width="140" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="310.0" y="203.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Splitter</text>
-<text x="310.0" y="220.0" font-size="11.5" fill="#dddddd" text-anchor="middle">split(body)</text>
+<rect x="240" y="180" width="140" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(295.0,184) scale(0.25)"><!-- Splitter -->
+  <circle cx="35" cy="60" r="12" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="5" y1="60" x2="23" y2="60" stroke="#151515"/>
+  <polyline points="18.0,62.5 23,60 18.0,57.5" stroke="#151515" fill="none"/>
+  <line x1="47" y1="52" x2="100" y2="30" stroke="#151515"/>
+  <polyline points="96.3,34.2 100,30 94.4,29.6" stroke="#151515" fill="none"/>
+  <line x1="47" y1="60" x2="100" y2="60" stroke="#151515"/>
+  <polyline points="95.0,62.5 100,60 95.0,57.5" stroke="#151515" fill="none"/>
+  <line x1="47" y1="68" x2="100" y2="90" stroke="#151515"/>
+  <polyline points="94.4,90.4 100,90 96.3,85.8" stroke="#151515" fill="none"/>
+  <line x1="32" y1="52" x2="32" y2="68" stroke="#EE0000" stroke-width="1.5"/>
+  <line x1="38" y1="52" x2="38" y2="68" stroke="#EE0000" stroke-width="1.5"/></g>
+<text x="310.0" y="221.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Splitter</text>
+<text x="310.0" y="238.0" font-size="11.5" fill="#555555" text-anchor="middle">split(body)</text>
 <rect x="440" y="160" width="100" height="35" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="490.0" y="183.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Item 1</text>
 <rect x="440" y="200" width="100" height="35" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
@@ -26,9 +49,22 @@
 <text x="490.0" y="263.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Item 3</text>
 <rect x="50" y="290" width="140" height="40" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
 <text x="120.0" y="315.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Notification</text>
-<rect x="240" y="290" width="140" height="40" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="310.0" y="308.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Recipient List</text>
-<text x="310.0" y="325.0" font-size="11.5" fill="#dddddd" text-anchor="middle">recipientList()</text>
+<rect x="240" y="290" width="140" height="40" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(298.0,294) scale(0.2)"><!-- Recipient List -->
+  <polygon points="45,35 65,55 45,75 25,55" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="65" y1="45" x2="95" y2="30" stroke="#151515"/>
+  <polyline points="91.6,34.5 95,30 89.4,30.0" stroke="#151515" fill="none"/>
+  <line x1="65" y1="55" x2="95" y2="55" stroke="#151515"/>
+  <polyline points="90.0,57.5 95,55 90.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="65" y1="65" x2="95" y2="80" stroke="#151515"/>
+  <polyline points="89.4,80.0 95,80 91.6,75.5" stroke="#151515" fill="none"/>
+  <line x1="38" y1="50" x2="52" y2="50" stroke="#EE0000" stroke-width="1.5"/>
+  <line x1="38" y1="55" x2="52" y2="55" stroke="#EE0000" stroke-width="1.5"/>
+  <line x1="38" y1="60" x2="52" y2="60" stroke="#EE0000" stroke-width="1.5"/>
+  <line x1="5" y1="55" x2="25" y2="55" stroke="#151515"/>
+  <polyline points="20.0,57.5 25,55 20.0,52.5" stroke="#151515" fill="none"/></g>
+<text x="310.0" y="323.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Recipient List</text>
+<text x="310.0" y="340.0" font-size="11.5" fill="#555555" text-anchor="middle">recipientList()</text>
 <rect x="440" y="280" width="100" height="35" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="490.0" y="303.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Email</text>
 <rect x="560" y="280" width="100" height="35" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
@@ -46,7 +82,7 @@
 <path d="M380,305 L440,298" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <path d="M380,310 L560,298" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <path d="M380,315 L680,298" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
-<text x="620" y="70" font-size="11" fill="#888" text-anchor="start">routes by content</text>
-<text x="570" y="215" font-size="11" fill="#888" text-anchor="start">splits into parts</text>
-<text x="800" y="310" font-size="11" fill="#888" text-anchor="start">fans out to list</text>
+<text x="620" y="70" font-size="11" fill="#555555" text-anchor="start">routes by content</text>
+<text x="570" y="215" font-size="11" fill="#555555" text-anchor="start">splits into parts</text>
+<text x="800" y="310" font-size="11" fill="#555555" text-anchor="start">fans out to list</text>
 </svg>
