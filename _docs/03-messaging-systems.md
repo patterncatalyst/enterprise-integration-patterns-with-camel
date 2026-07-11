@@ -375,5 +375,5 @@ These six building blocks are the vocabulary for the rest of this tutorial. Next
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
+*Verification status: <span class="status status--verified">verified</span> — messaging patterns verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
 Confirm: all Camel route examples compile and run with `camel run` against Camel 4.20; Kafka component header names (kafka.KEY, kafka.PARTITION, kafka.OFFSET) match actual Camel Kafka component behavior; Simple expression syntax for map access (`${body[field]}`) works as shown.*

@@ -1077,7 +1077,15 @@ divider("05", "Routing Patterns\nin Code", "Content-based router, splitter, aggr
   addNotes(s, "The message broker pattern creates a centralized routing hub within your application. In Camel, the direct: and seda: components implement synchronous and asynchronous in-memory endpoints. A typical message broker route consumes from a well-known endpoint like direct:incoming-messages, examines each message, and dispatches it to the appropriate processing route. The difference between direct: and seda: is threading: direct: runs synchronously in the caller's thread, while seda: queues the message and processes it in a separate thread. This distinction matters for error handling — with direct:, exceptions propagate back to the caller; with seda:, they do not. Use the message broker pattern for intra-application routing where messages need to be dispatched based on content. For inter-application routing, Kafka topics with consumer groups are the right choice.");
 }
 
-// Slide 55: Resequencer
+// Slide 55: Resequencer — diagram
+{
+  const s = S();
+  addDiagramSlide(s, "ROUTING PATTERNS", "Resequencer — Restoring Message Order", "11-resequencer",
+    "Figure 5.11 — Resequencer restores out-of-order messages by sequence number");
+  addNotes(s, "The resequencer pattern restores message order when messages arrive out of sequence. Two flavors: the stream resequencer uses a sliding window for continuous flows — it holds messages briefly and releases them in order as the window advances. The batch resequencer collects a fixed number of messages, sorts them, and releases the sorted batch. In our shipping domain, tracking updates from multiple carriers arrive at different speeds, producing out-of-order events. The resequencer ensures the tracking timeline is presented in chronological order.");
+}
+
+// Slide 56: Resequencer — code
 {
   const s = S();
   addCodeSlide(s, "ROUTING PATTERNS", "Resequencer — Restoring Message Order", "Java", [
@@ -1373,7 +1381,15 @@ divider("06", "Transformation\nin Code", "Translators, enrichers, claim checks, 
   addNotes(s, "The resequencer pattern restores message ordering when messages arrive out of sequence. This is a transformation pattern because it changes the order in which messages appear to downstream consumers. The stream resequencer works like a jitter buffer in audio streaming: it holds messages in a small window and releases them in order as the window advances. If message 3 arrives before message 2, the stream resequencer holds message 3 until message 2 arrives (or the timeout expires). The batch resequencer is simpler: it collects a batch of messages, sorts them by sequence number, and releases the sorted batch. The stream variant is better for continuous flows; the batch variant is better for periodic batch processing. The capacity limit prevents memory exhaustion if a producer sends messages much faster than the resequencer can release them.");
 }
 
-// Slide 67: Type conversion
+// Slide 67: Type conversion — diagram
+{
+  const s = S();
+  addDiagramSlide(s, "TRANSFORMATION", "Type Conversion — Camel's Automatic Type System", "12-type-conversion",
+    "Figure 6.8 — Camel chains type converters automatically");
+  addNotes(s, "Camel's type conversion system eliminates manual format conversion boilerplate. When you call getBody(Order.class), Camel searches its converter registry for a path from the current type to Order — chaining multiple converters if needed. The chain byte[] → String → JSON → POJO happens automatically. The marshal() and unmarshal() DSL methods handle explicit serialization. Custom @Converter annotations register domain-specific converters discovered at build time by Quarkus.");
+}
+
+// Slide 68: Type conversion — details
 {
   const s = S();
   addContentTitle(s, "TRANSFORMATION", "Type Conversion — Camel's Automatic Type System");
@@ -1735,7 +1751,15 @@ divider("08", "System Management\nin Code", "Control bus, wire tap, message hist
   addNotes(s, "The test message pattern injects canary messages into your production flow to verify end-to-end health. A timer route generates a synthetic order every 60 seconds with a testMessage=true header. Downstream routes can check this header and skip side effects (do not actually charge a credit card for a test message). If the canary stops arriving at the end of the pipeline, something is broken. The detour pattern conditionally routes messages through an extra processing step. Here, a Quarkus configuration property debug.enabled controls whether messages go through a debug inspector. In production, this defaults to false — but an operator can set it to true at runtime via a config change to enable verbose debugging without redeploying. The double curly braces use Quarkus property placeholder resolution, and the :false suffix provides a default value.");
 }
 
-// Slide 85: Channel Purger and Smart Proxy
+// Slide 85: Channel Purger and Smart Proxy — diagram
+{
+  const s = S();
+  addDiagramSlide(s, "SYSTEM MANAGEMENT", "Channel Purger and Smart Proxy", "17-purger-proxy",
+    "Figure 8.6 — Channel purger clears test data; smart proxy observes without disrupting");
+  addNotes(s, "Two system management patterns side by side. The channel purger clears accumulated messages from channels, primarily for testing — in Kafka, reset consumer group offsets or use unique topic names per test run for complete isolation. The smart proxy inserts an intermediary between producer and consumer to observe, log, or modify traffic without either party knowing. Useful for canary deployments: mirror production traffic to a new version, compare output, promote only when outputs match.");
+}
+
+// Slide 86: Channel Purger and Smart Proxy — details
 {
   const s = S();
   addContentTitle(s, "SYSTEM MANAGEMENT", "Channel Purger and Smart Proxy");
@@ -2159,7 +2183,15 @@ divider("10", "Case Study\nLoan Broker", "13 EIP patterns working together",
   addNotes(s, "The AggregatorRoute is the gather phase of scatter-gather. It consumes bank responses from the shared bank-responses topic and groups them by correlation ID. The BestRateStrategy compares each incoming bank rate against the current best — the aggregate always contains the lowest rate seen so far. Completion has two triggers: completionSize releases the aggregate when all expected bank responses have arrived (the count was set as a header by the recipient list), and completionTimeout releases after 10 seconds even if some banks have not responded. This timeout is essential — a bank might be down or slow, and you should not make the customer wait indefinitely. The aggregated result — the single best rate — is produced to the loan.results topic. This closes the scatter-gather loop: request scattered to banks, responses gathered and aggregated, best result selected.");
 }
 
-// Slide 105: DemoRoute
+// Slide 105: Loan Broker architecture — diagram
+{
+  const s = S();
+  addDiagramSlide(s, "CASE STUDY: LOAN BROKER", "Loan Broker — End-to-End Architecture", "28-loan-broker",
+    "Figure 10.7 — Complete Loan Broker scatter-gather architecture with EIP stencils");
+  addNotes(s, "This diagram shows the complete Loan Broker architecture using canonical EIP stencils. The customer submits a loan request via REST. The messaging gateway bridges HTTP to Kafka. The content enricher adds the credit score from a simulated credit bureau. The recipient list fans out to eligible banks based on credit score. Each bank calculates a rate independently. The aggregator gathers all bank responses and selects the best rate. This is the scatter-gather pattern in action — 13 EIP patterns working together in a single end-to-end flow.");
+}
+
+// Slide 106: DemoRoute
 {
   const s = S();
   addContentTitle(s, "CASE STUDY: LOAN BROKER", "DemoRoute — Generating Test Requests");
@@ -2356,7 +2388,15 @@ divider("11", "Case Study\nBond Trading", "16 EIP patterns in a financial market
   addNotes(s, "The TradeValidationRoute combines two critical patterns: idempotent consumer and wire tap. The idempotent consumer is non-negotiable in financial systems — a duplicate trade execution could cost millions. The Redis-backed repository ensures that each trade ID is processed exactly once, even if Kafka redelivers the message. The wire tap copies every trade to an audit topic for compliance recording — financial regulations require a complete audit trail of all trading activity. The trade validator bean performs business validation: checking that the trade quantity is within limits, the price is within the current market range, and the trader has authorization for this bond type. Only validated trades proceed to the validated trades topic. Note the ordering: deduplication first, then audit, then validation. This ensures the audit captures every unique trade attempt, including those that fail validation.");
 }
 
-// Slide 114: DemoDataRoute
+// Slide 114: Bond Trading architecture — diagram
+{
+  const s = S();
+  addDiagramSlide(s, "CASE STUDY: BOND TRADING", "Bond Trading — Market Data Distribution", "29-bond-trading",
+    "Figure 11.6 — Bond trading architecture: normalize, aggregate, distribute, trade, audit");
+  addNotes(s, "This diagram shows the complete Bond Trading architecture using canonical EIP stencils. Three market data feeds (Bloomberg, Reuters, Exchange) are normalized into a canonical BondQuote format via channel adapters and normalizer. The aggregator selects the best price per symbol. A content-based router distributes quotes to the appropriate trading desk based on bond type. The trade engine validates and executes trades. A wire tap copies every trade to an audit topic for compliance. This system demonstrates 16 EIP patterns working together for real-time market data distribution.");
+}
+
+// Slide 115: DemoDataRoute
 {
   const s = S();
   addContentTitle(s, "CASE STUDY: BOND TRADING", "DemoDataRoute — Generating Test Market Data");

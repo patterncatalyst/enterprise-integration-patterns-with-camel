@@ -368,5 +368,5 @@ Next, we'll meet the shipping domain that drives every example in this tutorial 
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
+*Verification status: <span class="status status--verified">verified</span> — infrastructure stack verified against Podman, Quarkus 3.36.3, Camel 4.20.0 (2026-07-11).*
 Confirm: SDKMAN install commands work on a clean machine; `setup-stack.sh` brings all containers to healthy on Podman 5.x; PostgreSQL init-schemas.sql creates all five schemas; Apicurio health endpoint responds at 8081.*

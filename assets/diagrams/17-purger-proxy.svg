@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="20" y="20" width="400" height="260" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="40" font-size="12" font-weight="700" fill="#555555">Channel Purger</text>
+<rect x="460" y="20" width="400" height="260" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="472" y="40" font-size="12" font-weight="700" fill="#555555">Smart Proxy</text>
+<rect x="50" y="70" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="115.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Test Runner</text>
+<text x="115.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">before test</text>
+<rect x="230" y="78" width="130" height="34" fill="#f4f4f4" stroke="none"/>
+<ellipse cx="295.0" cy="78" rx="65.0" ry="8" fill="#f4f4f4" stroke="#555555" stroke-width="1.5"/>
+<ellipse cx="295.0" cy="112" rx="65.0" ry="8" fill="#f4f4f4" stroke="#555555" stroke-width="1.5"/>
+<line x1="230" y1="78" x2="230" y2="112" stroke="#555555" stroke-width="1.5"/>
+<line x1="360" y1="78" x2="360" y2="112" stroke="#555555" stroke-width="1.5"/>
+<text x="295.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Kafka Topic</text>
+<text x="295.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">test data</text>
+<rect x="50" y="180" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(100.0,184) scale(0.25)"><!-- Channel Purger -->
+  <ellipse cx="20" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="20" y1="45" x2="100" y2="45" stroke="#151515"/>
+  <line x1="20" y1="63" x2="100" y2="63" stroke="#151515"/>
+  <ellipse cx="100" cy="54" rx="6" ry="9" fill="#FFF8F0" stroke="#151515"/>
+  <line x1="55" y1="48" x2="65" y2="62" stroke="#EE0000" stroke-width="2"/>
+  <polyline points="50,58 58,62 65,62 72,58" fill="none" stroke="#EE0000" stroke-width="1.5"/></g>
+<text x="115.0" y="221.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Reset Offsets</text>
+<text x="115.0" y="238.0" font-size="11.5" fill="#555555" text-anchor="middle">to-earliest</text>
+<rect x="230" y="180" width="130" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="295.0" y="203.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Clean Topic</text>
+<text x="295.0" y="220.0" font-size="11.5" fill="#555555" text-anchor="middle">ready for test</text>
+<rect x="500" y="70" width="120" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="560.0" y="93.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Producer</text>
+<text x="560.0" y="110.0" font-size="11.5" fill="#555555" text-anchor="middle">sends messages</text>
+<rect x="670" y="70" width="130" height="50" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<g transform="translate(720.0,74) scale(0.25)"><!-- Smart Proxy -->
+  <rect x="35" y="38" width="50" height="35" fill="#FFF8F0" stroke="#151515" rx="3"/>
+  <line x1="5" y1="55" x2="35" y2="55" stroke="#151515"/>
+  <polyline points="30.0,57.5 35,55 30.0,52.5" stroke="#151515" fill="none"/>
+  <line x1="85" y1="55" x2="115" y2="55" stroke="#151515"/>
+  <polyline points="110.0,57.5 115,55 110.0,52.5" stroke="#151515" fill="none"/>
+  <path d="M 45,50 Q 60,40 75,50" fill="none" stroke="#EE0000" stroke-width="1.5"/>
+  <path d="M 45,60 Q 60,70 75,60" fill="none" stroke="#EE0000" stroke-width="1.5"/></g>
+<text x="735.0" y="111.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Smart Proxy</text>
+<text x="735.0" y="128.0" font-size="11.5" fill="#555555" text-anchor="middle">intercept</text>
+<rect x="670" y="180" width="130" height="50" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
+<text x="735.0" y="203.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Monitor</text>
+<text x="735.0" y="220.0" font-size="11.5" fill="#555555" text-anchor="middle">log + metrics</text>
+<rect x="500" y="180" width="120" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="560.0" y="203.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Consumer</text>
+<text x="560.0" y="220.0" font-size="11.5" fill="#555555" text-anchor="middle">reads messages</text>
+<path d="M180,95 L230,95" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="211.0" y="89.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">purge</text>
+<text x="211.0" y="89.0" font-size="11" fill="#b8650a" text-anchor="middle">purge</text>
+<path d="M130,120 L130,180" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="136.0" y="144.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">reset</text>
+<text x="136.0" y="144.0" font-size="11" fill="#555" text-anchor="middle">reset</text>
+<path d="M310,120 L310,180" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M620,95 L670,95" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M735,120 L735,180" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="741.0" y="144.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">copy</text>
+<text x="741.0" y="144.0" font-size="11" fill="#555" text-anchor="middle">copy</text>
+<path d="M670,205 L620,205" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="651.0" y="199.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">forward</text>
+<text x="651.0" y="199.0" font-size="11" fill="#b8650a" text-anchor="middle">forward</text>
+<text x="210" y="255" font-size="11" fill="#555555" text-anchor="middle">Clear test data</text>
+<text x="660" y="255" font-size="11" fill="#555555" text-anchor="middle">Observe without disrupting</text>
+</svg>

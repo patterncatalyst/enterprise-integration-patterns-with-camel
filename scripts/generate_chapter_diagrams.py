@@ -756,4 +756,85 @@ g.emit("29-bond-trading", 900, 340,
 )
 
 
-print(f"Done — 26 chapter diagram pairs generated in {g.OUT}")
+# -- Resequencer ---------------------------------------------------------------
+g.emit("11-resequencer", 880, 260,
+    bands=[band(20, 20, 840, 220, "Resequencer — Restoring Message Order")],
+    nodes=[
+        node(50, 60, ["Msg 3"], "accent", w=90, h=40),
+        node(50, 110, ["Msg 1"], "accent", w=90, h=40),
+        node(50, 160, ["Msg 2"], "accent", w=90, h=40),
+        node(220, 90, ["Resequencer", "sort by seqNum"], "pattern", w=160, h=70, icon="resequencer"),
+        node(460, 60, ["Msg 1"], "info", w=90, h=40),
+        node(460, 110, ["Msg 2"], "info", w=90, h=40),
+        node(460, 160, ["Msg 3"], "info", w=90, h=40),
+        node(630, 60, ["Stream", "sliding window"], "muted", w=130, h=40),
+        node(630, 120, ["Batch", "collect + sort"], "muted", w=130, h=40),
+    ],
+    edges=[
+        edge(140, 80, 220, 110, amber=True),
+        edge(140, 130, 220, 125, amber=True),
+        edge(140, 180, 220, 140, amber=True),
+        edge(380, 115, 460, 80, amber=True, label="ordered"),
+        edge(380, 125, 460, 130, amber=True),
+        edge(380, 135, 460, 175, amber=True),
+    ],
+    notes=[
+        note(440, 215, "Out-of-order input → sorted output by sequence number", anchor="middle"),
+    ],
+)
+
+
+# -- Type Conversion ----------------------------------------------------------
+g.emit("12-type-conversion", 880, 240,
+    bands=[band(20, 20, 840, 200, "Type Conversion — Camel's Automatic Type System")],
+    nodes=[
+        node(40, 70, ["byte[]", "raw payload"], "muted", w=110, h=50),
+        node(200, 70, ["String", "text body"], "box", w=110, h=50),
+        node(360, 70, ["JSON", "jackson"], "pattern", w=110, h=50, icon="message-translator"),
+        node(520, 70, ["POJO", "Order.class"], "accent", w=110, h=50),
+        node(700, 70, ["marshal()", "json()"], "pattern", w=130, h=50, icon="canonical-data-model"),
+    ],
+    edges=[
+        edge(150, 95, 200, 95, amber=True, label="decode"),
+        edge(310, 95, 360, 95, amber=True, label="parse"),
+        edge(470, 95, 520, 95, amber=True, label="bind"),
+        edge(630, 95, 700, 95, label="serialize"),
+    ],
+    notes=[
+        note(440, 165, "Camel chains converters automatically: getBody(Order.class)", anchor="middle"),
+    ],
+)
+
+
+# -- Channel Purger + Smart Proxy ---------------------------------------------
+g.emit("17-purger-proxy", 880, 300,
+    bands=[
+        band(20, 20, 400, 260, "Channel Purger"),
+        band(460, 20, 400, 260, "Smart Proxy"),
+    ],
+    nodes=[
+        node(50, 70, ["Test Runner", "before test"], "accent", w=130, h=50),
+        node(230, 70, ["Kafka Topic", "test data"], "channel", w=130, h=50),
+        node(50, 180, ["Reset Offsets", "to-earliest"], "pattern", w=130, h=50, icon="channel-purger"),
+        node(230, 180, ["Clean Topic", "ready for test"], "info", w=130, h=50),
+        node(500, 70, ["Producer", "sends messages"], "accent", w=120, h=50),
+        node(670, 70, ["Smart Proxy", "intercept"], "pattern", w=130, h=50, icon="smart-proxy"),
+        node(670, 180, ["Monitor", "log + metrics"], "muted", w=130, h=50),
+        node(500, 180, ["Consumer", "reads messages"], "info", w=120, h=50),
+    ],
+    edges=[
+        edge(180, 95, 230, 95, amber=True, label="purge"),
+        edge(130, 120, 130, 180, label="reset"),
+        edge(310, 120, 310, 180, amber=True),
+        edge(620, 95, 670, 95, amber=True),
+        edge(735, 120, 735, 180, label="copy"),
+        edge(670, 205, 620, 205, amber=True, label="forward"),
+    ],
+    notes=[
+        note(210, 255, "Clear test data", anchor="middle"),
+        note(660, 255, "Observe without disrupting", anchor="middle"),
+    ],
+)
+
+
+print(f"Done — 29 chapter diagram pairs generated in {g.OUT}")

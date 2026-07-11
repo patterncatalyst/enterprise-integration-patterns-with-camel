@@ -7,7 +7,7 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 ## What's inside
 
 - **31 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 12 deep-dive appendices.
-- **26 Excalidraw diagrams** — visual architecture and pattern flow diagrams embedded throughout.
+- **50 Excalidraw diagrams** — visual architecture and pattern flow diagrams with EIP stencil icons embedded throughout.
 - **17 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
@@ -91,7 +91,7 @@ Two slide decks in `presentations/`:
 | Deck | Slides | Focus |
 |------|--------|-------|
 | **EIP 101** | 98 | Conceptual guide — all 65 patterns with diagrams |
-| **EIP 201** | 135 | Implementation deep-dive — Java DSL, code, case studies |
+| **EIP 201** | 126 | Implementation deep-dive — Java DSL, code, case studies |
 
 ## Getting started
 
