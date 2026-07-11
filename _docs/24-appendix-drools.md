@@ -23,12 +23,11 @@ The code is in `examples/24-drools-rules/`. The `README.md` there covers how to 
 
 ## Drools 10 with Camel Quarkus
 
-Drools 10 uses **Rule Units** — self-contained rule sets with typed data sources:
+Drools 10 uses the classic **KIE Session** API — create a `KieContainer` from the classpath, insert facts, fire rules:
 
-### Define a rule unit
+### Define the data model
 
 ```java
-// The data model
 public class Order {
     private long orderId;
     private String customerId;
@@ -38,50 +37,57 @@ public class Order {
     private String routingDecision;
     // getters, setters
 }
-
-// The rule unit
-public class OrderRoutingUnit implements RuleUnitData {
-    private DataStore<Order> orders;
-
-    public DataStore<Order> getOrders() {
-        return orders;
-    }
-}
 ```
 
 ### Write rules in DRL
 
 ```drl
-// src/main/resources/com/example/rules/order-routing.drl
-unit OrderRoutingUnit;
+// src/main/resources/com/example/eip/drools/order-routing.drl
+package com.example.eip.drools;
+
+import com.example.eip.drools.Order;
 
 rule "Route hazmat orders to hazmat handler"
+    salience 40
 when
-    $o: /orders[containsHazmat == true, routingDecision == null]
+    $o: Order(containsHazmat == true, routingDecision == null)
 then
     $o.setRoutingDecision("hazmat");
 end
 
 rule "Route high-value international to fraud review"
+    salience 30
 when
-    $o: /orders[amount >= 10000, destinationCountry != "US", routingDecision == null]
+    $o: Order(amount >= 10000, destinationCountry != "US", routingDecision == null)
 then
-    $o.setRoutingDecision("fraud-review-international");
+    $o.setRoutingDecision("fraud-review");
 end
 
 rule "Route express orders to priority queue"
+    salience 20
 when
-    $o: /orders[amount >= 500, routingDecision == null]
+    $o: Order(amount >= 500, routingDecision == null)
 then
     $o.setRoutingDecision("express");
 end
 
 rule "Default routing"
+    salience 10
 when
-    $o: /orders[routingDecision == null]
+    $o: Order(routingDecision == null)
 then
     $o.setRoutingDecision("standard");
 end
+```
+
+Add a `META-INF/kmodule.xml` to register the rule packages:
+
+```xml
+<kmodule xmlns="http://www.drools.org/xsd/kmodule">
+    <kbase name="orderRules" packages="com.example.eip.drools">
+        <ksession name="orderSession"/>
+    </kbase>
+</kmodule>
 ```
 
 ### Integrate with Camel
@@ -91,10 +97,14 @@ end
 @Named("ruleBasedRouter")
 public class RuleBasedRouter {
 
-    @Inject
-    RuleUnitInstance<OrderRoutingUnit> ruleUnit;
+    private final KieContainer kieContainer;
 
-    public void route(Exchange exchange) {
+    public RuleBasedRouter() {
+        KieServices ks = KieServices.Factory.get();
+        this.kieContainer = ks.getKieClasspathContainer();
+    }
+
+    public void evaluate(Exchange exchange) {
         Map<String, Object> body = exchange.getIn().getBody(Map.class);
         Order order = new Order();
         order.setOrderId(((Number) body.get("order_id")).longValue());
@@ -102,8 +112,13 @@ public class RuleBasedRouter {
         order.setDestinationCountry((String) body.get("destination_country"));
         order.setContainsHazmat(Boolean.TRUE.equals(body.get("contains_hazmat")));
 
-        ruleUnit.getUnit().getOrders().add(order);
-        ruleUnit.fire();
+        KieSession session = kieContainer.newKieSession();
+        try {
+            session.insert(order);
+            session.fireAllRules();
+        } finally {
+            session.dispose();
+        }
 
         exchange.getIn().setHeader("routingDecision", order.getRoutingDecision());
     }
@@ -113,7 +128,7 @@ public class RuleBasedRouter {
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=rule-router")
     .routeId("drools-content-based-router")
     .unmarshal().json(Map.class)
-    .bean("ruleBasedRouter", "route")
+    .bean("ruleBasedRouter", "evaluate")
     .log("Rule engine decided: ${header.routingDecision}")
     .toD("direct:${header.routingDecision}");
 ```
@@ -136,17 +151,24 @@ Export as a `.xls` or `.csv` decision table and Drools compiles it into rules. B
 ```xml
 <dependency>
     <groupId>org.drools</groupId>
-    <artifactId>drools-quarkus</artifactId>
+    <artifactId>drools-engine</artifactId>
     <version>10.2.0</version>
 </dependency>
 <dependency>
     <groupId>org.drools</groupId>
-    <artifactId>drools-quarkus-rules</artifactId>
+    <artifactId>drools-xml-support</artifactId>
+    <version>10.2.0</version>
+</dependency>
+<dependency>
+    <groupId>org.drools</groupId>
+    <artifactId>drools-mvel</artifactId>
     <version>10.2.0</version>
 </dependency>
 ```
 
+The `drools-engine` artifact provides the core KIE API without requiring the Drools Quarkus extension (which has version-coupling with the Quarkus build API). The `drools-xml-support` artifact provides `kmodule.xml` parsing, and `drools-mvel` provides the MVEL expression support used in DRL conditions.
+
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Drools 10 uses `RuleUnitData` and `DataStore` for rule units; `drools-quarkus` extension exists for Quarkus integration; DRL `unit` directive syntax is correct; rule unit injection with `@Inject RuleUnitInstance` works in Quarkus.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Drools 10.2.0, Java 25, Kafka on Podman, 2026-07-11.
+All five routes start (drools-content-router, route-standard, route-express, route-hazmat, route-fraud-review). Classic KIE Session API with `KieClasspathContainer` and `kmodule.xml` confirmed working. DRL rules fire in salience order.*

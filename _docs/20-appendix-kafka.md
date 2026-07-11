@@ -180,5 +180,5 @@ Key metrics to watch:
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Kafka KRaft mode is used in our Podman stack; `isolationLevel=read_committed` and `transactionalId` parameters exist on the Camel Kafka component; `enable.idempotence` property is valid; topic configuration flags match Kafka 3.x CLI.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Kafka (KRaft) on Podman, 2026-07-11.
+All three routes (partitioned producer, transactional pipeline, consumer lag monitor) start and process orders. Kafka partitioning, offset commits, and consumer group monitoring confirmed working.*

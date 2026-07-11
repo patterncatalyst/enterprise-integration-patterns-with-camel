@@ -252,5 +252,5 @@ Key parameters for the `pulsar:` component:
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Pulsar component `subscriptionType=Key_Shared` parameter is valid in Camel 4.20; `deadLetterTopic` and `maxRedeliverCount` parameters exist; `pulsar-admin namespaces set-message-ttl` command syntax is correct; standalone mode includes embedded bookie and ZooKeeper; `non-persistent://` topic URI is supported by the Camel Pulsar component; `set-retention`, `set-backlog-quota`, and `set-schema-compatibility-strategy` admin commands are correct.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Pulsar standalone on Podman, 2026-07-11.
+All routes start and connect to Pulsar. Shared/Key\_Shared subscriptions, dead letter topics with `maxRedeliverCount`, and producer/consumer lifecycle confirmed working. Requires `camel.component.pulsar.service-url` in application.properties.*

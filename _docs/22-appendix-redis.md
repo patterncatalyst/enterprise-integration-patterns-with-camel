@@ -194,5 +194,5 @@ quarkus.redis.max-pool-waiting=50
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `RedisIdempotentRepository` exists in Camel 4.20 and accepts a Redis client; `spring-redis` component supports `PUBLISH` and `SUBSCRIBE` commands; Quarkus Redis client API (`quarkus-redis-client`) supports `setex`, `get`, `del`, `set` with NX/EX arguments; `quarkus.redis.hosts` configuration property is correct.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Redis 7 + Kafka on Podman, 2026-07-11.
+All three routes start (cached enrichment, idempotent receiver, distributed lock). Quarkus Redis client, Kafka consumer, and timer routes confirmed working.*

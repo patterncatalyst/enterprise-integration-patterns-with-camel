@@ -42,6 +42,19 @@ mvn quarkus:dev
 | [17-observability](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/17-observability) | Control Bus, Wire Tap, Message History, Message Store (PostgreSQL) | Kafka + PostgreSQL | Ch 17 |
 | [18-testing-management](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) | Test Message, Detour, Smart Proxy, Circuit Breaker | Kafka | Ch 18 |
 
+## Appendix examples
+
+| Example | Patterns | Infrastructure | Appendix |
+|---------|----------|----------------|----------|
+| [20-kafka-deep-dive](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/20-kafka-deep-dive) | Key-based partitioning, transactional pipeline, consumer lag monitoring | Kafka | Appendix B |
+| [21-pulsar-deep-dive](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/21-pulsar-deep-dive) | Shared/Key_Shared subscriptions, dead letter topics | Pulsar | Appendix C |
+| [22-redis-integration](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/22-redis-integration) | Caching enrichment, idempotent receiver, distributed locking | Kafka + Redis | Appendix D |
+| [24-drools-rules](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/24-drools-rules) | Rule-based content routing with Drools 10 rule units | Kafka | Appendix F |
+| [25-quarkus-flow](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/25-quarkus-flow) | Order fulfillment saga with CDI state machine and Camel routes | Kafka | Appendix G |
+| [27-observability-stack](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/27-observability-stack) | OpenTelemetry tracing, Micrometer metrics, health probes | Kafka (LGTM optional) | Appendix I |
+| [32-kafka-consumer-tuning](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/32-kafka-consumer-tuning) | Throughput-tuned, safety-first, and static-membership consumers | Kafka | Appendix N |
+| [33-kafka-producer-tuning](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/33-kafka-producer-tuning) | Batched, compressed, idempotent, and synchronous producers | Kafka | Appendix O |
+
 ## Case studies
 
 | Example | Description | Appendix |

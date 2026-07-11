@@ -1,12 +1,12 @@
 package com.example.eip.drools;
 
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.apache.camel.Exchange;
-import org.drools.ruleunits.api.RuleUnit;
-import org.drools.ruleunits.api.RuleUnitInstance;
+import org.kie.api.KieServices;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 import java.util.Map;
 
@@ -14,8 +14,12 @@ import java.util.Map;
 @Named("ruleBasedRouter")
 public class RuleBasedRouter {
 
-    @Inject
-    RuleUnit<OrderRoutingUnit> ruleUnit;
+    private final KieContainer kieContainer;
+
+    public RuleBasedRouter() {
+        KieServices ks = KieServices.Factory.get();
+        this.kieContainer = ks.getKieClasspathContainer();
+    }
 
     public void evaluate(Exchange exchange) {
         @SuppressWarnings("unchecked")
@@ -28,11 +32,12 @@ public class RuleBasedRouter {
         order.setDestinationCountry((String) body.getOrDefault("destination_country", "US"));
         order.setContainsHazmat(Boolean.TRUE.equals(body.get("contains_hazmat")));
 
-        OrderRoutingUnit unitData = new OrderRoutingUnit();
-        unitData.getOrders().add(order);
-
-        try (RuleUnitInstance<OrderRoutingUnit> instance = ruleUnit.createInstance(unitData)) {
-            instance.fire();
+        KieSession session = kieContainer.newKieSession();
+        try {
+            session.insert(order);
+            session.fireAllRules();
+        } finally {
+            session.dispose();
         }
 
         exchange.getIn().setHeader("routingDecision", order.getRoutingDecision());

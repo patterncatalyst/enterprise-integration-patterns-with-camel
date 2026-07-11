@@ -65,12 +65,17 @@
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>drools-quarkus</artifactId>
+            <artifactId>drools-engine</artifactId>
             <version>${drools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>drools-quarkus-rules</artifactId>
+            <artifactId>drools-xml-support</artifactId>
+            <version>${drools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-mvel</artifactId>
             <version>${drools.version}</version>
         </dependency>
         <dependency>

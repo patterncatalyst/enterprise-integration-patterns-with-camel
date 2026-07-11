@@ -1,29 +1,35 @@
-unit OrderRoutingUnit;
+package com.example.eip.drools;
+
+import com.example.eip.drools.Order;
 
 rule "Route hazmat orders to hazmat handler"
+    salience 40
 when
-    $o: /orders[containsHazmat == true, routingDecision == null]
+    $o: Order(containsHazmat == true, routingDecision == null)
 then
     $o.setRoutingDecision("hazmat");
 end
 
 rule "Route high-value international to fraud review"
+    salience 30
 when
-    $o: /orders[amount >= 10000, destinationCountry != "US", routingDecision == null]
+    $o: Order(amount >= 10000, destinationCountry != "US", routingDecision == null)
 then
     $o.setRoutingDecision("fraud-review");
 end
 
 rule "Route express orders to priority queue"
+    salience 20
 when
-    $o: /orders[amount >= 500, routingDecision == null]
+    $o: Order(amount >= 500, routingDecision == null)
 then
     $o.setRoutingDecision("express");
 end
 
 rule "Default routing"
+    salience 10
 when
-    $o: /orders[routingDecision == null]
+    $o: Order(routingDecision == null)
 then
     $o.setRoutingDecision("standard");
 end

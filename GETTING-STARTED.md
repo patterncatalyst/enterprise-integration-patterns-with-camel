@@ -74,8 +74,16 @@ done
 | 13 | `examples/16-endpoint-management` | Messaging Gateway, Selective Consumer, Channel Purger, Messaging Mapper |
 | 14 | `examples/17-observability` | Control Bus, Wire Tap, Message History |
 | 15 | `examples/18-testing-management` | Test Message, Detour, Smart Proxy, Circuit Breaker |
-| 16 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) |
-| 17 | `examples/bond-trading` | Market data normalization (16 patterns) |
+| 16 | `examples/20-kafka-deep-dive` | Key-based partitioning, transactional pipeline, lag monitoring |
+| 17 | `examples/21-pulsar-deep-dive` | Shared/Key_Shared subscriptions, dead letter topics |
+| 18 | `examples/22-redis-integration` | Caching enrichment, idempotent receiver, distributed locking |
+| 19 | `examples/24-drools-rules` | Rule-based content routing with Drools 10 rule units |
+| 20 | `examples/25-quarkus-flow` | Order fulfillment saga with CDI state machine |
+| 21 | `examples/27-observability-stack` | OpenTelemetry tracing, Micrometer metrics, health probes |
+| 22 | `examples/32-kafka-consumer-tuning` | Throughput-tuned, safety-first, static-membership consumers |
+| 23 | `examples/33-kafka-producer-tuning` | Batched, compressed, idempotent, synchronous producers |
+| 24 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) |
+| 25 | `examples/bond-trading` | Market data normalization (16 patterns) |
 
 ## Tutorial site
 
