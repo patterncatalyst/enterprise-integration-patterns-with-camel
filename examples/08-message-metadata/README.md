@@ -23,27 +23,7 @@ mvn quarkus:dev
 
 ## Data flow
 
-```
-Timer (5s) --> eip.metadata.orders --+-> [Correlation ID] --> validate --> enrich --> eip.metadata.orders.correlated
-                                     |
-                                     +-> [Format Indicator] --> tag with contentType --> eip.metadata.orders.tagged
-                                     |                                                        |
-                                     |                                                  [Format Consumer]
-                                     |                                                  JSON --> processed
-                                     |                                                  unknown --> dead
-                                     |
-                                     +-> [Expiration] --> stamp TTL --> eip.metadata.orders.expiring
-                                                                              |
-                                                                         [TTL Check]
-                                                                         valid --> fulfilled
-                                                                         expired --> dead
-
-Timer (15s) --> eip.metadata.bulk-orders --> [Splitter] --> eip.metadata.line-items
-                                                                  |
-                                                            [Aggregator]
-                                                                  |
-                                                         eip.metadata.orders.reassembled
-```
+![Data flow for Chapter 8: Message Metadata](../../assets/diagrams/ex-08-message-metadata.svg)
 
 ## What to observe
 

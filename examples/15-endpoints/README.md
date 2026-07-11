@@ -23,23 +23,7 @@ Kafka, Pulsar, and PostgreSQL from the Podman stack (full stack minus Redis).
 
 ## Data flow
 
-```
-Timer (5s) ──┬→ eip.orders.placed → [Idempotent Receiver (JDBC)] → eip.orders.deduplicated
-             │                                                            ↓
-             │                                                   [Service Activator]
-             │                                                   (.bean(InventoryService))
-             │                                                            ↓
-             │                                                   eip.orders.inventory-checked
-             │
-             └→ eip.payments.required → [Transactional Client] → PostgreSQL
-                                         (payments + outbox in single TX)
-                                                    ↓
-                                         [Outbox Publisher (5s poll)]
-                                                    ↓
-                                         eip.payments.processed
-
-Pulsar:eip.orders.placed → [Durable Subscriber] → logs (cursor survives restarts)
-```
+![Data flow for Chapter 15: Endpoint Patterns](../../assets/diagrams/ex-15-endpoints.svg)
 
 ## What to observe
 

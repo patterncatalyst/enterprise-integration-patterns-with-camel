@@ -24,20 +24,7 @@ Requires Kafka from the Podman stack.
 
 ## Data flow
 
-```
-Timer (5s) → eip.orders.placed → [Dynamic Router] → validate → inventory → shipping → eip.orders.dynamic-routed
-
-eip.orders.processing → [Wire Tap] ──→ eip.orders.processed (main flow)
-                              └────→ eip.orders.audit (tapped copy)
-
-Timer (3s) → eip.orders.sequenced → [Resequencer (batch=10, 5s timeout)] → eip.orders.resequenced
-
-Timer (8s) → eip.orders.composed → [Split items] → [Process each] → [Aggregate] → eip.orders.enriched
-
-Timer (2s) → eip.orders.loadbalanced → [Round Robin] ──┬→ Fulfillment East (NYC)
-                                                        ├→ Fulfillment Central (CHI)
-                                                        └→ Fulfillment West (LAX)
-```
+![Data flow for Chapter 11: Advanced Routing](../../assets/diagrams/ex-11-advanced-routing.svg)
 
 ## What to observe
 

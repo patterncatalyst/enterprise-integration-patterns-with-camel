@@ -25,24 +25,7 @@ Requires Kafka, Pulsar, and Redis from the Podman stack.
 
 ## Data flow
 
-```
-Demo Timer (5s) --> kafka:eip.orders.placed --+--> [P2P Consumer] --> eip.orders.processed
-                                              +--> [Datatype Router] --+--> eip.orders.placed.typed
-                                                                       +--> eip.orders.cancelled
-                                                                       +--> eip.orders.refunded
-
-kafka:eip.orders.processed --> [Pub/Sub Publisher] --> eip.orders.events
-                                                           +--> subscriber-inventory
-                                                           +--> subscriber-notification
-                                                           +--> subscriber-analytics
-
-Pulsar Timer (5s) --> pulsar:eip.orders.placed --> [P2P Pulsar Consumer]
-                  --> pulsar:eip.orders.events --+--> pulsar-subscriber-inventory
-                                                 +--> pulsar-subscriber-notification
-                                                 +--> pulsar-subscriber-analytics
-
-Redis Timer (8s) --> redis:eip.orders.notifications --> [Redis Subscriber]
-```
+![Data flow for Chapter 4: Channel Types](../../assets/diagrams/ex-04-channel-types.svg)
 
 ## What to observe
 

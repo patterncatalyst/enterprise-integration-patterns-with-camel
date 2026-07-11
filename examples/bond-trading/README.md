@@ -10,31 +10,7 @@ orders before forwarding them for execution.
 
 ## Architecture
 
-```
-bond.feed.raw.bloomberg → [Adapter: Bloomberg] ─┐
-bond.feed.raw.reuters   → [Adapter: Reuters]   ─┼→ bond.prices.canonical
-bond.feed.raw.exchange  → [Adapter: Exchange]  ─┘
-                                                        ↓
-                                                 [Normalizer]
-                                              (aggregate by ISIN,
-                                               best bid / best ask)
-                                                        ↓
-                                                 bond.prices.best
-                                                        ↓
-                                                 [Desk Distributor]
-                                              (multicast + filter)
-                                              /         |         \
-                                             ↓          ↓          ↓
-                                     desk-a          desk-b       desk-c
-                                    (government)   (corporate)   (all bonds)
-
-bond.orders.new → [Trade Validator] → bond.orders.validated
-                   (idempotent +             ↓
-                    validation)        bond.audit.log
-                        ↓               (wire tap)
-                   rejected orders
-                    (logged only)
-```
+![Architecture for Bond Trading Case Study](../../assets/diagrams/ex-bond-trading.svg)
 
 ## Running
 

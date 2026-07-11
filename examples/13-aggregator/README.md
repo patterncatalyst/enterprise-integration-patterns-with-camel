@@ -22,14 +22,7 @@ Requires Kafka and PostgreSQL from the Podman stack.
 
 ## Data flow
 
-```
-eip.orders.line-items → [Aggregator (memory)]     → eip.orders.complete
-                      → [Aggregator (PostgreSQL)] → eip.orders.complete-persistent
-
-eip.orders.partner-a ─┐
-eip.orders.partner-b ─┤→ [Normalizer] → eip.orders.normalized
-eip.orders.partner-c ─┘
-```
+![Data flow for Chapter 13: Structural Transformation](../../assets/diagrams/ex-13-aggregator.svg)
 
 ## What to observe
 

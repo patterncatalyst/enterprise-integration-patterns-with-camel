@@ -22,19 +22,7 @@ Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCat
 
 ## Data flow
 
-```
-eip.orders.external → [Message Translator] → eip.orders.placed
-                                                    ↓
-                                             [Content Enricher]
-                                              (Redis lookup by SKU)
-                                                    ↓
-                                             eip.orders.enriched
-                                                    ↓
-                                             [Content Filter]
-                                              (strip PII)
-                                                    ↓
-                                             eip.orders.analytics
-```
+![Data flow for Chapter 12: Transformation](../../assets/diagrams/ex-12-transformation.svg)
 
 ## What to observe
 

@@ -23,13 +23,7 @@ Requires Kafka from the Podman stack.
 
 ## Data flow
 
-```
-kafka:eip.orders.placed --> [Order Processor] --> eip.orders.processed
-                                 | (failure)
-                            3 retries @ 1s
-                                 |
-                            eip.orders.dlq --> [DLQ Monitor]
-```
+![Data flow for Chapter 5: Channel Reliability](../../assets/diagrams/ex-05-reliability.svg)
 
 ## What to observe
 

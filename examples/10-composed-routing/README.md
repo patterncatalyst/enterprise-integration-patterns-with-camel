@@ -21,15 +21,7 @@ Requires Kafka from the Podman stack.
 
 ## Data flow
 
-```
-eip.shipping.rate-requests → [Scatter-Gather] ──┬→ [FedEx Quote]
-                                                ├→ [UPS Quote]
-                                                └→ [USPS Quote]
-                                                      ↓ (aggregate)
-                                                 [Best Rate] → eip.shipping.best-rate
-
-eip.orders.placed → [Routing Slip] → validate → [hazmat?] → [customs?] → assign-carrier
-```
+![Data flow for Chapter 10: Composed Routing](../../assets/diagrams/ex-10-composed-routing.svg)
 
 ## What to observe
 

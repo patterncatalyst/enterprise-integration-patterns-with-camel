@@ -22,17 +22,7 @@ Requires **Kafka** and **PostgreSQL** from the Podman stack.
 
 ## Data flow
 
-```
-eip.orders.placed → [Wire Tap Processor] ──→ eip.orders.processed
-                          └──→ [Audit Log] → eip.orders.audit
-
-eip.orders.incoming → [Validate] → [Enrich] → [Log History] → eip.orders.processed
-                          └── wireTap ──→ [Message Store] → PostgreSQL:system.message_store
-
-REST /control/status/{routeId} → [Control Bus] → route status
-REST /control/stop/{routeId}   → [Control Bus] → stop route
-REST /control/start/{routeId}  → [Control Bus] → start route
-```
+![Data flow for Chapter 17: System Management](../../assets/diagrams/ex-17-observability.svg)
 
 ## What to observe
 

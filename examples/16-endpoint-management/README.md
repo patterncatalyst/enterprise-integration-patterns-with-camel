@@ -23,22 +23,7 @@ Kafka from the Podman stack.
 
 ## Data flow
 
-```
-Timer (5s) → eip.orders.placed → [Selective Consumer] → (hazmat? drop) → eip.orders.accepted
-                                                                                ↓
-                                                                         [Channel Purger]
-                                                                         (stale? discard)
-                                                                                ↓
-                                                                         eip.orders.clean
-                                                                                ↓
-                                                                         [Messaging Mapper]
-                                                                         (JSON → Order POJO)
-                                                                                ↓
-                                                                         OrderService.process()
-
-Timer (8s) → [OrderMessagingGateway] → eip.orders.placed
-                                     → eip.orders.inventory-request
-```
+![Data flow for Chapter 16: Endpoint Management](../../assets/diagrams/ex-16-endpoint-management.svg)
 
 ## What to observe
 

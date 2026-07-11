@@ -22,28 +22,7 @@ Requires **Kafka** from the Podman stack.
 
 ## Data flow
 
-```
-Timer (5s) → eip.orders.placed ──→ [Business Processor] → eip.orders.processed
-                                        (filters test_message=true)
-                                              ↓ (test messages)
-                                   [Test Message Verifier]
-                                   (checks order_id < 0, amount == 99.99)
-                                              ↓ (failures)
-                                   eip.test.failures
-
-Timer (30s) → [Test Message Injector] → eip.orders.placed
-              (negative IDs, test_message=true)
-
-eip.orders.placed → [Detour] ──→ (enrichment enabled?) ──→ [Enrich] → eip.orders.enriched
-                                  (disabled?) ──→ eip.orders.enriched (bypass)
-
-eip.orders.processed → [Circuit Breaker] → [Inventory Check] → eip.orders.inventory-checked
-                                                ↓ (failure)
-                                           eip.orders.dlq
-
-POST /payments/process → [Smart Proxy] → mock-gateway (default)
-                                       → production-gateway (if configured)
-```
+![Data flow for Chapter 18: Testing and Management](../../assets/diagrams/ex-18-testing-management.svg)
 
 ## What to observe
 

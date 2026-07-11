@@ -22,11 +22,7 @@ mvn quarkus:dev
 
 ## Data flow
 
-```
-Timer (6s) --> [Command Producer] --> eip.commands.process-payment --> [Command Consumer] --> executes & logs result
-Timer (8s) --> [Document Producer] --> eip.documents.orders       --> [Document Consumer] --> receives & logs contents
-Timer (5s) --> [Event Producer]   --> eip.events.orders           --> [Event Consumer]    --> observes & records
-```
+![Data flow for Chapter 7: Message Types](../../assets/diagrams/ex-07-message-types.svg)
 
 ## What to observe
 

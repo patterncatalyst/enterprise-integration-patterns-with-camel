@@ -25,22 +25,7 @@ Kafka, Pulsar, and PostgreSQL from the Podman stack (full stack minus Redis).
 
 ## Data flow
 
-```
-Timer (3s) → eip.consumer.orders
-
-eip.consumer.events → [Event-Driven Consumer] → logs each message as it arrives
-eip.consumer.compete → [Competing Consumers (3 threads)] → parallel processing
-Timer (10s) → [pollEnrich] ← eip.consumer.poll → logs polled message
-eip.consumer.dispatch → [Message Dispatcher] → toD("direct:handle-${event_type}")
-                                                  ├→ handle-order_placed
-                                                  ├→ handle-order_cancelled
-                                                  └→ handle-order_refunded
-
-Pulsar:eip.consumer.events → [Pulsar Event-Driven (Shared, 3 consumers)]
-
-PostgreSQL:orders.orders → [SQL Polling (30s)] → eip.orders.placed
-Timer (30s) → INSERT INTO orders.orders (demo rows)
-```
+![Data flow for Chapter 14: Consumer Patterns](../../assets/diagrams/ex-14-consumer-patterns.svg)
 
 ## What to observe
 

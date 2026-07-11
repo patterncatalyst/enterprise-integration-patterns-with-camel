@@ -23,17 +23,7 @@ Requires Kafka, Pulsar, and PostgreSQL from the Podman stack.
 
 ## Data flow
 
-```
-Timer/REST --> eip.orders.incoming --+--> [Inventory Service]     (Message Bus)
-                                    +--> [Payment Service]       (Message Bus)
-                                    +--> [Notification Service]  (Message Bus)
-                                    +--> eip.orders.bridged --> [Fulfillment] --> eip.orders.fulfilled
-                                                                                        |
-                                                                                [Outbound Adapter]
-
-Pulsar:partner.orders --> [Bridge] --> Kafka:eip.orders.placed
-Kafka:eip.shipping.scheduled --> [Bridge] --> Pulsar:eip.shipping.scheduled
-```
+![Data flow for Chapter 6: Channel Infrastructure](../../assets/diagrams/ex-06-channel-infra.svg)
 
 ## What to observe
 

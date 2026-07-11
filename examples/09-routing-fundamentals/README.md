@@ -23,19 +23,7 @@ mvn quarkus:dev
 
 ## Data flow
 
-```
-Timer (5s) --> eip.orders.placed --+-> [Content-Based Router] --+-> eip.orders.hazmat
-                                   |                            +-> eip.orders.international
-                                   |                            +-> eip.orders.domestic
-                                   |
-                                   +-> [Message Filter] --> (amount >= $100) --> eip.orders.high-value
-
-eip.orders.batch --> [Splitter] --> split items[] --> eip.orders.individual
-
-eip.orders.shipped --> [Recipient List] --+-> notify-email (always)
-                                          +-> notify-sms (if phone present)
-                                          +-> notify-vip-desk (if amount >= $500)
-```
+![Data flow for Chapter 9: Routing Fundamentals](../../assets/diagrams/ex-09-routing-fundamentals.svg)
 
 ## What to observe
 

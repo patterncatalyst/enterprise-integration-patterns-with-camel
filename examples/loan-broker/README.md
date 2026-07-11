@@ -7,28 +7,7 @@ Aggregator that picks the lowest approved interest rate.
 
 ## Architecture
 
-```
-POST /api/loans ──→ [Gateway] ──→ loan.requests
-Timer (8s) ─────────────────────┘       ↓
-                                 [Credit Enricher]
-                                 (creditHistory, debtToIncome)
-                                        ↓
-                                 loan.enriched
-                                        ↓
-                                 [Recipient List]
-                            (eligible banks by score/amount)
-                               /        |        \
-                         [Bank A]   [Bank B]   [Bank C]
-                     Universal    Community   Prime National
-                     base 5.5%   base 4.8%    base 3.9%
-                               \        |        /
-                                 loan.bank.reply
-                                        ↓
-                                 [Aggregator]
-                                 (BestOfferStrategy: lowest rate)
-                                        ↓
-                                 loan.results
-```
+![Architecture for Loan Broker Case Study](../../assets/diagrams/ex-loan-broker.svg)
 
 ## Running
 

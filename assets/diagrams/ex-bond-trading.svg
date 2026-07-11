@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="10" y="10" width="860" height="200" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="22" y="30" font-size="12" font-weight="700" fill="#888">Price Pipeline</text>
+<rect x="10" y="220" width="520" height="190" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="22" y="240" font-size="12" font-weight="700" fill="#888">Trade Validation</text>
+<rect x="540" y="220" width="330" height="190" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="552" y="240" font-size="12" font-weight="700" fill="#888">Desk Distribution</text>
+<rect x="30" y="40" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="95.0" y="57.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.feed.raw</text>
+<text x="95.0" y="74.0" font-size="11.5" fill="#555555" text-anchor="middle">.bloomberg</text>
+<rect x="30" y="85" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="95.0" y="102.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.feed.raw</text>
+<text x="95.0" y="119.0" font-size="11.5" fill="#555555" text-anchor="middle">.reuters</text>
+<rect x="30" y="130" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="95.0" y="147.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.feed.raw</text>
+<text x="95.0" y="164.0" font-size="11.5" fill="#555555" text-anchor="middle">.exchange</text>
+<rect x="190" y="35" width="110" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="245.0" y="53.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Bloomberg</text>
+<text x="245.0" y="70.0" font-size="11.5" fill="#555555" text-anchor="middle">Adapter</text>
+<rect x="190" y="80" width="110" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="245.0" y="98.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Reuters</text>
+<text x="245.0" y="115.0" font-size="11.5" fill="#555555" text-anchor="middle">Adapter</text>
+<rect x="190" y="125" width="110" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="245.0" y="143.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Exchange</text>
+<text x="245.0" y="160.0" font-size="11.5" fill="#555555" text-anchor="middle">Adapter</text>
+<rect x="340" y="80" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="405.0" y="97.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.prices</text>
+<text x="405.0" y="114.0" font-size="11.5" fill="#555555" text-anchor="middle">.canonical</text>
+<rect x="500" y="65" width="155" height="55" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="577.5" y="90.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Normalizer</text>
+<text x="577.5" y="107.5" font-size="11.5" fill="#555555" text-anchor="middle">best bid/ask by ISIN</text>
+<rect x="690" y="75" width="130" height="38" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="755.0" y="99.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.prices.best</text>
+<rect x="30" y="260" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="95.0" y="284.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.orders.new</text>
+<rect x="200" y="250" width="160" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="280.0" y="273.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Trade Validator</text>
+<text x="280.0" y="290.0" font-size="11.5" fill="#555555" text-anchor="middle">idempotent + validate</text>
+<rect x="200" y="330" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="265.0" y="354.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">bond.audit.log</text>
+<rect x="400" y="260" width="130" height="38" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="465.0" y="284.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">.validated</text>
+<rect x="200" y="380" width="120" height="35" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="260.0" y="395.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">rejected</text>
+<text x="260.0" y="412.5" font-size="11.5" fill="#555555" text-anchor="middle">(logged only)</text>
+<rect x="560" y="250" width="155" height="50" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="637.5" y="273.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Desk Distributor</text>
+<text x="637.5" y="290.0" font-size="11.5" fill="#555555" text-anchor="middle">multicast + filter</text>
+<rect x="740" y="240" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="805.0" y="257.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">desk-a</text>
+<text x="805.0" y="274.0" font-size="11.5" fill="#555555" text-anchor="middle">(government)</text>
+<rect x="740" y="285" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="805.0" y="302.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">desk-b</text>
+<text x="805.0" y="319.0" font-size="11.5" fill="#555555" text-anchor="middle">(corporate)</text>
+<rect x="740" y="330" width="130" height="38" rx="9" fill="#f4f4f4" stroke="#888888" stroke-width="1.5"/>
+<text x="805.0" y="347.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">desk-c</text>
+<text x="805.0" y="364.0" font-size="11.5" fill="#555555" text-anchor="middle">(all bonds)</text>
+<path d="M160,58 L190,58" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M160,100 L190,100" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M160,148 L190,148" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M300,55 L340,95" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M300,100 L340,100" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M300,145 L340,105" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M470,98 L500,92" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M655,92 L690,92" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M160,280 L200,280" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M280,300 L280,330" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="286.0" y="309.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">wireTap</text>
+<text x="286.0" y="309.0" font-size="11" fill="#555" text-anchor="middle">wireTap</text>
+<path d="M360,275 L400,275" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M280,310 L280,380" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M690,92 L690,160" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M690,160 L635,250" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M715,275 L740,258" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M715,280 L740,300" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<path d="M715,288 L740,348" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
+<text x="500" y="170" font-size="10" fill="#888" text-anchor="start">BestPriceStrategy: highest bid + lowest ask</text>
+</svg>
