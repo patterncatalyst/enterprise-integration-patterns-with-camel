@@ -1,0 +1,29 @@
+unit OrderRoutingUnit;
+
+rule "Route hazmat orders to hazmat handler"
+when
+    $o: /orders[containsHazmat == true, routingDecision == null]
+then
+    $o.setRoutingDecision("hazmat");
+end
+
+rule "Route high-value international to fraud review"
+when
+    $o: /orders[amount >= 10000, destinationCountry != "US", routingDecision == null]
+then
+    $o.setRoutingDecision("fraud-review");
+end
+
+rule "Route express orders to priority queue"
+when
+    $o: /orders[amount >= 500, routingDecision == null]
+then
+    $o.setRoutingDecision("express");
+end
+
+rule "Default routing"
+when
+    $o: /orders[routingDecision == null]
+then
+    $o.setRoutingDecision("standard");
+end

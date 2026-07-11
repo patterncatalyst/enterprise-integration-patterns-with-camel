@@ -8,6 +8,8 @@ duration: "25 minutes"
 
 Kafka is the backbone of the shipping domain's event-driven architecture. This appendix covers the Kafka concepts that integration architects need beyond the basics — partitioning strategy, consumer group mechanics, exactly-once delivery, and operational patterns.
 
+The code is in `examples/20-kafka-deep-dive/`. The `README.md` there covers how to run it.
+
 ## Architecture recap
 
 {% include excalidraw.html file="20-kafka-architecture" alt="Kafka cluster architecture" caption="Figure K.1 — Kafka cluster with KRaft, partitions, and consumer groups" %}

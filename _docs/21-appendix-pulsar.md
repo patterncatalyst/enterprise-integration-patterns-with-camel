@@ -8,6 +8,8 @@ duration: "30 minutes"
 
 Apache Pulsar appears in this tutorial wherever its features provide a better fit than Kafka: per-message TTL (Message Expiration), key-shared subscriptions (ordered competing consumers), and native schema enforcement. This appendix covers the Pulsar concepts that differentiate it from Kafka and how Camel integrates with them.
 
+The code is in `examples/21-pulsar-deep-dive/`. The `README.md` there covers how to run it.
+
 ## Architecture
 
 Pulsar separates serving (brokers) from storage (BookKeeper):

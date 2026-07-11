@@ -6,9 +6,9 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 
 ## What's inside
 
-- **32 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 13 deep-dive appendices.
+- **37 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 18 deep-dive appendices.
 - **51 Excalidraw diagrams** — visual architecture and pattern flow diagrams with EIP stencil icons embedded throughout.
-- **17 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
+- **22 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
 
@@ -52,6 +52,11 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | `examples/17-observability` | Control Bus, Wire Tap, Message History, Message Store (PostgreSQL) | Ch 17 |
 | `examples/18-testing-management` | Test Message, Detour, Smart Proxy, Circuit Breaker | Ch 18 |
 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) | Appendix J |
+| `examples/20-kafka-deep-dive` | Key-based partitioning, transactional pipeline, consumer lag monitoring | Appendix B |
+| `examples/21-pulsar-deep-dive` | Shared/Key_Shared subscriptions, dead letter topics | Appendix C |
+| `examples/22-redis-integration` | Caching enrichment, idempotent receiver, distributed locking | Appendix D |
+| `examples/24-drools-rules` | Rule-based content routing with Drools 10 rule units | Appendix F |
+| `examples/27-observability-stack` | OpenTelemetry tracing, Micrometer metrics, health probes | Appendix I |
 | `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |
 
 Each example runs with `mvn quarkus:dev` against the infrastructure stack.

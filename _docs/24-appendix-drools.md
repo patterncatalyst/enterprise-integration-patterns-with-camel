@@ -8,6 +8,8 @@ duration: "25 minutes"
 
 Several EIP patterns — Content-Based Router, Message Filter, Dynamic Router — make decisions based on business rules. When those rules change frequently (pricing tiers, fraud thresholds, routing logic), embedding them in Java code means redeploying for every rule change. Drools externalizes rules so business analysts can modify them without developer intervention.
 
+The code is in `examples/24-drools-rules/`. The `README.md` there covers how to run it.
+
 {% include excalidraw.html file="24-appendix-drools" alt="Drools rule-based content router: Kafka consumer to rule engine to routing destinations" caption="Figure F.1 — A Drools Rule Unit evaluates orders against DRL rules and decision tables, setting a routing decision that Camel's toD() uses to dispatch to the correct handler." %}
 
 ## Why Drools for integration

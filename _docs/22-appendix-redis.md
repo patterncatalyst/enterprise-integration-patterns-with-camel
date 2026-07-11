@@ -8,6 +8,8 @@ duration: "20 minutes"
 
 Redis appears throughout this tutorial in supporting roles: caching for Content Enrichers, idempotent message deduplication, pub/sub for lightweight messaging, and distributed locks for Competing Consumers coordination. This appendix covers each use case with Camel integration.
 
+The code is in `examples/22-redis-integration/`. The `README.md` there covers how to run it.
+
 {% include excalidraw.html file="22-appendix-redis" alt="Redis four integration roles: caching, idempotent store, pub/sub, and distributed locking" caption="Figure D.1 — Redis serves four distinct roles in integration: cache-aside enrichment, idempotent message deduplication, pub/sub notifications, and distributed locking." %}
 
 ## Redis in the shipping domain
