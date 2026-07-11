@@ -2,8 +2,10 @@
 
 Demonstrates messaging endpoint patterns with Apache Camel on Quarkus:
 
-- **Idempotent Receiver** — deduplicates orders by `order_id` using `MemoryIdempotentRepository`
+- **Idempotent Receiver** — deduplicates orders by `order_id` using a JDBC-backed `JdbcMessageIdRepository` in PostgreSQL
 - **Service Activator** — receives a Kafka message and invokes a CDI bean (`InventoryService`) via `.bean()` to check stock levels
+- **Durable Subscriber** — Pulsar subscription that maintains cursor state across restarts, resuming from the last acknowledged message
+- **Transactional Client / Outbox Pattern** — writes payment record and outbox event in a single PostgreSQL transaction, then a separate route polls and publishes to Kafka
 
 ## Running
 
@@ -13,25 +15,27 @@ cd ../15-endpoints
 mvn quarkus:dev
 ```
 
+## Infrastructure
+
+Requires the full Podman stack (Kafka + Pulsar + PostgreSQL).
+
 ## Data flow
 
 ```
-eip.orders.placed → [Idempotent Receiver] → eip.orders.deduplicated
-                                                    ↓
-                                           [Service Activator]
-                                                    ↓
-                                           eip.orders.inventory-checked
+eip.orders.placed → [Idempotent Receiver (JDBC)] → eip.orders.deduplicated
+                                                          ↓
+                                                 [Service Activator]
+                                                          ↓
+                                                 eip.orders.inventory-checked
+
+eip.payments.required → [Transactional Client] → PostgreSQL (payments + outbox)
+                                                          ↓
+                                                 [Outbox Publisher]
+                                                          ↓
+                                                 eip.payments.processed
+
+Pulsar eip.orders.placed → [Durable Subscriber]
 ```
-
-## How to test
-
-Produce an order to `eip.orders.placed`:
-
-```json
-{"order_id": 5001, "customer_id": "C-300", "item_sku": "SKU-ABC", "quantity": 2, "amount": 149.99}
-```
-
-Produce the same message again — the duplicate is silently dropped. The first message flows through the `InventoryService` bean, which checks stock and adds `in_stock`, `available_quantity`, and `inventory_checked_at` fields.
 
 ## Kafka topics
 
@@ -40,6 +44,16 @@ Produce the same message again — the duplicate is silently dropped. The first 
 | `eip.orders.placed` | Incoming orders (may contain duplicates) |
 | `eip.orders.deduplicated` | Deduplicated orders |
 | `eip.orders.inventory-checked` | Orders enriched with stock info |
+| `eip.payments.required` | Payment requests |
+| `eip.payments.processed` | Processed payments (published from outbox) |
+
+## PostgreSQL tables
+
+| Table | Description |
+|-------|-------------|
+| `payments.payments` | Payment records |
+| `payments.outbox` | Transactional outbox events |
+| `camel_messageprocessed` | Idempotent receiver dedup tracking |
 
 ---
 

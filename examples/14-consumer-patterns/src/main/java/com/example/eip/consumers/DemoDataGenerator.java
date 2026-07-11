@@ -37,6 +37,21 @@ public class DemoDataGenerator extends RouteBuilder {
                 exchange.getIn().setHeader("kafka.KEY", String.valueOf(id));
             })
             .to("kafka:eip.consumer.orders?brokers={{kafka.brokers}}")
-            .log("Generated order ${header.kafka.KEY} (${body}) → eip.consumer.orders");
+            .log("Generated order ${header.kafka.KEY} → eip.consumer.orders");
+
+        // Insert demo orders into PostgreSQL for the SQL polling consumer
+        from("timer:demo-db-orders?period=30000&delay=10000")
+            .routeId("demo-db-inserter")
+            .process(exchange -> {
+                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                double amount = 25 + (id * 41 % 475);
+                exchange.getIn().setHeader("customerId", "CUST-%03d".formatted(id % 100));
+                exchange.getIn().setHeader("itemSku", "SKU-%04d".formatted(id % 9999));
+                exchange.getIn().setHeader("quantity", (int) (1 + id % 5));
+                exchange.getIn().setHeader("amount", amount);
+            })
+            .to("sql:INSERT INTO orders.orders (customer_id, item_sku, quantity, amount) "
+                + "VALUES (:#customerId, :#itemSku, :#quantity, :#amount)")
+            .log("Inserted demo order into PostgreSQL for SQL polling consumer");
     }
 }

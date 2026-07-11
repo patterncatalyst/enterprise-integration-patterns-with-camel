@@ -8,7 +8,7 @@ public class ControlBusRoute extends RouteBuilder {
 
     @Override
     public void configure() {
-        restConfiguration().host("0.0.0.0").port(8080);
+        restConfiguration().host("0.0.0.0");
 
         rest("/control")
             .get("/status/{routeId}")

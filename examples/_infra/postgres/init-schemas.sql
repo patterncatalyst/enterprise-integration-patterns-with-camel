@@ -64,3 +64,48 @@ CREATE TABLE notifications.notifications (
     status      VARCHAR(20),
     created_at  TIMESTAMP    NOT NULL DEFAULT NOW()
 );
+
+-- ── outbox (transactional outbox for Ch 15) ──────────────────────────────
+CREATE TABLE payments.outbox (
+    event_id     VARCHAR(64)  PRIMARY KEY,
+    event_type   VARCHAR(64)  NOT NULL,
+    aggregate_id VARCHAR(64)  NOT NULL,
+    payload      TEXT         NOT NULL,
+    published    BOOLEAN      NOT NULL DEFAULT false,
+    created_at   TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_outbox_unpublished ON payments.outbox (created_at)
+    WHERE published = false;
+
+-- ── system (message store for Ch 17) ─────────────────────────────────────
+CREATE SCHEMA IF NOT EXISTS system;
+
+CREATE TABLE system.message_store (
+    message_id  VARCHAR(255) NOT NULL,
+    route_id    VARCHAR(255) NOT NULL,
+    timestamp   TIMESTAMP    NOT NULL DEFAULT NOW(),
+    payload     TEXT         NOT NULL,
+    PRIMARY KEY (message_id, route_id)
+);
+
+-- ── Camel JDBC aggregation repository (Ch 13) ────────────────────────────
+CREATE TABLE camel_aggregation (
+    id       VARCHAR(255) NOT NULL PRIMARY KEY,
+    exchange BYTEA        NOT NULL,
+    version  BIGINT       NOT NULL
+);
+
+CREATE TABLE camel_aggregation_completed (
+    id       VARCHAR(255) NOT NULL PRIMARY KEY,
+    exchange BYTEA        NOT NULL,
+    version  BIGINT       NOT NULL
+);
+
+-- ── Camel JDBC idempotent repository (Ch 15) ─────────────────────────────
+CREATE TABLE camel_messageprocessed (
+    processorName VARCHAR(255) NOT NULL,
+    messageId     VARCHAR(100) NOT NULL,
+    createdAt     TIMESTAMP,
+    PRIMARY KEY (processorName, messageId)
+);

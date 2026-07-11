@@ -36,20 +36,20 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 
 | Example | Patterns | Chapter |
 |---------|----------|---------|
-| `examples/04-channel-types` | Point-to-Point, Publish-Subscribe, Datatype Channel | Ch 4 |
+| `examples/04-channel-types` | Point-to-Point, Publish-Subscribe, Datatype Channel (Kafka + Pulsar) | Ch 4 |
 | `examples/05-reliability` | Dead Letter Channel, Guaranteed Delivery | Ch 5 |
-| `examples/06-channel-infra` | Channel Adapter, Messaging Bridge, Message Bus | Ch 6 |
+| `examples/06-channel-infra` | Channel Adapter (REST→PostgreSQL→Kafka), Kafka↔Pulsar Bridge, Message Bus | Ch 6 |
 | `examples/07-message-types` | Command, Document, Event Message | Ch 7 |
 | `examples/08-message-metadata` | Correlation ID, Message Sequence, Expiration, Format Indicator | Ch 8 |
 | `examples/09-routing-fundamentals` | Content-Based Router, Filter, Splitter, Recipient List | Ch 9 |
 | `examples/10-composed-routing` | Scatter-Gather, Routing Slip | Ch 10 |
 | `examples/11-advanced-routing` | Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, Load Balancer | Ch 11 |
 | `examples/12-transformation` | Message Translator, Content Enricher, Content Filter | Ch 12 |
-| `examples/13-aggregator` | Aggregator, Normalizer | Ch 13 |
-| `examples/14-consumer-patterns` | Polling Consumer, Event-Driven Consumer, Competing Consumers, Message Dispatcher | Ch 14 |
-| `examples/15-endpoints` | Idempotent Receiver, Service Activator | Ch 15 |
+| `examples/13-aggregator` | Aggregator (in-memory + PostgreSQL JDBC), Normalizer | Ch 13 |
+| `examples/14-consumer-patterns` | Polling Consumer (Kafka + PostgreSQL), Event-Driven Consumer (Kafka + Pulsar), Competing Consumers, Message Dispatcher | Ch 14 |
+| `examples/15-endpoints` | Idempotent Receiver (JDBC), Outbox Pattern (PostgreSQL), Durable Subscriber (Pulsar), Service Activator | Ch 15 |
 | `examples/16-endpoint-management` | Messaging Gateway, Selective Consumer, Channel Purger, Messaging Mapper | Ch 16 |
-| `examples/17-observability` | Control Bus, Wire Tap, Message History | Ch 17 |
+| `examples/17-observability` | Control Bus, Wire Tap, Message History, Message Store (PostgreSQL) | Ch 17 |
 | `examples/18-testing-management` | Test Message, Detour, Smart Proxy, Circuit Breaker | Ch 18 |
 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) | Appendix J |
 | `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |

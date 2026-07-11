@@ -5,6 +5,7 @@ Demonstrates system management and observability patterns with Apache Camel on Q
 - **Control Bus** — exposes REST endpoints to start, stop, and query the status of routes at runtime via the `controlbus` component
 - **Wire Tap** — taps order processing to send a copy of each message to an audit log topic without affecting the main flow
 - **Message History** — enables message history tracking and logs the full route path each exchange has traversed
+- **Message Store** — wire-taps messages flowing through the order pipeline and persists them to PostgreSQL (`system.message_store`) for auditing and debugging
 
 ## Running
 
@@ -49,9 +50,9 @@ Watch the logs for the full route path (e.g., `message-history-demo@... -> histo
 **Control Bus** — query and manage routes via REST:
 
 ```bash
-curl http://localhost:8080/control/status/wiretap-order-processor
-curl -X POST http://localhost:8080/control/stop/wiretap-order-processor
-curl -X POST http://localhost:8080/control/start/wiretap-order-processor
+curl http://localhost:8082/control/status/wiretap-order-processor
+curl -X POST http://localhost:8082/control/stop/wiretap-order-processor
+curl -X POST http://localhost:8082/control/start/wiretap-order-processor
 ```
 
 ## Kafka topics
@@ -61,7 +62,7 @@ curl -X POST http://localhost:8080/control/start/wiretap-order-processor
 | `eip.orders.placed` | Incoming orders for wire tap demo |
 | `eip.orders.processed` | Successfully processed orders |
 | `eip.orders.audit` | Audit log copies via wire tap |
-| `eip.orders.incoming` | Incoming orders for message history demo |
+| `eip.orders.incoming` | Incoming orders for message history demo + message store |
 
 ---
 

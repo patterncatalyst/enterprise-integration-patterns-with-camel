@@ -3,6 +3,7 @@
 Demonstrates structural transformation patterns with Apache Camel on Quarkus:
 
 - **Aggregator** — collects individual order line items and assembles them into a complete order by `order_id`, using `completionSize(3)` and `completionTimeout(10000)`
+- **Persistent Aggregator** — same aggregation logic backed by a PostgreSQL `JdbcAggregationRepository` so in-flight aggregations survive restarts
 - **Normalizer** — receives orders from three partner sources in different formats and translates each to a canonical data model
 
 ## Running
@@ -16,7 +17,8 @@ mvn quarkus:dev
 ## Data flow
 
 ```
-eip.orders.line-items → [Aggregator] → eip.orders.complete
+eip.orders.line-items → [Aggregator (memory)]     → eip.orders.complete
+eip.orders.line-items → [Aggregator (PostgreSQL)] → eip.orders.complete-persistent
 
 eip.orders.partner-a ─┐
 eip.orders.partner-b ─┤→ [Normalizer] → eip.orders.normalized
@@ -55,7 +57,8 @@ All three arrive in canonical format on `eip.orders.normalized`.
 | Topic | Description |
 |-------|-------------|
 | `eip.orders.line-items` | Individual order line items |
-| `eip.orders.complete` | Assembled complete orders |
+| `eip.orders.complete` | Assembled complete orders (in-memory) |
+| `eip.orders.complete-persistent` | Assembled complete orders (PostgreSQL-backed) |
 | `eip.orders.partner-a` | Orders from Partner A format |
 | `eip.orders.partner-b` | Orders from Partner B format |
 | `eip.orders.partner-c` | Orders from Partner C format |
