@@ -61,11 +61,13 @@ services:
     ports:
       - "6650:6650"
       - "8080:8080"
+    environment:
+      - PULSAR_MEM=-Xms512m -Xmx1024m -XX:MaxDirectMemorySize=512m
     volumes:
       - pulsar-data:/pulsar/data:Z
     devices:
       - "/dev/null:/dev/null:rwm"
-    mem_limit: 1g
+    mem_limit: 2g
     healthcheck:
       test: ["CMD-SHELL", "bin/pulsar-admin brokers healthcheck"]
       interval: 10s
@@ -146,9 +148,13 @@ services:
 
 volumes:
   kafka-data:
+    name: eip-kafka-data
   pulsar-data:
+    name: eip-pulsar-data
   redis-data:
+    name: eip-redis-data
   postgres-data:
+    name: eip-postgres-data
 
 networks:
   eip-net:

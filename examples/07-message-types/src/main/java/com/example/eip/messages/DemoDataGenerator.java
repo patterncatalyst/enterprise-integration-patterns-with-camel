@@ -1,5 +1,7 @@
 package com.example.eip.messages;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -16,13 +18,15 @@ import org.apache.camel.builder.RouteBuilder;
 @ApplicationScoped
 public class DemoDataGenerator extends RouteBuilder {
 
+    private final AtomicLong counter = new AtomicLong();
+
     @Override
     public void configure() {
         // ── Command Messages ────────────────────────────────────────
         from("timer:generate-commands?period=6000&delay=2000")
             .routeId("generate-command-messages")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 double amount = 25.0 + (id * 17 % 475);
 
                 String json = """
@@ -49,7 +53,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:generate-documents?period=8000&delay=4000")
             .routeId("generate-document-messages")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 String[] countries = {"US", "CA", "GB", "DE", "JP"};
                 String country = countries[(int) (id % countries.length)];
                 double amount = 50 + (id * 37 % 500);
@@ -86,7 +90,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:generate-events?period=5000&delay=3000")
             .routeId("generate-event-messages")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 String eventId = "evt-" + java.util.UUID.randomUUID().toString().substring(0, 8);
                 String timestamp = java.time.Instant.now().toString();
 

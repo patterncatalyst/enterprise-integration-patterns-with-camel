@@ -1,10 +1,14 @@
 package com.example.eip.advanced;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
 @ApplicationScoped
 public class DemoDataGenerator extends RouteBuilder {
+
+    private final AtomicLong counter = new AtomicLong();
 
     @Override
     public void configure() {
@@ -12,7 +16,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:demo-orders?period=5000&delay=3000")
             .routeId("demo-data-generator")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 String[] countries = {"US", "CA", "GB", "DE", "JP"};
                 String country = countries[(int) (id % countries.length)];
                 double amount = 50 + (id * 37 % 500);
@@ -46,11 +50,11 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:demo-sequenced?period=3000&delay=5000")
             .routeId("demo-sequenced-generator")
             .process(exchange -> {
-                long counter = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long seq = counter.incrementAndGet();
                 // Produce messages in scrambled order within batches of 10
-                long batchBase = ((counter - 1) / 10) * 10 + 1;
+                long batchBase = ((seq - 1) / 10) * 10 + 1;
                 int[] scramble = {5, 2, 8, 1, 9, 3, 7, 0, 6, 4};
-                long seqNum = batchBase + scramble[(int) ((counter - 1) % 10)];
+                long seqNum = batchBase + scramble[(int) ((seq - 1) % 10)];
 
                 String json = """
                     {
@@ -72,7 +76,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:demo-composed?period=8000&delay=7000")
             .routeId("demo-composed-generator")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 int itemCount = (int) (2 + id % 4);
                 StringBuilder items = new StringBuilder("[");
                 for (int i = 0; i < itemCount; i++) {
@@ -100,7 +104,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:demo-loadbalanced?period=2000&delay=6000")
             .routeId("demo-loadbalanced-generator")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 String json = """
                     {
                         "order_id": %d,

@@ -1,5 +1,7 @@
 package com.example.eip.testing;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -13,14 +15,16 @@ import org.apache.camel.builder.RouteBuilder;
 @ApplicationScoped
 public class TestMessageRoute extends RouteBuilder {
 
+    private final AtomicLong counter = new AtomicLong();
+
     @Override
     public void configure() {
         // --- Inject synthetic test orders every 30 seconds ---
         from("timer:test-message-injector?period=30000&delay=10000")
             .routeId("test-message-injector")
             .process(exchange -> {
-                long counter = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
-                long testId = -1 * counter;   // negative IDs mark test messages
+                long id = counter.incrementAndGet();
+                long testId = -1 * id;   // negative IDs mark test messages
                 double expectedAmount = 99.99;
 
                 String json = """

@@ -1,10 +1,14 @@
 package com.example.eip.metadata;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
 @ApplicationScoped
 public class DemoDataGenerator extends RouteBuilder {
+
+    private final AtomicLong counter = new AtomicLong();
 
     @Override
     public void configure() {
@@ -12,7 +16,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:metadata-orders?period=5000&delay=3000")
             .routeId("demo-data-generator")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 String[] skus = {"WIDGET-A", "GADGET-B", "SENSOR-C", "MOTOR-D", "VALVE-E"};
                 String sku = skus[(int) (id % skus.length)];
                 double amount = 25 + (id * 41 % 475);
@@ -44,7 +48,7 @@ public class DemoDataGenerator extends RouteBuilder {
         from("timer:metadata-bulk?period=15000&delay=6000")
             .routeId("demo-bulk-generator")
             .process(exchange -> {
-                long batch = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long batch = counter.incrementAndGet();
                 int itemCount = (int) (3 + batch % 4); // 3-6 items per bulk order
 
                 StringBuilder items = new StringBuilder();

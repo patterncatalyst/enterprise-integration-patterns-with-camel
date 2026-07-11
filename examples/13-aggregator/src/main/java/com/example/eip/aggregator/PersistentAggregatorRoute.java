@@ -3,6 +3,7 @@ package com.example.eip.aggregator;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import jakarta.enterprise.inject.Produces;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import javax.sql.DataSource;
 
 import org.apache.camel.AggregationStrategy;
@@ -25,6 +26,7 @@ public class PersistentAggregatorRoute extends RouteBuilder {
     public PostgresAggregationRepository aggregationRepo(DataSource dataSource) {
         PostgresAggregationRepository repo = new PostgresAggregationRepository();
         repo.setDataSource(dataSource);
+        repo.setTransactionManager(new DataSourceTransactionManager(dataSource));
         repo.setRepositoryName("camel_aggregation");
         repo.setStoreBodyAsText(true);
         return repo;

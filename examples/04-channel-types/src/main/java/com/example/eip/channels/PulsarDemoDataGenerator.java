@@ -1,17 +1,21 @@
 package com.example.eip.channels;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
 @ApplicationScoped
 public class PulsarDemoDataGenerator extends RouteBuilder {
 
+    private final AtomicLong counter = new AtomicLong();
+
     @Override
     public void configure() {
         from("timer:demo-pulsar-orders?period=5000&delay=4000")
             .routeId("demo-data-generator-pulsar")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 double amount = 50 + (id * 43 % 500);
 
                 String json = """

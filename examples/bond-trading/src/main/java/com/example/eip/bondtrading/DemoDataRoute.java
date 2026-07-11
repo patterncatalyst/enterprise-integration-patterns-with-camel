@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Timer-based demo data generator that produces simulated market data
@@ -11,6 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @ApplicationScoped
 public class DemoDataRoute extends RouteBuilder {
+
+    private final AtomicLong counter = new AtomicLong();
 
     private static final String[] SOURCES = {"bloomberg", "reuters", "exchange"};
 
@@ -41,10 +44,10 @@ public class DemoDataRoute extends RouteBuilder {
             .routeId("demo-market-data-generator")
             .process(exchange -> {
                 var rng = ThreadLocalRandom.current();
-                long counter = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long tick = counter.incrementAndGet();
 
                 // Rotate through sources deterministically, with some randomness in prices
-                String source = SOURCES[(int) (counter % SOURCES.length)];
+                String source = SOURCES[(int) (tick % SOURCES.length)];
                 String bondId;
                 switch (source) {
                     case "reuters" -> bondId = REUTERS_BONDS[rng.nextInt(REUTERS_BONDS.length)];
@@ -89,9 +92,9 @@ public class DemoDataRoute extends RouteBuilder {
             .routeId("demo-trade-order-generator")
             .process(exchange -> {
                 var rng = ThreadLocalRandom.current();
-                long counter = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long tick = counter.incrementAndGet();
 
-                String orderId = "ORD-%06d".formatted(counter);
+                String orderId = "ORD-%06d".formatted(tick);
                 String portfolioId = PORTFOLIOS[rng.nextInt(PORTFOLIOS.length)];
                 String isin = BLOOMBERG_BONDS[rng.nextInt(BLOOMBERG_BONDS.length)];
                 String side = SIDES[rng.nextInt(SIDES.length)];

@@ -11,7 +11,7 @@ if [[ "${1:-}" == "--lgtm" ]]; then
 fi
 
 echo "==> Starting EIP base stack (Kafka, Pulsar, Redis, PostgreSQL, Apicurio)..."
-podman-compose -f "$INFRA_DIR/compose.yaml" up -d
+podman-compose -p eip -f "$INFRA_DIR/compose.yaml" up -d
 
 echo "==> Waiting for base services to become healthy..."
 services=(eip-kafka eip-redis eip-postgres eip-apicurio eip-pulsar)
@@ -40,7 +40,7 @@ echo "    Redis:        redis-cli -h localhost"
 if $LGTM; then
   echo ""
   echo "==> Starting LGTM observability stack..."
-  podman-compose -f "$INFRA_DIR/compose.yaml" -f "$INFRA_DIR/compose.lgtm.yaml" up -d
+  podman-compose -p eip -f "$INFRA_DIR/compose.yaml" -f "$INFRA_DIR/compose.lgtm.yaml" up -d
 
   lgtm_services=(eip-loki eip-tempo eip-mimir eip-otel-collector eip-grafana)
   echo "==> Waiting for LGTM services..."

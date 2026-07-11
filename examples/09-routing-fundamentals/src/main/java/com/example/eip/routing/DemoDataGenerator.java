@@ -1,17 +1,21 @@
 package com.example.eip.routing;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.camel.builder.RouteBuilder;
 
 @ApplicationScoped
 public class DemoDataGenerator extends RouteBuilder {
 
+    private final AtomicLong counter = new AtomicLong();
+
     @Override
     public void configure() {
         from("timer:demo-orders?period=5000&delay=3000")
             .routeId("demo-data-generator")
             .process(exchange -> {
-                long id = exchange.getIn().getHeader("CamelTimerCounter", Long.class);
+                long id = counter.incrementAndGet();
                 String[] countries = {"US", "CA", "GB", "DE", "JP"};
                 String country = countries[(int) (id % countries.length)];
                 boolean hazmat = id % 7 == 0;
