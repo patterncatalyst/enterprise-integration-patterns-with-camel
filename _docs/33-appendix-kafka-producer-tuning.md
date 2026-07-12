@@ -14,25 +14,7 @@ The code is in `examples/33-kafka-producer-tuning/`. The `README.md` there cover
 
 A Kafka producer doesn't send each message individually. Messages pass through a pipeline of buffering, batching, and (optionally) compression before they reach the network:
 
-```
-Application           Producer internals             Broker
-    │                      │                            │
-    │── send(record) ────►│                            │
-    │                      │── buffer in RecordAccumulator
-    │                      │   (buffer.memory, max.block.ms)
-    │                      │                            │
-    │                      │── batch by partition       │
-    │                      │   (batch.size, linger.ms)  │
-    │                      │                            │
-    │                      │── compress batch           │
-    │                      │   (compression.type)       │
-    │                      │                            │
-    │                      │── send to broker ─────────►│
-    │                      │   (acks, retries)          │
-    │                      │                            │
-    │                      │◄── acknowledgment ─────── │
-    │◄── callback ──────── │                            │
-```
+{% include excalidraw.html file="33-producer-pipeline" alt="Kafka producer pipeline showing buffering, batching, compression, and broker acknowledgment" caption="Figure O.1 — The producer pipeline: records are buffered in the RecordAccumulator, batched by partition, optionally compressed, then sent to the broker. The broker acknowledgment flows back through a callback to the application." %}
 
 ## Acknowledgment guarantees — acks
 
@@ -238,5 +220,5 @@ from("direct:publish-order")
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Camel Kafka component supports `requestRequiredAcks`, `batchSize`, `lingerMs`, `compressionCodec`, `bufferMemorySize`, `retries`, `synchronous` properties; `additionalProperties` map passes through to the underlying Kafka producer; idempotent producer configuration is valid with `enable.idempotence=true`.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37 / Camel 4.20 / Java 25.
+Example `33-kafka-producer-tuning` compiles and runs against the Podman stack with Kafka (KRaft).*

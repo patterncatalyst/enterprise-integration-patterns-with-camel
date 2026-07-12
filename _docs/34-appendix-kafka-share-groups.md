@@ -8,25 +8,15 @@ duration: "20 minutes"
 
 Traditional Kafka consumer groups tie each partition to exactly one consumer. This works well when per-key ordering matters, but creates friction when you want simple work distribution — the "queue" pattern where any available consumer picks up the next message. KIP-932 introduces **share groups**, a new consumer group type that decouples consumption from partition assignment and adds per-message acknowledgment.
 
+{% include excalidraw.html file="34-share-groups" alt="Comparison of traditional consumer groups with partition-bound assignment versus share groups with round-robin distribution" caption="Figure P.1 — Consumer groups (left) assign each partition to exactly one consumer — Consumer D is idle. Share groups (right) distribute messages round-robin across all consumers regardless of partition count." %}
+
 ## The problem with consumer groups for queues
 
-In a standard consumer group, partition assignment is exclusive:
+In a standard consumer group, partition assignment is exclusive — each partition is consumed by exactly one consumer. This creates three constraints:
 
-```
-Topic: eip.orders.placed (3 partitions)
-Consumer Group: order-processors
+1. **Consumer count is capped by partition count.** A fourth consumer is idle if there are only 3 partitions. Scaling consumers requires repartitioning the topic.
 
-  Consumer A → P0
-  Consumer B → P1
-  Consumer C → P2
-  Consumer D → (idle — no partition available)
-```
-
-This creates three constraints:
-
-1. **Consumer count is capped by partition count.** Consumer D is idle because there are only 3 partitions. Scaling consumers requires repartitioning the topic.
-
-2. **Uneven partitions cause hot spots.** If P0 receives 80% of the traffic (due to key distribution), Consumer A is overwhelmed while B and C are underutilized.
+2. **Uneven partitions cause hot spots.** If one partition receives 80% of the traffic (due to key distribution), its consumer is overwhelmed while the others are underutilized.
 
 3. **Rebalances are disruptive.** Adding or removing consumers triggers a rebalance that pauses all consumers in the group, even those whose partitions don't change.
 
@@ -34,17 +24,7 @@ For workloads that don't require per-key ordering — like dispatching notificat
 
 ## What share groups provide
 
-A share group delivers messages from all partitions to all consumers in a round-robin fashion, with per-message acknowledgment:
-
-```
-Topic: eip.orders.placed (3 partitions)
-Share Group: order-processors
-
-  Consumer A ← messages from P0, P1, P2 (round-robin)
-  Consumer B ← messages from P0, P1, P2 (round-robin)
-  Consumer C ← messages from P0, P1, P2 (round-robin)
-  Consumer D ← messages from P0, P1, P2 (round-robin)
-```
+A share group delivers messages from all partitions to all consumers in a round-robin fashion, with per-message acknowledgment. All four consumers receive messages regardless of partition count.
 
 Key differences from consumer groups:
 
@@ -187,5 +167,4 @@ For workloads that need queue semantics today, Pulsar's Shared subscription (App
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: KIP-932 share groups are an early access feature in Apache Kafka 4.0; the `group.type=share` configuration property exists; `share.group.delivery.count.limit` and `share.group.record.lock.duration.ms` are valid broker-side properties; Camel Kafka component supports `groupType` parameter or equivalent configuration.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*

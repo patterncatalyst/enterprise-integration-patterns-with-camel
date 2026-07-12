@@ -30,16 +30,7 @@ The key guarantee: at-most-one *consumer* will process each message (assuming no
 
 In Kafka, point-to-point semantics come from the **consumer group**. All consumers with the same `group.id` form a group, and Kafka assigns each partition to exactly one consumer in the group. A message on a given partition is delivered to only one consumer:
 
-```
-Topic: eip.orders.placed (3 partitions)
-
-Consumer Group: inventory-service
-  ├── Instance A  ←  Partition 0
-  ├── Instance B  ←  Partition 1
-  └── Instance C  ←  Partition 2
-
-Each order goes to exactly one instance.
-```
+{% include excalidraw.html file="04-point-to-point" alt="Kafka topic with 3 partitions, each assigned to exactly one consumer in the inventory-service consumer group" caption="Figure 4.1 — Point-to-point via Kafka consumer groups: each partition is assigned to exactly one consumer instance." %}
 
 If Instance B crashes, Kafka reassigns Partition 1 to Instance A or C (a **rebalance**). No messages are lost; processing continues with the surviving instances.
 
@@ -95,20 +86,7 @@ This is the foundation of event-driven architecture: producers announce facts (e
 
 In Kafka, publish-subscribe emerges naturally from **multiple consumer groups** on the same topic:
 
-```
-Topic: eip.orders.placed (3 partitions)
-
-Consumer Group: inventory-service
-  └── Instance A  ←  All 3 partitions
-
-Consumer Group: notification-service
-  └── Instance A  ←  All 3 partitions
-
-Consumer Group: analytics-service    (added later — no changes anywhere else)
-  └── Instance A  ←  All 3 partitions
-
-Each group gets EVERY message. Within a group, messages are distributed.
-```
+{% include excalidraw.html file="04-pub-sub" alt="Kafka topic fanning out to three independent consumer groups — inventory, notification, and analytics — each receiving all messages" caption="Figure 4.2 — Publish-subscribe via multiple consumer groups: each group receives every message independently. Adding analytics-service requires no changes to the publisher or existing consumers." %}
 
 This is elegant: the same topic supports both point-to-point (within a group) and publish-subscribe (across groups) simultaneously. The publisher doesn't know or care how many groups are listening.
 
@@ -116,20 +94,7 @@ This is elegant: the same topic supports both point-to-point (within a group) an
 
 In Pulsar, each **subscription** to a topic is an independent subscriber. Multiple subscriptions on the same topic give you publish-subscribe:
 
-```
-Topic: persistent://public/default/eip.orders.placed
-
-Subscription: inventory-service (Shared)
-  └── Consumer A
-
-Subscription: notification-service (Exclusive)
-  └── Consumer A
-
-Subscription: analytics-service (Exclusive)
-  └── Consumer A
-
-Each subscription gets EVERY message independently.
-```
+{% include excalidraw.html file="04-pulsar-subscriptions" alt="Pulsar topic with three subscriptions — inventory (Shared with two consumers), notification (Exclusive), and analytics (Exclusive)" caption="Figure 4.3 — Pulsar subscriptions: each subscription receives every message independently. The Shared subscription distributes work across multiple consumers; Exclusive subscriptions have one active consumer each." %}
 
 ### How Camel models it
 

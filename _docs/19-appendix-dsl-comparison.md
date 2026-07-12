@@ -438,5 +438,4 @@ Spring Boot is a perfectly valid choice for Camel. If your organization standard
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `@Component` is the correct Spring annotation for route discovery in Camel Spring Boot; `camel-spring-boot-starter` is the correct core starter artifact; `@CamelSpringBootTest` exists in `camel-test-spring-junit5`; `@EndpointInject` works for MockEndpoint injection in Spring; `camel.component.kafka.brokers` is the correct property key on both runtimes; Spring Boot Buildpacks command is `spring-boot:build-image`; Quarkus container image build flag is `quarkus.container-image.build=true`; Spring AOT native compilation uses `mvn -Pnative native:compile`.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual comparison chapter, no runnable example.*

@@ -221,18 +221,12 @@ While this tutorial focuses on Camel routes for integration logic, Kafka Connect
 | Data egress (Kafka → DB, Kafka → file) | Kafka Connect sink connectors |
 | EIP logic (routing, transformation, aggregation) | Camel routes |
 
-A typical shipping domain pipeline:
+A typical shipping domain pipeline combines all three:
 
-```
-PostgreSQL orders table
-    → [Debezium source connector] → Kafka: eip.orders.cdc
-    → [Camel route: validate, enrich, route] → Kafka: eip.orders.processed
-    → [JDBC sink connector] → Analytics database
-```
+{% include excalidraw.html file="36-connect-pipeline" alt="Data pipeline showing PostgreSQL flowing through Debezium source connector, Kafka, Camel route processing, and JDBC sink connector to analytics database" caption="Figure R.1 — A shipping domain pipeline: Debezium captures CDC events from PostgreSQL, Camel routes apply EIP logic (validate, enrich, route), and a JDBC sink connector writes processed orders to the analytics database. Each component manages its own offsets." %}
 
 When the Camel route has a bug and you need to reprocess, you reset the Camel consumer group offsets (Appendix N). When the source connector misses rows, you alter the connector offset. When the sink connector writes to the wrong table, you fix the config and reset its offset. Each component has its own offset management surface.
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Kafka Connect REST API endpoints `GET /connectors/{name}/offsets`, `PATCH /connectors/{name}/offsets`, `DELETE /connectors/{name}/offsets` exist in Kafka Connect 3.6+; `PUT /connectors/{name}/stop` and `PUT /connectors/{name}/resume` endpoints exist; `connect-offsets` is the default offset storage topic name; KIP-875 introduced the offset management endpoints.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*

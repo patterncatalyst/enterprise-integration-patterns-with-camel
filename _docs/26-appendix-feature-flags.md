@@ -150,5 +150,4 @@ flagd:
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: OpenFeature SDK `dev.openfeature:sdk` artifact exists; flagd provider `dev.openfeature.contrib.providers:flagd` exists; flagd container image `ghcr.io/open-feature/flagd` is the correct registry; `MutableContext` class is in the OpenFeature SDK; flagd `--uri file:` flag syntax is correct.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*

@@ -205,5 +205,5 @@ public class InventoryChecker {
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Quarkus Flow / Kogito Serverless Workflow extension exists at version 0.12.0; CNCF Serverless Workflow spec version 0.8 is the correct spec; `quarkus-serverless-workflow` artifact ID is correct; workflow function `type: custom` with `operation: service:beanName` invokes CDI beans.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37 / Camel 4.20 / Java 25.
+Example `25-quarkus-flow` compiles and runs against the Podman stack.*

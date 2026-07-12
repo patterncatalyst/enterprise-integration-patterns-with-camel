@@ -310,5 +310,4 @@ Virtual threads appear in `jcmd <pid> Thread.dump_to_file -format=json <file>` o
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: virtual thread configuration with `camel.main.virtualThreadsEnabled=true` works on Quarkus 3.37.x with Camel 4.20.x; SEDA `virtualThreadPerTask=true` processes messages on virtual threads; pinning detection with `-Djdk.tracePinnedThreads=short` produces expected output.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*

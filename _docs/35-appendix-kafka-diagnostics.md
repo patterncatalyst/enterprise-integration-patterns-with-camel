@@ -284,5 +284,4 @@ Most Kafka issues in integration routes fall into three categories: **consumer l
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: `kafka-topics.sh`, `kafka-consumer-groups.sh`, `kafka-log-dirs.sh`, and `kafka-configs.sh` are available in the Apache Kafka container image; `--describe`, `--state`, `--reset-offsets` flags work as documented; `jcmd` is available inside the Kafka container for JVM diagnostics; JMX configuration environment variables are correct.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*

@@ -1,39 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 520" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
 <defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
-<rect x="20" y="10" width="860" height="500" rx="12" fill="#fafafa" stroke="#ddd"/>
-<text x="32" y="30" font-size="12" font-weight="700" fill="#555555">Shipping Domain — Order Flow</text>
-<rect x="370" y="40" width="160" height="50" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
-<text x="450.0" y="63.0" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Customer</text>
-<text x="450.0" y="80.0" font-size="11.5" fill="#dddddd" text-anchor="middle">HTTP POST /orders</text>
-<rect x="370" y="130" width="160" height="55" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
-<text x="450.0" y="155.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">order-service</text>
-<text x="450.0" y="172.5" font-size="11.5" fill="#555555" text-anchor="middle">PostgreSQL · orders</text>
-<rect x="100" y="260" width="170" height="55" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
-<text x="185.0" y="285.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">inventory-service</text>
-<text x="185.0" y="302.5" font-size="11.5" fill="#555555" text-anchor="middle">PostgreSQL · inventory</text>
-<rect x="630" y="260" width="170" height="55" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
-<text x="715.0" y="285.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">notification-service</text>
-<text x="715.0" y="302.5" font-size="11.5" fill="#555555" text-anchor="middle">email / SMS</text>
-<rect x="100" y="370" width="170" height="55" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
-<text x="185.0" y="395.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">payment-service</text>
-<text x="185.0" y="412.5" font-size="11.5" fill="#555555" text-anchor="middle">PostgreSQL · payments</text>
-<rect x="100" y="460" width="170" height="50" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
-<text x="185.0" y="483.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">shipping-service</text>
-<text x="185.0" y="500.0" font-size="11.5" fill="#555555" text-anchor="middle">PostgreSQL · shipping</text>
-<path d="M450,90 L450,130" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<text x="456.0" y="104.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">HTTP</text>
-<text x="456.0" y="104.0" font-size="11" fill="#b8650a" text-anchor="middle">HTTP</text>
-<path d="M370,160 L270,260" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<path d="M530,160 L630,260" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<path d="M185,315 L185,370" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<path d="M270,400 L630,290" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
-<path d="M185,425 L185,460" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
-<text x="270" y="210" font-size="11" fill="#555555" text-anchor="middle">OrderPlaced</text>
-<text x="630" y="210" font-size="11" fill="#555555" text-anchor="middle">OrderPlaced</text>
-<text x="280" y="342" font-size="11" fill="#555555" text-anchor="middle">InventoryReserved</text>
-<text x="510" y="330" font-size="11" fill="#555555" text-anchor="middle">PaymentProcessed</text>
-<text x="280" y="442" font-size="11" fill="#555555" text-anchor="middle">ShipmentScheduled</text>
-<text x="400" y="210" font-size="10" fill="#555555" text-anchor="start">Kafka topic: eip.orders.placed</text>
-<text x="55" y="345" font-size="10" fill="#555555" text-anchor="start">eip.inventory.reserved</text>
-<text x="55" y="450" font-size="10" fill="#555555" text-anchor="start">eip.payments.processed</text>
+<rect x="20" y="10" width="660" height="500" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="32" y="30" font-size="12" font-weight="700" fill="#555555">Order Flow</text>
+<rect x="260" y="30" width="180" height="40" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="350.0" y="55.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Customer</text>
+<rect x="260" y="100" width="180" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="350.0" y="125.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">order-service</text>
+<rect x="80" y="200" width="180" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="170.0" y="225.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">inventory-service</text>
+<rect x="440" y="200" width="180" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="530.0" y="225.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">notification-service</text>
+<rect x="80" y="300" width="180" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="170.0" y="325.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">payment-service</text>
+<rect x="440" y="300" width="180" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="530.0" y="325.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">notification-service</text>
+<rect x="80" y="400" width="180" height="40" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="170.0" y="425.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">shipping-service</text>
+<rect x="260" y="460" width="180" height="40" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="350.0" y="478.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">order-service</text>
+<text x="350.0" y="495.0" font-size="11.5" fill="#555555" text-anchor="middle">status → SHIPPED</text>
+<rect x="440" y="400" width="180" height="40" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="530.0" y="425.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">notification-service</text>
+<path d="M350,70 L350,100" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="356.0" y="79.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">HTTP POST</text>
+<text x="356.0" y="79.0" font-size="11" fill="#b8650a" text-anchor="middle">HTTP POST</text>
+<path d="M300,140 L170,200" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="241.0" y="164.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">OrderPlaced</text>
+<text x="241.0" y="164.0" font-size="11" fill="#b8650a" text-anchor="middle">OrderPlaced</text>
+<path d="M400,140 L530,200" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="471.0" y="164.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">OrderPlaced</text>
+<text x="471.0" y="164.0" font-size="11" fill="#b8650a" text-anchor="middle">OrderPlaced</text>
+<path d="M170,240 L170,300" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="176.0" y="264.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">InventoryReserved</text>
+<text x="176.0" y="264.0" font-size="11" fill="#b8650a" text-anchor="middle">InventoryReserved</text>
+<path d="M170,340 L170,400" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="176.0" y="364.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">PaymentProcessed</text>
+<text x="176.0" y="364.0" font-size="11" fill="#b8650a" text-anchor="middle">PaymentProcessed</text>
+<path d="M260,320 L440,320" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="356.0" y="314.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">PaymentProcessed</text>
+<text x="356.0" y="314.0" font-size="11" fill="#b8650a" text-anchor="middle">PaymentProcessed</text>
+<path d="M170,440 L260,480" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="221.0" y="454.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">ShipmentScheduled</text>
+<text x="221.0" y="454.0" font-size="11" fill="#b8650a" text-anchor="middle">ShipmentScheduled</text>
+<path d="M260,420 L440,420" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<text x="356.0" y="414.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">ShipmentScheduled</text>
+<text x="356.0" y="414.0" font-size="11" fill="#b8650a" text-anchor="middle">ShipmentScheduled</text>
+<text x="350" y="170" font-size="11" fill="#555555" text-anchor="middle">fan-out</text>
 </svg>

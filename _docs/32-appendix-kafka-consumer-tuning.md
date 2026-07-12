@@ -14,18 +14,7 @@ The code is in `examples/32-kafka-consumer-tuning/`. The `README.md` there cover
 
 A Kafka consumer cycles through three operations: **fetch** (pull batches from the broker), **poll** (deliver records to application code), and **commit** (acknowledge processed offsets). Each operation has configuration knobs that trade off throughput against latency and safety.
 
-```
-Broker                     Consumer
-  │                           │
-  │◄── fetch request ─────── │  (fetch.min.bytes, fetch.max.wait.ms)
-  │── batch of records ─────►│
-  │                           │── poll() returns records
-  │                           │   (max.poll.records, max.poll.interval.ms)
-  │                           │── process records
-  │◄── commit offsets ─────── │  (enable.auto.commit, auto.commit.interval.ms)
-  │── ack ──────────────────►│
-  │                           │
-```
+{% include excalidraw.html file="32-consumer-lifecycle" alt="Kafka consumer lifecycle showing fetch, poll, and commit operations between broker and consumer" caption="Figure N.1 — The consumer lifecycle: fetch batches from the broker, poll and process records, then commit offsets. Each step has configuration knobs that trade throughput against latency and safety." %}
 
 ## Throughput tuning — fetch thresholds
 
@@ -260,5 +249,5 @@ This reduces rebalance impact from "all consumers paused" to "only affected part
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Camel Kafka component supports `fetchMinBytes`, `fetchWaitMaxMs`, `maxPollRecords`, `maxPollIntervalMs`, `autoCommitEnable`, `allowManualCommit`, `sessionTimeoutMs`, `heartbeatIntervalMs`, `autoOffsetReset`, `groupInstanceId` properties; `KafkaConstants.MANUAL_COMMIT` header is available for manual offset commit; cooperative-sticky assignor works via `additional-properties`.*
+*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37 / Camel 4.20 / Java 25.
+Example `32-kafka-consumer-tuning` compiles and runs against the Podman stack with Kafka (KRaft).*

@@ -197,19 +197,7 @@ You can scale competing consumers at two levels:
 
 2. **Across multiple application instances** — Deploy multiple copies of the service (via Kubernetes replicas, Podman instances, etc.). Each instance joins the same consumer group and is assigned a subset of partitions.
 
-```
-Topic: eip.orders.placed (12 partitions)
-
-Instance 1 (consumersCount=2):
-  Thread-A → P0, P1, P2
-  Thread-B → P3, P4, P5
-
-Instance 2 (consumersCount=2):
-  Thread-A → P6, P7, P8
-  Thread-B → P9, P10, P11
-
-Total: 4 consumer threads across 2 instances, each processing 3 partitions.
-```
+{% include excalidraw.html file="14-consumer-scaling" alt="Two application instances each with two consumer threads, distributing 12 Kafka partitions evenly — 3 partitions per thread" caption="Figure 14.1 — Competing consumer scaling: 2 instances × 2 threads = 4 consumers, each assigned 3 of 12 partitions." %}
 
 Adding a third instance with `consumersCount=2` would trigger a rebalance, redistributing partitions to 2 per thread (12 partitions ÷ 6 threads).
 

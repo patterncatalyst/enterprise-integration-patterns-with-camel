@@ -104,33 +104,7 @@ The notification service subscribes to a broad set of topics and uses a **Conten
 
 Here is the end-to-end flow for a successful order:
 
-```
-Customer ──HTTP POST──▶ order-service
-                              │
-                         OrderPlaced
-                              │
-                    ┌─────────┼─────────────┐
-                    ▼                        ▼
-          inventory-service         notification-service
-                    │                   (order confirmed)
-            InventoryReserved
-                    │
-                    ▼
-          payment-service
-                    │
-            PaymentProcessed
-                    │
-                    ├──────────────────────┐
-                    ▼                      ▼
-          shipping-service        notification-service
-                    │                (payment confirmed)
-          ShipmentScheduled
-                    │
-                    ├──────────────────────┐
-                    ▼                      ▼
-            order-service         notification-service
-          (status → SHIPPED)        (shipment details)
-```
+{% include excalidraw.html file="01-order-flow" alt="Order flow from customer through order-service, inventory-service, payment-service, and shipping-service with notification-service receiving events at each stage" caption="Figure 1.1 — The shipping domain message flow: a customer HTTP POST triggers an event cascade through five services, with notification-service subscribing to events at every stage." %}
 
 Every arrow in this diagram is a **message** flowing through a **channel** (a Kafka topic). Every service is a **message endpoint**. The entire flow is a **pipes and filters** architecture. You'll study each of these foundational patterns in Part 2.
 

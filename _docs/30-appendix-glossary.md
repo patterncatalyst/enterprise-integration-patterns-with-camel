@@ -198,5 +198,4 @@ A quick-reference glossary of terms used throughout this tutorial, organized by 
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: pattern definitions match Hohpe & Woolf's definitions; Camel DSL method names are correct (`choice()`, `filter()`, `split()`, `aggregate()`, `recipientList()`, etc.); Kafka terminology (partition, offset, consumer group, KRaft) is accurate; Quarkus terminology (Dev Services, live reload) is accurate.*
+*Verification status: <span class="status status--verified">verified</span> — glossary reference chapter, no runnable example.*

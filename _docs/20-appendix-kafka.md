@@ -54,20 +54,7 @@ For our tutorial stack: 3 partitions per topic (matches the single-broker dev se
 
 When a consumer joins or leaves a group, Kafka redistributes partitions:
 
-```
-Before rebalance (2 consumers):
-  Consumer A → P0, P1
-  Consumer B → P2
-
-Consumer C joins → rebalance:
-  Consumer A → P0
-  Consumer B → P1
-  Consumer C → P2
-
-Consumer B crashes → rebalance:
-  Consumer A → P0, P1
-  Consumer C → P2
-```
+{% include excalidraw.html file="20-consumer-rebalancing" alt="Three rebalancing scenarios: initial 2-consumer assignment, after Consumer C joins (3-way split), and after Consumer B crashes (2-way redistribution)" caption="Figure B.1 — Consumer group rebalancing: partitions are redistributed when consumers join or leave the group." %}
 
 During rebalance, consumers pause processing (~seconds). Camel's Kafka component handles rebalancing automatically — but your processing logic must be idempotent because messages may be re-delivered during rebalance.
 

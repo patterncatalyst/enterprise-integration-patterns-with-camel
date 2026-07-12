@@ -77,16 +77,7 @@ Each span includes:
 
 Camel propagates OpenTelemetry trace context through Kafka headers automatically. When order-service publishes to `eip.orders.placed` and inventory-service consumes it, both spans appear under the same trace:
 
-```
-Trace: abc123
-├── order-service: POST /api/orders [200ms]
-│   ├── route:create-order [50ms]
-│   ├── sql:INSERT INTO orders.orders [30ms]
-│   └── kafka:eip.orders.placed (PRODUCE) [10ms]
-└── inventory-service: kafka:eip.orders.placed (CONSUME) [45ms]
-    ├── route:check-inventory [40ms]
-    └── sql:SELECT FROM inventory.stock [15ms]
-```
+{% include excalidraw.html file="27-trace-tree" alt="Distributed trace showing spans across order-service and inventory-service, linked via Kafka header propagation" caption="Figure I.1 — Distributed trace: the produce span in order-service and the consume span in inventory-service are linked under the same trace ID via Kafka header propagation." %}
 
 ## Custom spans
 

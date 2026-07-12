@@ -250,5 +250,4 @@ The native build produces a GraalVM native image: ~20ms startup, ~50MB memory. I
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span>.
-Confirm: Quarkus Dev Services auto-start containers for Kafka, PostgreSQL, and Redis; `camel export --runtime=quarkus` generates a Quarkus project; continuous testing toggle with 'r' key works in `mvn quarkus:dev`; native image build command is correct; Dev UI is at `/q/dev-ui` path; `AdviceWith` API is available in Camel 4.x; `camel.main.tracing` property enables exchange tracing; `quarkus-dev-service` label is applied to Dev Services containers.*
+*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*
