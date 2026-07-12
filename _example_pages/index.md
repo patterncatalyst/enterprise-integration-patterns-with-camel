@@ -54,6 +54,7 @@ mvn quarkus:dev
 | [27-observability-stack](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/27-observability-stack) | OpenTelemetry tracing, Micrometer metrics, health probes | Kafka (LGTM optional) | Appendix I |
 | [32-kafka-consumer-tuning](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/32-kafka-consumer-tuning) | Throughput-tuned, safety-first, and static-membership consumers | Kafka | Appendix N |
 | [33-kafka-producer-tuning](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/33-kafka-producer-tuning) | Batched, compressed, idempotent, and synchronous producers | Kafka | Appendix O |
+| [37-testing-strategies](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/37-testing-strategies) | Three-tier testing: unit (MockEndpoint), integration (REST Assured), Newman | None (self-contained) | Appendix S |
 
 ## Case studies
 

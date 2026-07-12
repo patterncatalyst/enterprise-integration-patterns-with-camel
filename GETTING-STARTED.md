@@ -82,8 +82,9 @@ done
 | 21 | `examples/27-observability-stack` | OpenTelemetry tracing, Micrometer metrics, health probes |
 | 22 | `examples/32-kafka-consumer-tuning` | Throughput-tuned, safety-first, static-membership consumers |
 | 23 | `examples/33-kafka-producer-tuning` | Batched, compressed, idempotent, synchronous producers |
-| 24 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) |
-| 25 | `examples/bond-trading` | Market data normalization (16 patterns) |
+| 24 | `examples/37-testing-strategies` | Three-tier testing: unit, integration, Newman |
+| 25 | `examples/loan-broker` | Scatter-Gather case study (13 patterns) |
+| 26 | `examples/bond-trading` | Market data normalization (16 patterns) |
 
 ## Tutorial site
 

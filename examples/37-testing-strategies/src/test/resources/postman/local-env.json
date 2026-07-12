@@ -1,0 +1,13 @@
+{
+  "id": "eip-local-env",
+  "name": "EIP Local",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8082",
+      "type": "default",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
