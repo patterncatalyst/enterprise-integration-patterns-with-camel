@@ -8,7 +8,21 @@ duration: "20 minutes"
 
 Redis appears throughout this tutorial in supporting roles: caching for Content Enrichers, idempotent message deduplication, pub/sub for lightweight messaging, and distributed locks for Competing Consumers coordination. This appendix covers each use case with Camel integration.
 
-The code is in `examples/22-redis-integration/`. The `README.md` there covers how to run it.
+The code is in `examples/22-redis-integration/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/22-redis-integration/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/22-redis-integration/spring-boot
+mvn spring-boot:run
+```
 
 {% include excalidraw.html file="22-appendix-redis" alt="Redis four integration roles: caching, idempotent store, pub/sub, and distributed locking" caption="Figure D.1 — Redis serves four distinct roles in integration: cache-aside enrichment, idempotent message deduplication, pub/sub notifications, and distributed locking." %}
 
@@ -194,5 +208,4 @@ quarkus.redis.max-pool-waiting=50
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Redis 7 + Kafka on Podman, 2026-07-11.
-All three routes start (cached enrichment, idempotent receiver, distributed lock). Quarkus Redis client, Kafka consumer, and timer routes confirmed working.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

@@ -1,6 +1,6 @@
 # Appendix I: Observability Stack
 
-Demonstrates end-to-end observability for Camel routes using OpenTelemetry distributed tracing, Micrometer metrics with Prometheus, and custom health probe endpoints. Traces propagate automatically across Kafka-backed and direct Camel routes, giving full visibility into the order processing pipeline through the LGTM stack (Grafana, Loki, Tempo, Mimir).
+Demonstrates end-to-end observability for Camel routes using OpenTelemetry distributed tracing, Micrometer metrics with Prometheus, and custom health probe endpoints. Traces propagate automatically across Kafka-backed and direct Camel routes, giving full visibility into the order processing pipeline through the LGTM stack (Grafana, Loki, Tempo, Mimir). Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Auto-instrumented distributed tracing** -- OpenTelemetry traces span the full order pipeline (validate, enrich, complete) with each direct route appearing as a child span in Tempo
 - **Custom Micrometer metrics (counters, timers)** -- orders counted by destination country and processing time recorded as a Micrometer timer, exposed via the Prometheus endpoint
@@ -12,7 +12,13 @@ Demonstrates end-to-end observability for Camel routes using OpenTelemetry distr
 # From the repository root -- start Kafka and the LGTM observability overlay
 ./scripts/setup-stack.sh --lgtm
 
-cd examples/27-observability-stack && mvn quarkus:dev
+# Quarkus
+cd examples/27-observability-stack/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/27-observability-stack/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -56,4 +62,4 @@ curl http://localhost:8087/health/routes
 
 ---
 
-*Verification status: unverified.*
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

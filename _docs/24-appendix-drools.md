@@ -8,7 +8,21 @@ duration: "25 minutes"
 
 Several EIP patterns — Content-Based Router, Message Filter, Dynamic Router — make decisions based on business rules. When those rules change frequently (pricing tiers, fraud thresholds, routing logic), embedding them in Java code means redeploying for every rule change. Drools externalizes rules so business analysts can modify them without developer intervention.
 
-The code is in `examples/24-drools-rules/`. The `README.md` there covers how to run it.
+The code is in `examples/24-drools-rules/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/24-drools-rules/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/24-drools-rules/spring-boot
+mvn spring-boot:run
+```
 
 {% include excalidraw.html file="24-appendix-drools" alt="Drools rule-based content router: Kafka consumer to rule engine to routing destinations" caption="Figure F.1 — A Drools Rule Unit evaluates orders against DRL rules and decision tables, setting a routing decision that Camel's toD() uses to dispatch to the correct handler." %}
 
@@ -170,5 +184,4 @@ The `drools-engine` artifact provides the core KIE API without requiring the Dro
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Drools 10.2.0, Java 25, Kafka on Podman, 2026-07-11.
-All five routes start (drools-content-router, route-standard, route-express, route-hazmat, route-fraud-review). Classic KIE Session API with `KieClasspathContainer` and `kmodule.xml` confirmed working. DRL rules fire in salience order.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

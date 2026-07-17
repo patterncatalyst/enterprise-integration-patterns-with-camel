@@ -1,6 +1,6 @@
 # Appendix C: Pulsar Deep Dive
 
-Demonstrates advanced Apache Pulsar patterns with Camel Quarkus, covering subscription types that control how messages are distributed across consumers, per-key ordering guarantees, and dead letter topic handling for messages that exhaust their redelivery attempts.
+Demonstrates advanced Apache Pulsar patterns with Apache Camel, covering subscription types that control how messages are distributed across consumers, per-key ordering guarantees, and dead letter topic handling for messages that exhaust their redelivery attempts. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Shared subscription** -- competing consumers where Pulsar distributes messages round-robin across multiple consumer instances attached to the same subscription
 - **Key_Shared subscription** -- per-key ordering that ensures all messages with the same key (e.g., the same order ID) are always delivered to the same consumer instance
@@ -12,8 +12,13 @@ Demonstrates advanced Apache Pulsar patterns with Camel Quarkus, covering subscr
 # Start the infrastructure stack (Pulsar required)
 ./scripts/setup-stack.sh
 
-cd examples/21-pulsar-deep-dive
+# Quarkus
+cd examples/21-pulsar-deep-dive/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/21-pulsar-deep-dive/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -45,4 +50,4 @@ podman exec -it pulsar bin/pulsar-admin topics subscriptions persistent://public
 
 ---
 
-*Verification status: unverified.*
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

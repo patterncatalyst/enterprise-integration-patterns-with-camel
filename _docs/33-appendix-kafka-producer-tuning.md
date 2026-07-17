@@ -8,7 +8,21 @@ duration: "20 minutes"
 
 Appendix N covered the consumer side — fetch sizes, poll intervals, and offset commits. This appendix covers the producer: how Camel's Kafka component batches, compresses, and delivers messages, and which configuration properties control the tradeoffs between throughput, latency, and durability.
 
-The code is in `examples/33-kafka-producer-tuning/`. The `README.md` there covers how to run it.
+The code is in `examples/33-kafka-producer-tuning/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/33-kafka-producer-tuning/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/33-kafka-producer-tuning/spring-boot
+mvn spring-boot:run
+```
 
 ## The producer pipeline
 
@@ -220,5 +234,4 @@ from("direct:publish-order")
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37 / Camel 4.20 / Java 25.
-Example `33-kafka-producer-tuning` compiles and runs against the Podman stack with Kafka (KRaft).*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

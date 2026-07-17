@@ -1,6 +1,6 @@
 # Appendix F: Drools and Business Rules
 
-Demonstrates rule-based content routing using Drools 10 Rule Units with Camel Quarkus. Incoming orders are evaluated against a set of DRL rules that assign a routing decision, and Camel routes each order to the appropriate destination topic based on that decision.
+Demonstrates rule-based content routing using Drools 10 Rule Units with Apache Camel. Incoming orders are evaluated against a set of DRL rules that assign a routing decision, and Camel routes each order to the appropriate destination topic based on that decision. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Rule Unit with DRL** -- order routing logic is expressed as declarative Drools rules in a `.drl` file, evaluated via a Drools Rule Unit
 - **Rule-based content routing via Camel bean** -- a CDI bean wraps the Drools rule unit and integrates with Camel as a bean processor, setting routing headers based on rule outcomes
@@ -12,8 +12,13 @@ Demonstrates rule-based content routing using Drools 10 Rule Units with Camel Qu
 # Start the infrastructure stack (Kafka required)
 ./scripts/setup-stack.sh
 
-cd examples/24-drools-rules
+# Quarkus
+cd examples/24-drools-rules/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/24-drools-rules/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -64,4 +69,4 @@ echo '{"order_id": 1004, "customer_id": "C-400", "amount": 15000.00, "destinatio
 
 ---
 
-*Verification status: unverified.*
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

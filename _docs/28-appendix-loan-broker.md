@@ -6,9 +6,25 @@ description: "A complete EIP case study — the classic Loan Broker from Hohpe &
 duration: "45 minutes"
 ---
 
-The Loan Broker is the original end-to-end EIP case study from *Enterprise Integration Patterns*. It combines nearly every major pattern: Content-Based Router, Recipient List, Scatter-Gather, Aggregator, Message Translator, and more. This appendix rebuilds the Loan Broker with Camel on Quarkus, using Kafka as the messaging backbone — and then maps its lessons back to our shipping domain.
+The Loan Broker is the original end-to-end EIP case study from *Enterprise Integration Patterns*. It combines nearly every major pattern: Content-Based Router, Recipient List, Scatter-Gather, Aggregator, Message Translator, and more. This appendix rebuilds the Loan Broker with Camel on Quarkus and Spring Boot, using Kafka as the messaging backbone — and then maps its lessons back to our shipping domain.
 
 {% include excalidraw.html file="28-loan-broker" alt="Loan Broker Scatter-Gather architecture" caption="Figure J.1 — The Loan Broker: gateway, enricher, recipient list, bank services, and aggregator." %}
+
+The code is in `examples/loan-broker/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/loan-broker/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/loan-broker/spring-boot
+mvn spring-boot:run
+```
 
 ## The Loan Broker problem
 
@@ -181,9 +197,25 @@ from("kafka:loan.enriched?brokers=localhost:9092&groupId=loan-router")
     .recipientList(method("bankEndpointResolver", "resolve"))
     .parallelProcessing()
     .timeout(10000);
+```
 
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
 @ApplicationScoped
 @Named("bankEndpointResolver")
+public class BankEndpointResolver {
+
+    public List<String> resolve(@Header("eligibleBanks") String banks) {
+        return Arrays.stream(banks.split(","))
+            .map(bank -> "kafka:loan.bank.request." + bank + "?brokers=localhost:9092")
+            .toList();
+    }
+}
+```
+
+```java
+@Component("bankEndpointResolver")
 public class BankEndpointResolver {
 
     public List<String> resolve(@Header("eligibleBanks") String banks) {
@@ -282,6 +314,8 @@ public class BestLoanOfferStrategy implements AggregationStrategy {
 
 Return the best offer to the customer via a polling endpoint:
 
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
 ```java
 @ApplicationScoped
 public class LoanResultStore {
@@ -296,7 +330,25 @@ public class LoanResultStore {
         return Optional.ofNullable(results.get(requestId));
     }
 }
+```
 
+```java
+@Component
+public class LoanResultStore {
+
+    private final Map<String, LoanResult> results = new ConcurrentHashMap<>();
+
+    public void store(String requestId, LoanResult result) {
+        results.put(requestId, result);
+    }
+
+    public Optional<LoanResult> get(String requestId) {
+        return Optional.ofNullable(results.get(requestId));
+    }
+}
+```
+
+```java
 // Consumer that populates the result store
 from("kafka:loan.results?brokers=localhost:9092&groupId=loan-result-store")
     .routeId("loan-result-consumer")
@@ -399,4 +451,4 @@ from("kafka:eip.shipping.rate-requests?brokers=localhost:9092&groupId=carrier-sc
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

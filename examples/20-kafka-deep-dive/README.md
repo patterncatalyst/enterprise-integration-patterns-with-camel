@@ -1,6 +1,6 @@
 # Appendix B: Kafka Deep Dive
 
-Explores advanced Apache Kafka patterns with Camel Quarkus: key-based partitioning for ordered processing, transactional consume-transform-produce pipelines with manual offset control, and consumer group lag monitoring via the Kafka AdminClient.
+Explores advanced Apache Kafka patterns with Apache Camel: key-based partitioning for ordered processing, transactional consume-transform-produce pipelines with manual offset control, and consumer group lag monitoring via the Kafka AdminClient. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Key-based partitioning** -- produces orders with the order ID as the Kafka key so that all events for a given order land on the same partition, preserving per-key ordering
 - **Transactional pipeline** -- consumes from `eip.orders.placed`, enriches each order with warehouse assignment and priority, then produces to `eip.orders.enriched` with idempotent writes and manual offset commits
@@ -12,8 +12,13 @@ Explores advanced Apache Kafka patterns with Camel Quarkus: key-based partitioni
 # Start the infrastructure stack (Kafka required)
 ./scripts/setup-stack.sh
 
-cd examples/20-kafka-deep-dive
+# Quarkus
+cd examples/20-kafka-deep-dive/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/20-kafka-deep-dive/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -37,4 +42,4 @@ Requires Kafka from the Podman stack.
 
 ---
 
-*Verification status: unverified.*
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

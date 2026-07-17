@@ -1,6 +1,6 @@
 # Appendix D: Redis for Integration
 
-Demonstrates three integration patterns that use Redis alongside Apache Camel on Quarkus: cache-aside enrichment to accelerate message processing, Redis-backed idempotent consumption for exactly-once semantics, and distributed locking to coordinate scheduled tasks across instances.
+Demonstrates three integration patterns that use Redis alongside Apache Camel: cache-aside enrichment to accelerate message processing, Redis-backed idempotent consumption for exactly-once semantics, and distributed locking to coordinate scheduled tasks across instances. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Caching enrichment** -- consumes orders from Kafka, checks Redis for cached customer data, falls back to a simulated DB lookup on cache miss, and caches the result with a TTL
 - **Idempotent receiver with Redis** -- uses Redis SET NX to deduplicate payment events so that redelivered messages are safely skipped
@@ -12,8 +12,13 @@ Demonstrates three integration patterns that use Redis alongside Apache Camel on
 # Start the infrastructure stack (Kafka and Redis required)
 ./scripts/setup-stack.sh
 
-cd examples/22-redis-integration
+# Quarkus
+cd examples/22-redis-integration/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/22-redis-integration/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -39,7 +44,7 @@ Requires **Kafka** and **Redis** from the Podman stack.
 
 ## How to test
 
-1. Start the application with `mvn quarkus:dev`
+1. Start the application (Quarkus: `mvn quarkus:dev`, Spring Boot: `mvn spring-boot:run`)
 2. Produce an order to `eip.orders.placed` via Kafka UI at [http://localhost:8090](http://localhost:8090):
    ```json
    {"order_id": 1001, "customer_id": "C-042", "item_sku": "SKU-A1", "quantity": 3, "amount": 89.97}
@@ -58,4 +63,4 @@ Requires **Kafka** and **Redis** from the Podman stack.
 
 ---
 
-*Verification status: unverified.*
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

@@ -8,7 +8,21 @@ duration: "20 minutes"
 
 Appendix B introduced Kafka's core concepts — partitions, consumer groups, offsets, and exactly-once semantics. This appendix focuses on the consumer side: the configuration properties that control throughput, latency, data safety, and rebalance behavior. Every property is shown in the context of Camel's Kafka component, with guidance for the shipping domain's workload profiles.
 
-The code is in `examples/32-kafka-consumer-tuning/`. The `README.md` there covers how to run it.
+The code is in `examples/32-kafka-consumer-tuning/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/32-kafka-consumer-tuning/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/32-kafka-consumer-tuning/spring-boot
+mvn spring-boot:run
+```
 
 ## The consumer lifecycle
 
@@ -249,5 +263,4 @@ This reduces rebalance impact from "all consumers paused" to "only affected part
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37 / Camel 4.20 / Java 25.
-Example `32-kafka-consumer-tuning` compiles and runs against the Podman stack with Kafka (KRaft).*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

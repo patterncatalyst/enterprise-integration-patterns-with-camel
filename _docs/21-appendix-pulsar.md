@@ -8,7 +8,21 @@ duration: "30 minutes"
 
 Apache Pulsar appears in this tutorial wherever its features provide a better fit than Kafka: per-message TTL (Message Expiration), key-shared subscriptions (ordered competing consumers), and native schema enforcement. This appendix covers the Pulsar concepts that differentiate it from Kafka and how Camel integrates with them.
 
-The code is in `examples/21-pulsar-deep-dive/`. The `README.md` there covers how to run it.
+The code is in `examples/21-pulsar-deep-dive/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/21-pulsar-deep-dive/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/21-pulsar-deep-dive/spring-boot
+mvn spring-boot:run
+```
 
 ## Architecture
 
@@ -252,5 +266,4 @@ Key parameters for the `pulsar:` component:
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Pulsar standalone on Podman, 2026-07-11.
-All routes start and connect to Pulsar. Shared/Key\_Shared subscriptions, dead letter topics with `maxRedeliverCount`, and producer/consumer lifecycle confirmed working. Requires `camel.component.pulsar.service-url` in application.properties.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

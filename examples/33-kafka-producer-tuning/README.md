@@ -1,6 +1,6 @@
 # Kafka Producer Tuning — Appendix O Example
 
-Demonstrates four Kafka producer tuning profiles from Chapter 33 (Appendix O):
+Demonstrates four Kafka producer tuning profiles from Chapter 33 (Appendix O). Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 1. **Batched producer** — maximizes throughput with `lingerMs=100` and `batchSize=65536` to accumulate records before sending
 2. **Compressed producer** — uses LZ4 compression for large messages, reducing network bandwidth
@@ -11,12 +11,15 @@ Demonstrates four Kafka producer tuning profiles from Chapter 33 (Appendix O):
 
 ```bash
 # Start the infrastructure stack
-cd ../../
 ./scripts/setup-stack.sh
 
-# Run the example
-cd examples/33-kafka-producer-tuning
+# Quarkus
+cd examples/33-kafka-producer-tuning/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/33-kafka-producer-tuning/spring-boot
+mvn spring-boot:run
 ```
 
 Each producer profile includes a verifier consumer that confirms messages were received correctly.
@@ -27,3 +30,7 @@ Each producer profile includes a verifier consumer that confirms messages were r
 - **Compressed producer**: sends large orders with multiple items; LZ4 reduces payload size
 - **Idempotent producer**: safe to retry without duplicates — broker deduplicates using sequence numbers
 - **Synchronous producer**: blocks until all ISR replicas acknowledge; error handler catches failures
+
+---
+
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

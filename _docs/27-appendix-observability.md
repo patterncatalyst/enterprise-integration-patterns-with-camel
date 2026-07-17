@@ -8,7 +8,21 @@ duration: "25 minutes"
 
 Chapter 17 introduced the observability patterns — Control Bus, Message Store, Message History, and monitoring Wire Taps. This appendix goes deeper into the implementation: how to instrument Camel routes with OpenTelemetry, build Grafana dashboards, and trace messages across services.
 
-The code is in `examples/27-observability-stack/`. The `README.md` there covers how to run it.
+The code is in `examples/27-observability-stack/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/27-observability-stack/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/27-observability-stack/spring-boot
+mvn spring-boot:run
+```
 
 {% include excalidraw.html file="27-appendix-observability" alt="LGTM observability stack: Camel services to OTel Collector to Loki, Tempo, Mimir, and Grafana" caption="Figure I.1 — The LGTM observability pipeline: Camel services emit traces, metrics, and logs via OpenTelemetry to the OTel Collector, which fans out to Loki, Tempo, and Mimir for Grafana visualization." %}
 
@@ -186,5 +200,4 @@ kafka_consumer_group_lag{group="inventory-service", topic="eip.orders.placed"}
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Kafka on Podman, 2026-07-11.
-All seven routes start (traced pipeline, validation, enrichment, completion, metrics counter, metrics summary REST, health probe REST). `camel-quarkus-opentelemetry` and `camel-quarkus-micrometer` extensions load correctly.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

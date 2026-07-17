@@ -1,12 +1,12 @@
 # Bond Trading Case Study (Appendix K)
 
-Market Data Distribution implementation using Apache Camel on Quarkus. Raw price
+Market Data Distribution implementation using Apache Camel. Raw price
 feeds arrive from three market data sources (Bloomberg, Reuters, Exchange), each
 with its own proprietary format. Channel Adapters normalize every feed into a
 canonical price, a Normalizer aggregates the best composite bid/ask across sources
 by ISIN, and a Content-Based Router multicasts filtered prices to trading desk
 topics. A separate trade validation pipeline deduplicates and validates incoming
-orders before forwarding them for execution.
+orders before forwarding them for execution. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 ## Architecture
 
@@ -14,16 +14,17 @@ orders before forwarding them for execution.
 
 ## Running
 
-Start the infrastructure from the repository root:
-
 ```bash
+# Start the infrastructure stack (Kafka required)
 ./scripts/setup-stack.sh
-```
 
-Then run the Quarkus application in dev mode:
+# Quarkus
+cd examples/bond-trading/quarkus
+mvn quarkus:dev
 
-```bash
-cd examples/bond-trading && mvn quarkus:dev
+# Spring Boot
+cd examples/bond-trading/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -86,4 +87,4 @@ You can also inspect Kafka topics via the Kafka UI at <http://localhost:8090>.
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

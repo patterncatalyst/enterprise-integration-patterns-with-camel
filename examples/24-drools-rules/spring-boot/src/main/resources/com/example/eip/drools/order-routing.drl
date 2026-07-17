@@ -1,0 +1,35 @@
+package com.example.eip.drools;
+
+import com.example.eip.drools.Order;
+
+rule "Route hazmat orders to hazmat handler"
+    salience 40
+when
+    $o: Order(containsHazmat == true, routingDecision == null)
+then
+    $o.setRoutingDecision("hazmat");
+end
+
+rule "Route high-value international to fraud review"
+    salience 30
+when
+    $o: Order(amount >= 10000, destinationCountry != "US", routingDecision == null)
+then
+    $o.setRoutingDecision("fraud-review");
+end
+
+rule "Route express orders to priority queue"
+    salience 20
+when
+    $o: Order(amount >= 500, routingDecision == null)
+then
+    $o.setRoutingDecision("express");
+end
+
+rule "Default routing"
+    salience 10
+when
+    $o: Order(routingDecision == null)
+then
+    $o.setRoutingDecision("standard");
+end

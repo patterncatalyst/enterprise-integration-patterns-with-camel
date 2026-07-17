@@ -10,6 +10,22 @@ The Loan Broker (Appendix J) showed how Scatter-Gather solves comparison shoppin
 
 {% include excalidraw.html file="29-bond-trading" alt="Bond Trading market data distribution" caption="Figure K.1 — Bond Trading: multiple feeds normalized, filtered per desk, traded, and audited." %}
 
+The code is in `examples/bond-trading/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/bond-trading/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/bond-trading/spring-boot
+mvn spring-boot:run
+```
+
 ## The bond trading problem
 
 A trading desk needs:
@@ -117,6 +133,8 @@ from("kafka:bond.feed.raw.reuters?brokers=localhost:9092&groupId=feed-normalizer
 
 **Pattern: Channel Adapter + Message Translator.** Each adapter translates a source-specific format into the canonical `CanonicalPrice` record. The normalizer beans handle identifier mapping (Bloomberg FIGI → ISIN), field renaming, and yield calculation.
 
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
 ```java
 @ApplicationScoped
 @Named("bloombergNormalizer")
@@ -124,6 +142,30 @@ public class BloombergNormalizer {
 
     @Inject
     @Named("isinMapper")
+    Map<String, String> figiToIsin;
+
+    public CanonicalPrice normalize(RawPriceUpdate raw) {
+        String isin = figiToIsin.getOrDefault(raw.bondId(), raw.bondId());
+        double bidYield = priceToYield(raw.bidPrice(), /* coupon, maturity from reference data */);
+        double askYield = priceToYield(raw.askPrice(), /* coupon, maturity from reference data */);
+        return new CanonicalPrice(
+            isin, /* issuer from ref data */, /* type from ref data */,
+            "USD", /* coupon */, /* maturity */,
+            raw.bidPrice(), raw.askPrice(),
+            bidYield, askYield,
+            raw.bidSize(), raw.askSize(),
+            "bloomberg", raw.sourceTimestamp()
+        );
+    }
+}
+```
+
+```java
+@Component("bloombergNormalizer")
+public class BloombergNormalizer {
+
+    @Autowired
+    @Qualifier("isinMapper")
     Map<String, String> figiToIsin;
 
     public CanonicalPrice normalize(RawPriceUpdate raw) {
@@ -392,4 +434,4 @@ Two case studies, two different shapes of the same patterns — proving that EIP
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

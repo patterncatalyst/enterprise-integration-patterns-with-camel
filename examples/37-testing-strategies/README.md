@@ -1,8 +1,8 @@
 # EIP Testing Strategies
 
-Three-tier testing strategy for Camel Quarkus routes — unit tests with MockEndpoint and AdviceWith, integration tests with Dev Services and REST Assured, and black-box API tests with Newman.
+Three-tier testing strategy for Camel routes — unit tests with MockEndpoint and AdviceWith, integration tests with Dev Services and REST Assured, and black-box API tests with Newman. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
-Companion code for **Appendix S: Testing Strategies for Camel Quarkus**.
+Companion code for **Appendix S: Testing Strategies**.
 
 ## What's inside
 
@@ -34,12 +34,24 @@ Companion code for **Appendix S: Testing Strategies for Camel Quarkus**.
 ### Tier 1 — Unit tests (no infrastructure needed)
 
 ```bash
+# Quarkus
+cd examples/37-testing-strategies/quarkus
+mvn test
+
+# Spring Boot
+cd examples/37-testing-strategies/spring-boot
 mvn test
 ```
 
 ### Tier 2 — Integration tests (Dev Services auto-starts Kafka)
 
 ```bash
+# Quarkus
+cd examples/37-testing-strategies/quarkus
+mvn verify
+
+# Spring Boot
+cd examples/37-testing-strategies/spring-boot
 mvn verify
 ```
 
@@ -48,7 +60,13 @@ mvn verify
 Start the app in one terminal:
 
 ```bash
+# Quarkus
+cd examples/37-testing-strategies/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/37-testing-strategies/spring-boot
+mvn spring-boot:run
 ```
 
 In another terminal:
@@ -64,6 +82,6 @@ Or via Maven (requires Newman installed):
 mvn verify -Pnewman
 ```
 
-## Verification status
+---
 
-Verification status: **unverified**.
+*Verification status: unverified. Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

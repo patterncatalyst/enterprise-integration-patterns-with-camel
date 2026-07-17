@@ -10,7 +10,21 @@ Chapter 18 introduced the Test Message pattern — runtime health checks that ve
 
 Integration-heavy Camel applications need a different testing strategy than typical web apps. Routes wire together Kafka, databases, HTTP services, and CDI beans — testing all of that end-to-end for every change is slow and fragile. The solution is a three-tier pyramid: fast unit tests at the base, integration tests in the middle, and external API tests at the top.
 
-The code is in `examples/37-testing-strategies/`. The `README.md` there covers how to run each tier.
+The code is in `examples/37-testing-strategies/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/37-testing-strategies/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/37-testing-strategies/spring-boot
+mvn spring-boot:run
+```
 
 {% include excalidraw.html file="37-appendix-testing-strategies" alt="Testing pyramid with three tiers — unit tests at the base, integration tests in the middle, Newman at the top" caption="Figure S.1 — The testing pyramid for Camel Quarkus: unit tests are fast and many, integration tests verify real infrastructure, Newman tests validate external API contracts." %}
 
@@ -77,6 +91,8 @@ from("direct:validate-order")
 
 The test:
 
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
 ```java
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -84,6 +100,48 @@ class OrderValidationRouteTest {
 
     @Inject CamelContext camelContext;
     @Inject ProducerTemplate producer;
+
+    @BeforeAll
+    void adviceRoutes() throws Exception {
+        AdviceWith.adviceWith(camelContext, "domestic-handler", route -> {
+            route.weaveAddLast().to("mock:domestic");
+        });
+        AdviceWith.adviceWith(camelContext, "international-handler", route -> {
+            route.weaveAddLast().to("mock:international");
+        });
+        AdviceWith.adviceWith(camelContext, "hazmat-handler", route -> {
+            route.weaveAddLast().to("mock:hazmat");
+        });
+    }
+
+    @BeforeEach
+    void resetMocks() {
+        MockEndpoint.resetMocks(camelContext);
+    }
+
+    @Test
+    void domesticOrderRoutesToDomestic() throws Exception {
+        MockEndpoint domestic = camelContext.getEndpoint(
+            "mock:domestic", MockEndpoint.class);
+        domestic.expectedMessageCount(1);
+
+        producer.sendBody("direct:validate-order",
+            "{\"order_id\": 1001, \"country\": \"US\", " +
+            "\"shipping_type\": \"STANDARD\", \"amount\": 59.99}");
+
+        domestic.assertIsSatisfied();
+    }
+}
+```
+
+```java
+@SpringBootTest
+@CamelSpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class OrderValidationRouteTest {
+
+    @Autowired CamelContext camelContext;
+    @Autowired ProducerTemplate producer;
 
     @BeforeAll
     void adviceRoutes() throws Exception {
@@ -539,7 +597,7 @@ Appendix C showed how `mvn quarkus:dev` runs tests continuously as you code. Pre
 %test.quarkus.kafka.devservices.enabled=false
 ```
 
-**Newman assumes the app is running.** Unlike REST Assured (which starts the app via `@QuarkusTest`), Newman is an external process. Start the app with `mvn quarkus:dev` in one terminal before running Newman in another. For CI, use Quarkus's Failsafe integration to start/stop the app around the `integration-test` phase.
+**Newman assumes the app is running.** Unlike REST Assured (which starts the app via `@QuarkusTest`), Newman is an external process. Start the app with `mvn quarkus:dev` (Quarkus) or `mvn spring-boot:run` (Spring Boot) in one terminal before running Newman in another. For CI, use Quarkus's Failsafe integration to start/stop the app around the `integration-test` phase.
 
 **CamelQuarkusTestSupport is JVM-only.** It cannot be used with `@QuarkusIntegrationTest` (which tests the packaged artifact without CDI). For native image testing, use REST Assured assertions only.
 
@@ -565,4 +623,4 @@ Appendix C showed how `mvn quarkus:dev` runs tests continuously as you code. Pre
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0, Java 25 (2026-07-12). 14 tests pass: 10 unit (mvn test) + 4 integration (mvn verify).*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

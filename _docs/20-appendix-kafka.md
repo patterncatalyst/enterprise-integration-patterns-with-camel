@@ -8,7 +8,21 @@ duration: "25 minutes"
 
 Kafka is the backbone of the shipping domain's event-driven architecture. This appendix covers the Kafka concepts that integration architects need beyond the basics — partitioning strategy, consumer group mechanics, exactly-once delivery, and operational patterns.
 
-The code is in `examples/20-kafka-deep-dive/`. The `README.md` there covers how to run it.
+The code is in `examples/20-kafka-deep-dive/`.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/20-kafka-deep-dive/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/20-kafka-deep-dive/spring-boot
+mvn spring-boot:run
+```
 
 ## Architecture recap
 
@@ -167,5 +181,4 @@ Key metrics to watch:
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> on Quarkus 3.37.0, Camel 4.20.0, Java 25, Kafka (KRaft) on Podman, 2026-07-11.
-All three routes (partitioned producer, transactional pipeline, consumer lag monitor) start and process orders. Kafka partitioning, offset commits, and consumer group monitoring confirmed working.*
+*Verification status: <span class="status status--verified">verified</span> against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

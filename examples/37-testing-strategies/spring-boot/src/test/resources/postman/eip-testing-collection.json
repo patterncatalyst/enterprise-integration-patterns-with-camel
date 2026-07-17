@@ -1,0 +1,203 @@
+{
+  "info": {
+    "name": "EIP Testing Strategies",
+    "_postman_id": "eip-testing-37",
+    "description": "Black-box API tests for the EIP Testing Strategies example (Appendix S).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Liveness probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/q/health/live",
+              "host": ["{{baseUrl}}"],
+              "path": ["q", "health", "live"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Liveness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Status is UP', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Readiness probe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/q/health/ready",
+              "host": ["{{baseUrl}}"],
+              "path": ["q", "health", "ready"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Readiness returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Status is UP', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('UP');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Payment Gateway",
+      "item": [
+        {
+          "name": "Process valid payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"order_id\": 7001, \"amount\": 149.99, \"card_token\": \"tok_test_visa\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/process",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "process"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Payment returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Status is APPROVED', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('APPROVED');",
+                  "});",
+                  "pm.test('Gateway is MOCK', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.gateway).to.eql('MOCK');",
+                  "});",
+                  "pm.test('Has transaction ID', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.transaction_id).to.not.be.undefined;",
+                  "});",
+                  "pm.test('Response time under 2s', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process empty payment body",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/process",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "process"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Empty body still returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Gateway processes request', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.gateway).to.eql('MOCK');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Process large payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"order_id\": 7002, \"amount\": 9999.99, \"card_token\": \"tok_test_amex\", \"currency\": \"USD\"}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/process",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "process"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Large payment returns 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Large payment is approved', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql('APPROVED');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
