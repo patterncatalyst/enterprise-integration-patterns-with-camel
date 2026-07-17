@@ -227,14 +227,19 @@ When you run the examples in later chapters, you'll follow a consistent pattern:
 4. **Produce a trigger** — Send an HTTP request, publish a message to a Kafka topic using the Kafka UI at `http://localhost:8090`, or drop a file into a watched directory.
 5. **Observe the flow** — Watch the Camel logs, check the database, browse Kafka topics in the UI, or (with the LGTM stack) trace the message flow across services in Grafana.
 
-For the full-stack case studies and multi-service examples, you'll use the promoted Quarkus projects in `examples/`:
+For the full-stack case studies and multi-service examples, you'll use the projects in `examples/`. Core chapters provide both Quarkus and Spring Boot variants:
 
 ```bash
-cd examples/09-routing-fundamentals
+# Quarkus
+cd examples/09-routing-fundamentals/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/09-routing-fundamentals/spring-boot
+mvn spring-boot:run
 ```
 
-The Camel CLI's `camel export --runtime=quarkus` command is how these promoted projects were created — a single route file becomes a full Quarkus application with CDI, configuration, container packaging, and all the production concerns that a prototype doesn't need.
+The Camel CLI's `camel export` command is how these projects were created — a single route file becomes a full application with dependency injection, configuration, container packaging, and all the production concerns that a prototype doesn't need. Use `--runtime=quarkus` or `--runtime=spring-boot` to choose your target.
 
 Every pattern chapter follows this loop: understand the pattern, see how Camel implements it, run it with `camel run`, and observe what happens. The domain is simple enough that the patterns stay in focus, but rich enough that the examples feel real.
 

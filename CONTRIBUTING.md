@@ -10,7 +10,7 @@ _parts/         — part index pages
 _layouts/       — Jekyll layouts
 _includes/      — Jekyll includes
 assets/         — CSS, diagrams (SVG + Excalidraw source)
-examples/       — runnable Camel Quarkus projects
+examples/       — runnable Camel projects (Quarkus + Spring Boot variants)
   _infra/       — Podman compose stack
   domain-model/ — shared canonical entities
 presentations/  — EIP 101 + EIP 201 PPTX decks
@@ -19,7 +19,7 @@ scripts/        — setup-stack.sh, generate_diagram.py
 
 ## Conventions
 
-- **Java DSL only** — no YAML DSL or XML DSL in code examples
+- **Java DSL** — route examples use Camel's Java DSL on both Quarkus and Spring Boot
 - **Shipping domain** — all examples use orders, inventory, payments, shipping, notifications
 - **Chapter front matter** — `title`, `order`, `part`, `description`, `duration`; the `part` value must match a `_parts` file's `part_name`
 - **Quote YAML values with colons** — unquoted colons in front matter break the Jekyll build
@@ -35,14 +35,14 @@ bundle exec jekyll serve
 ## Running examples
 
 ```bash
-./scripts/setup-stack.sh          # start infrastructure
-cd examples/<name>
-mvn quarkus:dev                   # start with live reload
+./scripts/setup-stack.sh                    # start infrastructure
+cd examples/<name>/quarkus && mvn quarkus:dev       # Quarkus with live reload
+cd examples/<name>/spring-boot && mvn spring-boot:run  # Spring Boot
 ```
 
 ## Adding an example
 
-1. Create `examples/<chapter>-<name>/` with a standard Quarkus project
+1. Create `examples/<chapter>-<name>/` with `quarkus/` and `spring-boot/` subdirectories
 2. Use `examples/domain-model` as a dependency for shared types
 3. Add the example to the CI matrix in `.github/workflows/examples.yml`
 4. Add a row to the examples table in `README.md`

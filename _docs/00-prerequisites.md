@@ -38,11 +38,11 @@ java -version
 
 ### Why Java 25?
 
-Java 25 is the current LTS release (after 21), and brings meaningful improvements for integration workloads: JDK 24 eliminated `synchronized` monitor pinning for virtual threads, JDK 25 finalized `ScopedValue` for lightweight context propagation, and the overall runtime is faster and leaner. Quarkus 3.31+ fully supports Java 25. We target the LTS because it's the version you'll use in production. Quarkus *does* support GraalVM native compilation, and several Camel components have native support, but native builds add compilation time and reduce the set of components available at runtime. We'll use JVM mode throughout this tutorial and note where native is an option.
+Java 25 is the current LTS release (after 21), and brings meaningful improvements for integration workloads: JDK 24 eliminated `synchronized` monitor pinning for virtual threads, JDK 25 finalized `ScopedValue` for lightweight context propagation, and the overall runtime is faster and leaner. Both Quarkus 3.31+ and Spring Boot 4.0+ fully support Java 25. We target the LTS because it's the version you'll use in production. Quarkus *does* support GraalVM native compilation, and several Camel components have native support, but native builds add compilation time and reduce the set of components available at runtime. We'll use JVM mode throughout this tutorial and note where native is an option.
 
 ## JBang & the Camel CLI
 
-**JBang** lets you run Java source files directly — no project scaffolding, no `pom.xml`, no build step. The **Camel CLI** (`camel`), installed through JBang, is the fastest way to run, test, and explore Camel routes. Most pattern examples in this tutorial are single route files that you run with `camel run` — no Maven project required. When you're ready to promote a prototype into a full Quarkus application, `camel export` generates the project for you.
+**JBang** lets you run Java source files directly — no project scaffolding, no `pom.xml`, no build step. The **Camel CLI** (`camel`), installed through JBang, is the fastest way to run, test, and explore Camel routes. Most pattern examples in this tutorial are single route files that you run with `camel run` — no Maven project required. When you're ready to promote a prototype into a full Quarkus or Spring Boot application, `camel export` generates the project for you.
 
 ### Installing JBang
 
@@ -86,6 +86,7 @@ The Camel CLI is how you'll interact with most examples in this tutorial:
 | `camel run --dev route.yaml` | Run with live reload — edit the file, Camel restarts automatically |
 | `camel init hello.yaml` | Scaffold a new route file from a template |
 | `camel export --runtime=quarkus` | Export route files to a full Quarkus Maven project |
+| `camel export --runtime=spring-boot` | Export route files to a full Spring Boot Maven project |
 | `camel get` | Inspect running routes (endpoints, statistics) |
 | `camel trace` | Trace messages flowing through routes |
 | `camel top` | Live performance view of running routes |
@@ -109,13 +110,13 @@ The development loop for most chapters looks like this:
 
 1. **Prototype with `camel run`** — Write a route in a single file (YAML, Java, or XML DSL) and run it directly. No project, no POM, no build. Use `--dev` for live reload while you iterate.
 2. **Inspect with `camel get` / `camel trace`** — See what routes are active, trace messages through them, monitor throughput.
-3. **Promote with `camel export`** — When a route is ready for the full stack (CDI injection, Quarkus config, database integration, container packaging), export it to a Quarkus project.
+3. **Promote with `camel export`** — When a route is ready for the full stack (dependency injection, runtime config, database integration, container packaging), export it to a Quarkus or Spring Boot project.
 
-This keeps the feedback loop tight — seconds, not minutes — while you're learning patterns. The full Quarkus projects in `examples/` are the promoted versions of these prototypes.
+This keeps the feedback loop tight — seconds, not minutes — while you're learning patterns. The projects in `examples/` are the promoted versions of these prototypes, available in both Quarkus and Spring Boot variants.
 
 ## Apache Maven
 
-Maven 3.9+ is the build tool for the full Quarkus projects in this tutorial. You won't need Maven for most pattern examples (those run directly with `camel run`), but you'll need it when you work with the promoted Quarkus projects in `examples/` and for the case study implementations.
+Maven 3.9+ is the build tool for the Quarkus and Spring Boot projects in this tutorial. You won't need Maven for most pattern examples (those run directly with `camel run`), but you'll need it when you work with the full projects in `examples/` and for the case study implementations.
 
 ### Installing with SDKMAN
 
@@ -139,13 +140,15 @@ export JAVA_HOME=$(sdk home java 25.0.2-tem)
 
 ### Maven settings for this tutorial
 
-No special `settings.xml` is needed. All dependencies come from Maven Central, and the Quarkus BOM manages version alignment. The promoted Quarkus projects inherit from a parent POM that locks these versions:
+No special `settings.xml` is needed. All dependencies come from Maven Central, and the runtime BOMs manage version alignment. The projects lock these versions:
 
 | Dependency | Version |
 |-----------|---------|
 | Apache Camel | 4.20.0 |
 | Camel Quarkus | 3.36.0 |
 | Quarkus | 3.37.0 |
+| Camel Spring Boot | 4.20.0 |
+| Spring Boot | 4.0.7 |
 | Camel CLI (JBang) | 4.20.0 |
 | Drools | 10.2.0 |
 
@@ -235,7 +238,7 @@ cd enterprise-integration-patterns-with-camel
 
 ## IDE setup
 
-Any IDE with Java 25 support will work. We recommend either **VS Code** or **IntelliJ IDEA** — both have excellent Quarkus extensions that provide live reload, configuration assistance, and route visualization.
+Any IDE with Java 25 support will work. We recommend either **VS Code** or **IntelliJ IDEA** — both have excellent Quarkus and Spring Boot extensions that provide live reload, configuration assistance, and route visualization.
 
 ### VS Code
 
@@ -244,16 +247,17 @@ Install the following extensions:
 | Extension | Purpose |
 |-----------|---------|
 | **Quarkus** (`redhat.vscode-quarkus`) | Dev mode, config completion, deployment descriptors |
+| **Spring Boot Extension Pack** (`vmware.vscode-boot-dev-pack`) | Spring Boot support, config completion |
 | **Language Support for Java** (`redhat.java`) | Java language server |
 | **XML** (`redhat.vscode-xml`) | XML DSL syntax and validation |
 | **YAML** (`redhat.vscode-yaml`) | YAML DSL syntax and validation |
 | **Apache Camel** (`redhat.vscode-apache-camel`) | Camel route completion, endpoint URI validation |
 
-Open the project root folder in VS Code. The Quarkus extension will detect the Maven projects and offer to start dev mode.
+Open the project root folder in VS Code. The Quarkus and Spring Boot extensions will detect the Maven projects and offer to start dev mode.
 
 ### IntelliJ IDEA
 
-IntelliJ IDEA Ultimate includes built-in Quarkus support. Community Edition users should install the **Quarkus Tools** plugin from the JetBrains Marketplace.
+IntelliJ IDEA Ultimate includes built-in Quarkus and Spring Boot support. Community Edition users should install the **Quarkus Tools** plugin from the JetBrains Marketplace.
 
 Additional useful plugins:
 
@@ -269,7 +273,7 @@ Import the project as a Maven project. IntelliJ will resolve dependencies and in
 Regardless of your IDE:
 - Set the project SDK to Java 25.
 - Make sure Maven uses the same JDK (check IDE Maven settings).
-- Enable annotation processing (Quarkus uses it for CDI bean generation).
+- Enable annotation processing (both Quarkus and Spring Boot use it for bean generation).
 
 ## The local stack
 
@@ -359,7 +363,7 @@ podman-compose -f examples/_infra/compose.yaml down -v
 
 - Java 25 via SDKMAN, Maven 3.9+, and how to ensure they're wired together.
 - JBang and the Camel CLI — the fastest way to run, inspect, and prototype Camel routes from single files.
-- The tutorial workflow: prototype with `camel run --dev`, inspect with `camel get` / `camel trace`, promote with `camel export --runtime=quarkus`.
+- The tutorial workflow: prototype with `camel run --dev`, inspect with `camel get` / `camel trace`, promote with `camel export --runtime=quarkus` (or `--runtime=spring-boot`).
 - Podman and podman-compose for rootless container management.
 - The two-tier local stack: base infrastructure and optional LGTM observability.
 - How to verify that every service is healthy and ready.

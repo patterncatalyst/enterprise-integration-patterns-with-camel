@@ -1,6 +1,6 @@
 # Chapter 12: Transformation
 
-Demonstrates the three core transformation patterns as a connected pipeline: translate external formats to canonical, enrich with product data from Redis, then filter sensitive fields for analytics.
+Demonstrates the three core transformation patterns as a connected pipeline: translate external formats to canonical, enrich with product data from Redis, then filter sensitive fields for analytics. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations, DI annotations, and Redis client configuration differ.
 
 - **Message Translator** — converts external partner order format (`orderNumber`/`clientRef`/`productCode`) to canonical internal format (`order_id`/`customer_id`/`item_sku`)
 - **Content Enricher** — uses `.enrich("direct:redis-product-lookup", strategy)` to look up product details from Redis by SKU and merge `product_name`, `category`, `weight_kg`, `shipping_zone` into the order
@@ -12,13 +12,18 @@ Demonstrates the three core transformation patterns as a connected pipeline: tra
 # From repo root — start the infrastructure stack
 ./scripts/setup-stack.sh
 
-# Run the example
-cd examples/12-transformation && mvn quarkus:dev
+# Quarkus
+cd examples/12-transformation/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/12-transformation/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
 
-Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCatalog` CDI `@Startup` bean seeds product data into Redis hashes.
+Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCatalog` bean seeds product data into Redis hashes (Quarkus uses CDI `@Startup`; Spring Boot uses `@PostConstruct`).
 
 ## Data flow
 
@@ -65,4 +70,4 @@ Follow the message through all three stages: `eip.orders.placed` (translated), `
 Each key is a Redis hash with fields: `name`, `price`, `category`, `weight_kg`, `shipping_zone`. Unknown SKUs return defaults: "Unknown Product", General, 1.0kg, ZONE-1.
 
 ---
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

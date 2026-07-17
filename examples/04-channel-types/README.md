@@ -1,6 +1,6 @@
 # Chapter 4: Channel Types
 
-Demonstrates six messaging channel patterns with Apache Camel on Quarkus, showing the same Point-to-Point and Publish-Subscribe concepts implemented across Kafka, Pulsar, and Redis:
+Demonstrates six messaging channel patterns with Apache Camel, showing the same Point-to-Point and Publish-Subscribe concepts implemented across Kafka, Pulsar, and Redis. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Point-to-Point Channel** — a single consumer group (`p2p-order-processor`) ensures each order is processed by exactly one consumer
 - **Publish-Subscribe Channel** — three independent consumer groups (`subscriber-inventory`, `subscriber-notification`, `subscriber-analytics`) on the same topic, each receives every message
@@ -15,8 +15,13 @@ Demonstrates six messaging channel patterns with Apache Camel on Quarkus, showin
 # Start the full infrastructure stack (Kafka + Pulsar + Redis required)
 ./scripts/setup-stack.sh
 
-cd examples/04-channel-types
+# Quarkus
+cd examples/04-channel-types/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/04-channel-types/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -64,4 +69,4 @@ Open Kafka UI at [http://localhost:8090](http://localhost:8090) to inspect topic
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

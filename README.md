@@ -22,7 +22,7 @@ cd enterprise-integration-patterns-with-camel
 # Start the local stack
 ./scripts/setup-stack.sh
 
-# Run a Camel Quarkus example
+# Run a Quarkus example
 cd examples/09-routing-fundamentals/quarkus
 mvn quarkus:dev
 

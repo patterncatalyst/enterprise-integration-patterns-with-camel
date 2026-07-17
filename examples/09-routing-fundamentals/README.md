@@ -1,6 +1,6 @@
 # Chapter 9: Routing Fundamentals
 
-Demonstrates four core routing patterns with Apache Camel on Quarkus. A timer-driven generator publishes orders to Kafka every five seconds, cycling through destination countries and occasionally flagging hazardous materials. Downstream routes show how Camel's fluent Java DSL routes, filters, splits, and fans out messages based on content.
+Demonstrates four core routing patterns with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ. A timer-driven generator publishes orders to Kafka every five seconds, cycling through destination countries and occasionally flagging hazardous materials. Downstream routes show how Camel's fluent Java DSL routes, filters, splits, and fans out messages based on content.
 
 - **Content-Based Router** -- routes orders by `contains_hazmat` flag and `destination_country` using `.choice()` to hazmat, international, or domestic topics.
 - **Message Filter** -- filters to keep only high-value orders (amount >= $100) using `.filter()`.
@@ -13,8 +13,13 @@ Demonstrates four core routing patterns with Apache Camel on Quarkus. A timer-dr
 # From repository root
 ./scripts/setup-stack.sh
 
-cd examples/09-routing-fundamentals
+# Quarkus
+cd examples/09-routing-fundamentals/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/09-routing-fundamentals/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -51,4 +56,4 @@ There are no REST endpoints. The demo data generator starts automatically and pr
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

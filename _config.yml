@@ -3,7 +3,7 @@
 # ────────────────────────────────────────────────────────────────────────────
 
 title: "Enterprise Integration Patterns with Apache Camel"
-description: "A comprehensive guide to the 65 Enterprise Integration Patterns — implemented with Apache Camel, Quarkus, Kafka, Pulsar, and Redis, with runnable examples on Podman."
+description: "A comprehensive guide to the 65 Enterprise Integration Patterns — implemented with Apache Camel on Quarkus and Spring Boot, backed by Kafka, Pulsar, and Redis, with runnable examples on Podman."
 brand_emoji: "🔀"
 
 github_username: "patterncatalyst"
