@@ -6,7 +6,21 @@ description: "Routing Slip, Process Manager, and Scatter-Gather — multi-step r
 duration: "45 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/10-composed-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/10-composed-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/10-composed-routing/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/10-composed-routing/spring-boot
+mvn spring-boot:run
+```
 
 The previous chapter covered the building blocks: content-based router, filter, recipient list, and splitter. Each makes a single routing decision. But real workflows involve *sequences* of decisions: this order needs to go through fraud check, *then* inventory reservation, *then* payment — but the specific sequence depends on the order type, the customer tier, and the product category. The sequence isn't hardcoded; it's determined at runtime.
 
@@ -346,4 +360,4 @@ Next: Advanced Routing — Dynamic Router, Wire Tap, Resequencer, Composed Messa
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

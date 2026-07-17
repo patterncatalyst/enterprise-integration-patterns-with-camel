@@ -6,7 +6,21 @@ description: "Dynamic Router, Wire Tap, Resequencer, Composed Message Processor,
 duration: "40 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/11-advanced-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/11-advanced-routing) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/11-advanced-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/11-advanced-routing) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/11-advanced-routing/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/11-advanced-routing/spring-boot
+mvn spring-boot:run
+```
 
 The previous two chapters covered the most common routing patterns. This chapter rounds out the routing catalog with five patterns that address specific challenges: routing decisions that change at runtime, observability without disrupting the flow, reordering out-of-sequence messages, processing composite messages efficiently, and distributing load across multiple processing nodes.
 
@@ -37,10 +51,48 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=dynamic-routing")
     .routeId("dynamic-router")
     .unmarshal().json(Map.class)
     .dynamicRouter(method(OrderRoutingBean.class, "route"));
+```
 
-// The bean is called repeatedly until it returns null
+The bean is called repeatedly until it returns `null`:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
 @ApplicationScoped
 @Named("orderRoutingBean")
+public class OrderRoutingBean {
+
+    public String route(@Body Map<String, Object> order,
+                        @ExchangeProperties Map<String, Object> properties) {
+        // Track which step we're on
+        int step = (int) properties.getOrDefault("routingStep", 0);
+        properties.put("routingStep", step + 1);
+
+        return switch (step) {
+            case 0 -> "direct:validate";
+            case 1 -> {
+                // Dynamic decision based on validation result
+                Boolean valid = (Boolean) properties.get("validated");
+                yield valid ? "direct:check-inventory" : "direct:reject-order";
+            }
+            case 2 -> {
+                Boolean inStock = (Boolean) properties.get("inStock");
+                if (!inStock) yield "direct:backorder";
+                double amount = ((Number) order.get("amount")).doubleValue();
+                yield amount >= 10000 ? "direct:fraud-review" : "direct:process-payment";
+            }
+            case 3 -> {
+                Boolean fraudCleared = (Boolean) properties.getOrDefault("fraudCleared", true);
+                yield fraudCleared ? "direct:schedule-shipping" : "direct:cancel-order";
+            }
+            default -> null; // Stop routing
+        };
+    }
+}
+```
+
+```java
+@Component("orderRoutingBean")
 public class OrderRoutingBean {
 
     public String route(@Body Map<String, Object> order,
@@ -355,4 +407,4 @@ This completes Part 5 — Message Routing (12 patterns across 3 chapters). Next:
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

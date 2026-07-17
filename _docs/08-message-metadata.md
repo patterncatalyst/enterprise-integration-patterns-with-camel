@@ -6,7 +6,21 @@ description: "Request-reply, correlation identifiers, return addresses, message 
 duration: "45 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/08-message-metadata/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/08-message-metadata) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/08-message-metadata/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/08-message-metadata) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/08-message-metadata/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/08-message-metadata/spring-boot
+mvn spring-boot:run
+```
 
 A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations — without coupling sender and receiver.
 
@@ -426,4 +440,4 @@ This completes Part 4 — Message Construction. Next: Part 5 — Message Routing
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

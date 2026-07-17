@@ -1,6 +1,6 @@
 # Chapter 16: Endpoint Management
 
-Demonstrates four patterns for managing how application code interacts with messaging endpoints, covering API abstraction, content-based filtering, stale message cleanup, and wire-to-domain mapping.
+Demonstrates four patterns for managing how application code interacts with messaging endpoints, covering API abstraction, content-based filtering, stale message cleanup, and wire-to-domain mapping. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Messaging Gateway** — `OrderMessagingGateway` CDI bean wraps `FluentProducerTemplate` behind domain methods (`publishOrderPlaced`, `requestInventoryCheck`) so application code never touches Camel APIs
 - **Selective Consumer** — Inspects `containsHazmat` header and only accepts non-hazmat orders
@@ -10,11 +10,16 @@ Demonstrates four patterns for managing how application code interacts with mess
 ## Running
 
 ```bash
-# From the repository root — start the infrastructure stack
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-# Start the example
-cd examples/16-endpoint-management && mvn quarkus:dev
+# Quarkus
+cd examples/16-endpoint-management/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/16-endpoint-management/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -44,4 +49,4 @@ Kafka from the Podman stack.
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

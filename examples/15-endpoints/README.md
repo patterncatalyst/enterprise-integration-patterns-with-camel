@@ -1,6 +1,6 @@
 # Chapter 15: Endpoint Patterns
 
-Demonstrates four endpoint-level patterns that handle deduplication, service invocation, durable subscriptions, and transactional reliability across Kafka, Pulsar, and PostgreSQL.
+Demonstrates four endpoint-level patterns that handle deduplication, service invocation, durable subscriptions, and transactional reliability across Kafka, Pulsar, and PostgreSQL. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Idempotent Receiver (JDBC)** — `JdbcMessageIdRepository` backed by PostgreSQL deduplicates messages by `order_id` using jsonpath
 - **Service Activator** — `.bean(InventoryService.class, "checkStock")` invokes a CDI-managed service bean from within a Camel route
@@ -10,11 +10,16 @@ Demonstrates four endpoint-level patterns that handle deduplication, service inv
 ## Running
 
 ```bash
-# From the repository root — start the infrastructure stack
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-# Start the example
-cd examples/15-endpoints && mvn quarkus:dev
+# Quarkus
+cd examples/15-endpoints/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/15-endpoints/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -60,4 +65,4 @@ Kafka, Pulsar, and PostgreSQL from the Podman stack (full stack minus Redis).
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

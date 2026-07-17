@@ -1,6 +1,6 @@
 # Chapter 14: Consumer Patterns
 
-Demonstrates six consumer strategies for pulling and receiving messages from Kafka, Pulsar, and PostgreSQL, ranging from on-demand polling to parallel competing consumers and content-based dispatch.
+Demonstrates six consumer strategies for pulling and receiving messages from Kafka, Pulsar, and PostgreSQL, ranging from on-demand polling to parallel competing consumers and content-based dispatch. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Polling Consumer** — Timer fires every 10s and uses `pollEnrich` to grab the next Kafka message on demand
 - **SQL Polling Consumer** — Polls PostgreSQL every 30s for unprocessed rows, marks them as `PROCESSING`, and publishes to Kafka
@@ -12,11 +12,16 @@ Demonstrates six consumer strategies for pulling and receiving messages from Kaf
 ## Running
 
 ```bash
-# From the repository root — start the infrastructure stack
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-# Start the example
-cd examples/14-consumer-patterns && mvn quarkus:dev
+# Quarkus
+cd examples/14-consumer-patterns/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/14-consumer-patterns/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -62,4 +67,4 @@ Kafka, Pulsar, and PostgreSQL from the Podman stack (full stack minus Redis).
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

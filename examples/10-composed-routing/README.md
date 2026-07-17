@@ -1,6 +1,6 @@
 # Chapter 10: Composed Routing
 
-Demonstrates how individual routing patterns compose into larger message flows, combining scatter-gather for parallel rate comparison with routing slips for dynamic sequential processing.
+Demonstrates how individual routing patterns compose into larger message flows, combining scatter-gather for parallel rate comparison with routing slips for dynamic sequential processing. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Scatter-Gather** — multicasts shipping rate requests to FedEx, UPS, USPS in parallel with a 5s timeout; BestRateStrategy aggregation selects the lowest rate
 - **Routing Slip** — dynamically constructs a comma-separated processing pipeline based on order properties, then executes via `.routingSlip(header("orderSlip"))`
@@ -8,11 +8,16 @@ Demonstrates how individual routing patterns compose into larger message flows, 
 ## Running
 
 ```bash
-# From repo root — start the infrastructure stack
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-# Run the example
-cd examples/10-composed-routing && mvn quarkus:dev
+# Quarkus
+cd examples/10-composed-routing/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/10-composed-routing/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -52,4 +57,4 @@ Watch the best rate result appear on `eip.shipping.best-rate`.
 | `eip.orders.placed` | Incoming orders for routing slip |
 
 ---
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

@@ -6,7 +6,21 @@ description: "Test Message, Detour, Smart Proxy, and Channel Adapter management 
 duration: "35 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/18-testing-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/18-testing-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/18-testing-management/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/18-testing-management/spring-boot
+mvn spring-boot:run
+```
 
 The previous chapter covered observability — knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
 
@@ -322,4 +336,4 @@ This completes Part 8 — System Management (8 patterns across 2 chapters) — a
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

@@ -1,6 +1,6 @@
 # Chapter 11: Advanced Routing
 
-Explores five advanced routing patterns with built-in demo data generators that produce a continuous stream of test messages across all routes.
+Explores five advanced routing patterns with built-in demo data generators that produce a continuous stream of test messages across all routes. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Dynamic Router** — routes messages through a sequence of processing steps determined at runtime by a control bean that returns the next destination or null to stop
 - **Wire Tap** — sends a copy of each message to an audit channel without disrupting the main flow
@@ -11,11 +11,16 @@ Explores five advanced routing patterns with built-in demo data generators that 
 ## Running
 
 ```bash
-# From repo root — start the infrastructure stack
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-# Run the example
-cd examples/11-advanced-routing && mvn quarkus:dev
+# Quarkus
+cd examples/11-advanced-routing/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/11-advanced-routing/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -51,4 +56,4 @@ Requires Kafka from the Podman stack.
 | `eip.orders.loadbalanced` | Orders entering load balancer |
 
 ---
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

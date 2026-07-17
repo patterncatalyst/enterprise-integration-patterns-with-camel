@@ -6,7 +6,21 @@ description: "Aggregator, Normalizer, and Canonical Data Model — patterns that
 duration: "40 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/13-aggregator/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/13-aggregator/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/13-aggregator/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/13-aggregator/spring-boot
+mvn spring-boot:run
+```
 
 The previous chapter transformed individual messages — translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
 
@@ -281,4 +295,4 @@ This completes Part 6 — Message Transformation (7 patterns across 2 chapters).
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

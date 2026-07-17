@@ -1,6 +1,6 @@
 # Chapter 18: Testing and Management
 
-Demonstrates four testing and management patterns with Apache Camel on Quarkus. These patterns validate message flows at runtime, control routing behavior through configuration, and protect against downstream failures.
+Demonstrates four testing and management patterns with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ. These patterns validate message flows at runtime, control routing behavior through configuration, and protect against downstream failures.
 
 - **Test Message** — injects synthetic test orders (negative IDs, `test_message=true` header) every 30 seconds; a verifier route checks processed output and logs pass/fail; the business route filters test messages before processing
 - **Detour** — conditionally bypasses an enrichment step based on the `feature.enrichment.enabled` property
@@ -10,10 +10,16 @@ Demonstrates four testing and management patterns with Apache Camel on Quarkus. 
 ## Running
 
 ```bash
-# From the repository root
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-cd examples/18-testing-management && mvn quarkus:dev
+# Quarkus
+cd examples/18-testing-management/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/18-testing-management/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -57,4 +63,4 @@ curl -X POST http://localhost:8082/payments/process \
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

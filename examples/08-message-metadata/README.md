@@ -1,6 +1,6 @@
 # Chapter 8: Message Metadata
 
-Demonstrates four message metadata patterns with Apache Camel on Quarkus. Two timer-driven generators feed orders into Kafka, where downstream routes stamp, inspect, split, aggregate, and expire messages based on header metadata -- showing how metadata travels with the message body and drives routing decisions.
+Demonstrates four message metadata patterns with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ. Two timer-driven generators feed orders into Kafka, where downstream routes stamp, inspect, split, aggregate, and expire messages based on header metadata -- showing how metadata travels with the message body and drives routing decisions.
 
 - **Correlation Identifier** -- stamps a UUID `X-Correlation-ID` header that travels through validate, enrich, and output stages, enabling end-to-end request tracking.
 - **Message Sequence** -- splits a bulk order into individual line items carrying `CamelSplitIndex` and `CamelSplitSize` headers, then aggregates them back by `BulkOrderId`.
@@ -10,11 +10,16 @@ Demonstrates four message metadata patterns with Apache Camel on Quarkus. Two ti
 ## Running
 
 ```bash
-# From repository root
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-cd examples/08-message-metadata
+# Quarkus
+cd examples/08-message-metadata/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/08-message-metadata/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -53,4 +58,4 @@ There are no REST endpoints. Both timers start automatically. Open Kafka UI at [
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

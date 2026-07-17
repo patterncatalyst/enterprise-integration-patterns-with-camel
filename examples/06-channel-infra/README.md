@@ -1,6 +1,6 @@
 # Chapter 6: Channel Infrastructure
 
-Demonstrates channel-level infrastructure patterns with Apache Camel on Quarkus:
+Demonstrates channel-level infrastructure patterns with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Channel Adapter (Inbound)** — REST endpoint accepts HTTP orders, persists to PostgreSQL, publishes to Kafka — bridges non-messaging to messaging
 - **Channel Adapter (Outbound)** — Kafka consumer dispatches fulfilled orders to an external shipping API (simulated)
@@ -10,11 +10,16 @@ Demonstrates channel-level infrastructure patterns with Apache Camel on Quarkus:
 ## Running
 
 ```bash
-# Start the infrastructure stack (Kafka + Pulsar + PostgreSQL required)
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-cd examples/06-channel-infra
+# Quarkus
+cd examples/06-channel-infra/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/06-channel-infra/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -70,4 +75,4 @@ curl -X POST http://localhost:8082/api/orders \
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

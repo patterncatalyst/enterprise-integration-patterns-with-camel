@@ -1,6 +1,6 @@
 # Chapter 13: Structural Transformation
 
-Demonstrates aggregation with both in-memory and persistent backing stores, plus the normalizer pattern for unifying disparate partner formats into a single canonical model.
+Demonstrates aggregation with both in-memory and persistent backing stores, plus the normalizer pattern for unifying disparate partner formats into a single canonical model. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Aggregator (in-memory)** — correlates order line items by `order_id` using jsonpath, accumulates into a single order with a `line_items` list and running `total_amount`; completes after 3 items or 10s timeout
 - **Aggregator (PostgreSQL JDBC)** — same aggregation logic backed by `PostgresAggregationRepository` on PostgreSQL so in-flight aggregations survive restarts; completes after 3 items or 15s timeout
@@ -9,11 +9,16 @@ Demonstrates aggregation with both in-memory and persistent backing stores, plus
 ## Running
 
 ```bash
-# From repo root — start the infrastructure stack
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-# Run the example
-cd examples/13-aggregator && mvn quarkus:dev
+# Quarkus
+cd examples/13-aggregator/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/13-aggregator/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -92,4 +97,4 @@ All arrive in canonical format on `eip.orders.normalized`.
 | `camel_aggregation` | Managed by `PostgresAggregationRepository` for persistent in-flight aggregation state |
 
 ---
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

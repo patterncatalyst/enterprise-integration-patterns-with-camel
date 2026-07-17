@@ -6,7 +6,21 @@ description: "Durable Subscriber, Idempotent Receiver, Transactional Client, and
 duration: "40 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/15-endpoints/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/15-endpoints) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/15-endpoints/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/15-endpoints) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/15-endpoints/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/15-endpoints/spring-boot
+mvn spring-boot:run
+```
 
 The previous chapter covered how consumers receive messages. This chapter covers the other side: how producers send messages durably, how consumers guarantee exactly-once processing, how transactions span messaging and database operations, and how messaging integrates with service-oriented application code.
 
@@ -230,12 +244,22 @@ A **Service Activator** connects a message channel to application code. It recei
 
 Camel's `bean()` method and CDI integration make the service activator pattern nearly invisible:
 
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
 ```java
-// The service — plain CDI, no Camel dependency
+// Quarkus — CDI discovers the service via @ApplicationScoped
 @ApplicationScoped
 @Named("paymentProcessor")
 public class PaymentProcessor {
+```
 
+```java
+// Spring Boot — Spring discovers the service via @Component
+@Component("paymentProcessor")
+public class PaymentProcessor {
+```
+
+```java
     @Inject
     PaymentGateway gateway;
 
@@ -292,4 +316,4 @@ Next: endpoint lifecycle and management — Messaging Gateway, Channel Purger, a
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

@@ -1,6 +1,6 @@
 # Chapter 7: Message Types
 
-Demonstrates the three fundamental message types defined by Hohpe and Woolf, implemented with Apache Camel on Quarkus. Three independent timer-driven routes produce and consume Command, Document, and Event messages through Kafka, showing how each type implies a different contract between sender and receiver.
+Demonstrates the three fundamental message types defined by Hohpe and Woolf, implemented with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ. Three independent timer-driven routes produce and consume Command, Document, and Event messages through Kafka, showing how each type implies a different contract between sender and receiver.
 
 - **Command Message** -- a "do something" directive (`ProcessPayment`) sent point-to-point; the consumer executes the command and produces a result with status `PROCESSED`.
 - **Document Message** -- a "here is the data" transfer carrying a complete order record with everything the receiver needs; the consumer receives the document with no implied action.
@@ -9,11 +9,16 @@ Demonstrates the three fundamental message types defined by Hohpe and Woolf, imp
 ## Running
 
 ```bash
-# From repository root
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-cd examples/07-message-types
+# Quarkus
+cd examples/07-message-types/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/07-message-types/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -45,4 +50,4 @@ There are no REST endpoints. All three routes are timer-driven and begin produci
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

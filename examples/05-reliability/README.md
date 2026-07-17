@@ -1,6 +1,6 @@
 # Chapter 5: Channel Reliability
 
-Demonstrates error handling and guaranteed delivery with Apache Camel on Quarkus:
+Demonstrates error handling and guaranteed delivery with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
 - **Dead Letter Channel** — failed orders retry 3 times at 1-second intervals then route to `eip.orders.dlq`; a DLQ monitor route logs each failure with the exception reason
 - **Guaranteed Delivery** — Kafka producer `acks=all` ensures messages survive broker failures
@@ -8,11 +8,16 @@ Demonstrates error handling and guaranteed delivery with Apache Camel on Quarkus
 ## Running
 
 ```bash
-# Start the infrastructure stack (Kafka required)
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-cd examples/05-reliability
+# Quarkus
+cd examples/05-reliability/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/05-reliability/spring-boot
+mvn spring-boot:run
 ```
 
 This example has no demo data generator — it relies on messages on `eip.orders.placed` from other examples (e.g., Chapter 4) or external producers.
@@ -44,4 +49,4 @@ Open Kafka UI at [http://localhost:8090](http://localhost:8090) to inspect the `
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

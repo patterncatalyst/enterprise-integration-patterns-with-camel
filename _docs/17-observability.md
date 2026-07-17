@@ -6,7 +6,21 @@ description: "Control Bus, Message Store, Message History, and Wire Tap (for mon
 duration: "40 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/17-observability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/17-observability) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/17-observability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/17-observability) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/17-observability/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/17-observability/spring-boot
+mvn spring-boot:run
+```
 
 A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
 
@@ -97,11 +111,24 @@ Camel Quarkus automatically registers health checks for every route:
 // application.properties
 // camel.health.routes-enabled = true
 // camel.health.consumers-enabled = true
+```
 
-// Custom health check
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
+// Quarkus — CDI discovers the health check via @ApplicationScoped
 @ApplicationScoped
 @Readiness
 public class KafkaHealthCheck implements HealthCheck {
+```
+
+```java
+// Spring Boot — Spring discovers the health check via @Component
+@Component
+public class KafkaHealthCheck implements HealthCheck {
+```
+
+```java
     @Override
     public HealthCheckResponse call() {
         // Check Kafka connectivity
@@ -334,4 +361,4 @@ Next: testing and management patterns — Test Message, Detour, Smart Proxy, and
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

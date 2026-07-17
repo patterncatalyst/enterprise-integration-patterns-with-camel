@@ -6,7 +6,21 @@ description: "Connecting disparate systems — channel adapters, messaging bridg
 duration: "30 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/06-channel-infra/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/06-channel-infra) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/06-channel-infra/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/06-channel-infra) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/06-channel-infra/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/06-channel-infra/spring-boot
+mvn spring-boot:run
+```
 
 The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world — how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.
 
@@ -215,4 +229,4 @@ This completes Part 3 — Messaging Channels. Next, we move inside the message i
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

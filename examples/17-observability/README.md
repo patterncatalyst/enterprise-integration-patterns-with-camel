@@ -1,6 +1,6 @@
 # Chapter 17: System Management
 
-Demonstrates system management and observability patterns with Apache Camel on Quarkus. These patterns provide runtime visibility, auditing, and administrative control over running integration routes.
+Demonstrates system management and observability patterns with Apache Camel. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ. These patterns provide runtime visibility, auditing, and administrative control over running integration routes.
 
 - **Control Bus** — exposes REST endpoints to start, stop, and query the status of routes at runtime via the `controlbus` component
 - **Wire Tap** — taps order processing to send a copy of each message to an audit log topic without affecting the main flow
@@ -10,10 +10,16 @@ Demonstrates system management and observability patterns with Apache Camel on Q
 ## Running
 
 ```bash
-# From the repository root
+# Start the full infrastructure stack
 ./scripts/setup-stack.sh
 
-cd examples/17-observability && mvn quarkus:dev
+# Quarkus
+cd examples/17-observability/quarkus
+mvn quarkus:dev
+
+# Spring Boot
+cd examples/17-observability/spring-boot
+mvn spring-boot:run
 ```
 
 ## Infrastructure
@@ -77,4 +83,4 @@ curl -X POST http://localhost:8082/control/start/wiretap-order-processor
 
 ---
 
-*Verification status: verified against Quarkus 3.36.3, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*

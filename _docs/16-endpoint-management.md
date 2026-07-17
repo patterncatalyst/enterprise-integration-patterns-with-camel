@@ -6,7 +6,21 @@ description: "Messaging Gateway, Selective Consumer, Channel Purger, and Messagi
 duration: "35 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/16-endpoint-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/16-endpoint-management) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/16-endpoint-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/16-endpoint-management) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/16-endpoint-management/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/16-endpoint-management/spring-boot
+mvn spring-boot:run
+```
 
 The previous two chapters covered how consumers receive and producers send messages. This chapter completes the Messaging Endpoints catalog with four patterns that manage the boundary layer itself: abstracting messaging behind a gateway, selectively consuming from shared channels, purging stale messages, and mapping between domain objects and messages.
 
@@ -26,12 +40,22 @@ A **Messaging Gateway** hides the messaging system behind a domain-specific inte
 
 Camel's `ProducerTemplate` and `FluentProducerTemplate` are the building blocks. Wrap them in a CDI bean that exposes domain methods:
 
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
 ```java
-// The Messaging Gateway: domain-specific interface over messaging
+// Quarkus — CDI discovers the gateway via @ApplicationScoped
 @ApplicationScoped
 @Named("orderGateway")
 public class OrderMessagingGateway {
+```
 
+```java
+// Spring Boot — Spring discovers the gateway via @Component
+@Component("orderGateway")
+public class OrderMessagingGateway {
+```
+
+```java
     @Inject
     FluentProducerTemplate producer;
 
@@ -237,8 +261,23 @@ public class Order {
 }
 
 // The service method — Camel maps the Order body to the parameter
+```
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
+// Quarkus — CDI discovers the service via @ApplicationScoped
 @ApplicationScoped
 public class OrderService {
+```
+
+```java
+// Spring Boot — Spring discovers the service via @Component
+@Component
+public class OrderService {
+```
+
+```java
     public OrderResult processOrder(Order order) {
         // Pure domain logic — no messaging concerns
         return new OrderResult(order.getOrderId(), "PROCESSED");
@@ -303,4 +342,4 @@ This completes Part 7 — Messaging Endpoints (12 patterns across 3 chapters). N
 
 ---
 
-*Verification status: verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11).*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*
