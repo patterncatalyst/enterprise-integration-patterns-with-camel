@@ -8,7 +8,7 @@ duration: "40 minutes"
 
 > **Runnable example:** The code from this chapter is in [`examples/11-advanced-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/11-advanced-routing) with subdirectories for each runtime.
 
-{% include codetabs.html langs="Quarkus|Spring Boot" %}
+{% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
 
 ```bash
 # Quarkus
@@ -20,6 +20,12 @@ mvn quarkus:dev
 # Spring Boot
 cd examples/11-advanced-routing/spring-boot
 mvn spring-boot:run
+```
+
+```bash
+# YAML DSL (Camel CLI)
+cd examples/11-advanced-routing/yaml-dsl
+camel run *
 ```
 
 The previous two chapters covered the most common routing patterns. This chapter rounds out the routing catalog with five patterns that address specific challenges: routing decisions that change at runtime, observability without disrupting the flow, reordering out-of-sequence messages, processing composite messages efficiently, and distributing load across multiple processing nodes.
@@ -407,4 +413,4 @@ This completes Part 5 — Message Routing (12 patterns across 3 chapters). Next:
 
 ---
 
-*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0. YAML DSL routes provided for Camel CLI.*

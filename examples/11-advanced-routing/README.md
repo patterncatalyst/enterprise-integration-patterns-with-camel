@@ -21,7 +21,13 @@ mvn quarkus:dev
 # Spring Boot
 cd examples/11-advanced-routing/spring-boot
 mvn spring-boot:run
+
+# YAML DSL (Camel CLI — no Maven required)
+cd examples/11-advanced-routing/yaml-dsl
+camel run *
 ```
+
+> **Note:** The YAML DSL variant includes only the declarative EIP routes. Data generators and Java-specific patterns (custom aggregation strategies, CDI beans) remain in the Quarkus and Spring Boot variants.
 
 ## Infrastructure
 

@@ -1,0 +1,38 @@
+# Messaging Bridge pattern — connects two messaging systems so that
+# messages available on one are also available on the other.
+#
+# This example bridges bidirectionally between Kafka and Pulsar:
+# orders flow from Pulsar into Kafka, and shipping events flow
+# from Kafka into Pulsar.
+
+# Pulsar → Kafka: partner orders arrive on Pulsar, bridged into Kafka
+- route:
+    id: messaging-bridge-pulsar-to-kafka
+    from:
+      uri: "pulsar:persistent://public/default/partner.orders.placed"
+      parameters:
+        subscriptionName: kafka-bridge
+        subscriptionType: Exclusive
+    steps:
+      - log: "Messaging Bridge — Pulsar → Kafka: ${body}"
+      - to:
+          uri: "kafka:eip.orders.placed"
+          parameters:
+            brokers: "{{kafka.brokers}}"
+      - log: "Messaging Bridge — order forwarded to Kafka"
+
+# Kafka → Pulsar: shipping events bridged to Pulsar for partner systems
+- route:
+    id: messaging-bridge-kafka-to-pulsar
+    from:
+      uri: "kafka:eip.shipping.scheduled"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: pulsar-bridge
+    steps:
+      - log: "Messaging Bridge — Kafka → Pulsar: ${body}"
+      - to:
+          uri: "pulsar:persistent://public/default/eip.shipping.scheduled"
+          parameters:
+            producerName: kafka-bridge
+      - log: "Messaging Bridge — shipping event forwarded to Pulsar"

@@ -1,0 +1,33 @@
+# Event Message pattern — a notification that something happened.
+#
+# An event envelope containing event_type, event_id, event_time,
+# source, and data is published to eip.events.orders.  The consumer
+# logs the event — it does not return a result and the producer has
+# no expectation of any action.
+
+# Producer: accept event from direct endpoint, publish to Kafka
+- route:
+    id: event-message-producer
+    from:
+      uri: "direct:send-event"
+    steps:
+      - log: "Sending event → eip.events.orders: ${body}"
+      - to:
+          uri: "kafka:eip.events.orders"
+          parameters:
+            brokers: "{{kafka.brokers}}"
+
+# Consumer: receive and log the event
+- route:
+    id: event-message-consumer
+    from:
+      uri: "kafka:eip.events.orders"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: event-consumer
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Received event: type=${body[event_type]}, id=${body[event_id]}, time=${body[event_time]}, source=${body[source]}"
+      - log: "Event data: ${body[data]}"

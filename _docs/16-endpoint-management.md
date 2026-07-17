@@ -8,7 +8,7 @@ duration: "35 minutes"
 
 > **Runnable example:** The code from this chapter is in [`examples/16-endpoint-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/16-endpoint-management) with subdirectories for each runtime.
 
-{% include codetabs.html langs="Quarkus|Spring Boot" %}
+{% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
 
 ```bash
 # Quarkus
@@ -20,6 +20,12 @@ mvn quarkus:dev
 # Spring Boot
 cd examples/16-endpoint-management/spring-boot
 mvn spring-boot:run
+```
+
+```bash
+# YAML DSL (Camel CLI)
+cd examples/16-endpoint-management/yaml-dsl
+camel run *
 ```
 
 The previous two chapters covered how consumers receive and producers send messages. This chapter completes the Messaging Endpoints catalog with four patterns that manage the boundary layer itself: abstracting messaging behind a gateway, selectively consuming from shared channels, purging stale messages, and mapping between domain objects and messages.
@@ -342,4 +348,4 @@ This completes Part 7 — Messaging Endpoints (12 patterns across 3 chapters). N
 
 ---
 
-*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0. YAML DSL routes provided for Camel CLI.*

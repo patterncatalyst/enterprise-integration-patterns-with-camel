@@ -1,0 +1,46 @@
+# Pulsar channel patterns — mirrors Kafka patterns using Pulsar's
+# subscription model for Point-to-Point and Publish-Subscribe.
+
+# Point-to-Point on Pulsar: Shared subscription distributes
+# messages round-robin across consumers (same as Kafka consumer group)
+- route:
+    id: point-to-point-pulsar
+    from:
+      uri: "pulsar:persistent://public/default/eip.orders.placed"
+      parameters:
+        subscriptionName: pulsar-p2p-processor
+        subscriptionType: Shared
+    steps:
+      - log: "Pulsar P2P received order: ${body}"
+
+# Publish-Subscribe on Pulsar: each Exclusive subscription
+# receives every message independently (fan-out)
+- route:
+    id: pubsub-pulsar-inventory
+    from:
+      uri: "pulsar:persistent://public/default/eip.orders.events"
+      parameters:
+        subscriptionName: subscriber-inventory
+        subscriptionType: Exclusive
+    steps:
+      - log: "Pulsar Pub/Sub [inventory] received: ${body}"
+
+- route:
+    id: pubsub-pulsar-notification
+    from:
+      uri: "pulsar:persistent://public/default/eip.orders.events"
+      parameters:
+        subscriptionName: subscriber-notification
+        subscriptionType: Exclusive
+    steps:
+      - log: "Pulsar Pub/Sub [notification] received: ${body}"
+
+- route:
+    id: pubsub-pulsar-analytics
+    from:
+      uri: "pulsar:persistent://public/default/eip.orders.events"
+      parameters:
+        subscriptionName: subscriber-analytics
+        subscriptionType: Exclusive
+    steps:
+      - log: "Pulsar Pub/Sub [analytics] received: ${body}"

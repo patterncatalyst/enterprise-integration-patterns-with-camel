@@ -1,0 +1,51 @@
+# Channel Adapter pattern — connects non-messaging systems to the
+# messaging infrastructure.
+#
+# Inbound adapter: a REST endpoint accepts orders from external HTTP
+# clients, persists them to PostgreSQL, and publishes to Kafka.
+#
+# Outbound adapter: a Kafka consumer reads processed orders and
+# "sends" them to an external system (simulated with a log).
+
+# --- Inbound Channel Adapter (REST → PostgreSQL → Kafka) ---
+- rest:
+    path: /api/orders
+    post:
+      - consumes: application/json
+        produces: application/json
+        to: "direct:inbound-adapter"
+
+- route:
+    id: channel-adapter-inbound
+    from:
+      uri: "direct:inbound-adapter"
+    steps:
+      - log: "Inbound Channel Adapter — received order via REST: ${body}"
+      - unmarshal:
+          json:
+            library: Jackson
+      - to:
+          uri: "sql:INSERT INTO orders.orders (customer_id, item_sku, quantity, amount) VALUES (:#${body[customer_id]}, :#${body[item_sku]}, :#${body[quantity]}, :#${body[amount]})"
+      - log: "Inbound Channel Adapter — persisted to PostgreSQL"
+      - marshal:
+          json:
+            library: Jackson
+      - to:
+          uri: "kafka:eip.orders.incoming"
+          parameters:
+            brokers: "{{kafka.brokers}}"
+      - setBody:
+          constant: "{\"status\": \"accepted\"}"
+
+# --- Outbound Channel Adapter (Kafka → external system) ---
+- route:
+    id: channel-adapter-outbound
+    from:
+      uri: "kafka:eip.orders.fulfilled"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: outbound-adapter
+    steps:
+      - log: "Outbound Channel Adapter — dispatching to external shipping API: ${body}"
+      - log: "  -> POST https://shipping.example.com/dispatch  (simulated)"
+      - log: "  -> Order dispatched successfully"

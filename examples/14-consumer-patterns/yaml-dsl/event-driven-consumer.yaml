@@ -1,0 +1,15 @@
+# Event-Driven Consumer: messages are pushed to the route as soon as
+# they arrive on the Kafka topic — the default consumption model in Camel.
+- route:
+    id: event-driven-consumer
+    from:
+      uri: "kafka:eip.consumer.events"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: event-driven-consumer
+        autoOffsetReset: earliest
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Event-driven consumer received: order ${body[order_id]}, type=${body[event_type]}, amount=${body[amount]}"

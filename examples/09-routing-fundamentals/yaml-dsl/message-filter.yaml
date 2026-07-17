@@ -1,0 +1,21 @@
+# Message Filter: passes only high-value orders (amount >= 100)
+# through to the downstream channel, discarding the rest.
+- route:
+    id: message-filter
+    from:
+      uri: "kafka:eip.orders.placed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: filter-demo
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - filter:
+          simple: "${body[amount]} >= 100"
+          steps:
+            - log: "High-value order ${body[order_id]}: $${body[amount]}"
+            - to:
+                uri: "kafka:eip.orders.high-value"
+                parameters:
+                  brokers: "{{kafka.brokers}}"

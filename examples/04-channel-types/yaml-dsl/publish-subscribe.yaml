@@ -1,0 +1,62 @@
+# Publish-Subscribe Channel: each subscriber uses a DIFFERENT consumer
+# group so every subscriber receives every message (pub/sub fan-out).
+
+# Publisher: forward processed orders to the shared events topic.
+- route:
+    id: pubsub-publisher
+    from:
+      uri: "kafka:eip.orders.processed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: pubsub-publisher
+    steps:
+      - log: "Publishing order event ${header.kafka.KEY} → eip.orders.events"
+      - to:
+          uri: "kafka:eip.orders.events"
+          parameters:
+            brokers: "{{kafka.brokers}}"
+
+# Subscriber 1 — Inventory
+- route:
+    id: pubsub-subscriber-inventory
+    from:
+      uri: "kafka:eip.orders.events"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: subscriber-inventory
+    steps:
+      - log: "Inventory subscriber received order ${header.kafka.KEY}"
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Reserving stock for SKU ${body[item_sku]}, qty ${body[quantity]}"
+
+# Subscriber 2 — Notification
+- route:
+    id: pubsub-subscriber-notification
+    from:
+      uri: "kafka:eip.orders.events"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: subscriber-notification
+    steps:
+      - log: "Notification subscriber received order ${header.kafka.KEY}"
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Sending confirmation email for order ${body[order_id]}"
+
+# Subscriber 3 — Analytics
+- route:
+    id: pubsub-subscriber-analytics
+    from:
+      uri: "kafka:eip.orders.events"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: subscriber-analytics
+    steps:
+      - log: "Analytics subscriber received order ${header.kafka.KEY}"
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Recording analytics — order ${body[order_id]}, amount ${body[amount]}"

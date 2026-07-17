@@ -8,7 +8,7 @@ duration: "35 minutes"
 
 > **Runnable example:** The code from this chapter is in [`examples/04-channel-types/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/04-channel-types) with subdirectories for each runtime.
 
-{% include codetabs.html langs="Quarkus|Spring Boot" %}
+{% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
 
 ```bash
 # Quarkus
@@ -20,6 +20,12 @@ mvn quarkus:dev
 # Spring Boot
 cd examples/04-channel-types/spring-boot
 mvn spring-boot:run
+```
+
+```bash
+# YAML DSL (Camel CLI)
+cd examples/04-channel-types/yaml-dsl
+camel run *
 ```
 
 The previous chapter introduced the Message Channel as one of six building blocks. But not all channels behave the same way. The most important design decision in any messaging architecture is the channel type: does a message go to *one* consumer or to *all* consumers? This chapter covers the three channel patterns that answer that question, shows how Kafka and Pulsar implement each one, and demonstrates how Camel routes connect to them.
@@ -297,4 +303,4 @@ Next, we tackle what happens when things go wrong — invalid messages, dead let
 
 ---
 
-*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0. YAML DSL routes provided for Camel CLI.*

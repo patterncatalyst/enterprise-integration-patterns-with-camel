@@ -1,0 +1,54 @@
+# Message Bus pattern — a shared messaging infrastructure that
+# multiple applications connect to for loosely-coupled communication.
+#
+# Kafka acts as the message bus.  Multiple independent consumers
+# (each with its own consumer group) subscribe to the same topics,
+# demonstrating how the bus decouples producers from consumers.
+
+# --- Inventory service: reacts to incoming orders ---
+- route:
+    id: message-bus-inventory
+    from:
+      uri: "kafka:eip.orders.incoming"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: bus-inventory-service
+    steps:
+      - log: "Message Bus [inventory-service] — reserving stock for order: ${body}"
+
+# --- Payment service: reacts to the same incoming orders ---
+- route:
+    id: message-bus-payment
+    from:
+      uri: "kafka:eip.orders.incoming"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: bus-payment-service
+    steps:
+      - log: "Message Bus [payment-service] — initiating payment for order: ${body}"
+
+# --- Notification service: reacts to the same incoming orders ---
+- route:
+    id: message-bus-notification
+    from:
+      uri: "kafka:eip.orders.incoming"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: bus-notification-service
+    steps:
+      - log: "Message Bus [notification-service] — sending confirmation for order: ${body}"
+
+# --- Fulfillment service: listens to bridged orders and marks them fulfilled ---
+- route:
+    id: message-bus-fulfillment
+    from:
+      uri: "kafka:eip.orders.bridged"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: bus-fulfillment-service
+    steps:
+      - log: "Message Bus [fulfillment-service] — fulfilling bridged order: ${body}"
+      - to:
+          uri: "kafka:eip.orders.fulfilled"
+          parameters:
+            brokers: "{{kafka.brokers}}"

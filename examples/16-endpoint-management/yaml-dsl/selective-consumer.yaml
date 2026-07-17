@@ -1,0 +1,24 @@
+# Selective Consumer — a Kafka consumer that inspects message headers
+# and only processes messages matching a selection criterion.  Here, only
+# non-hazmat orders are accepted; hazmat orders are logged and discarded.
+- route:
+    id: selective-consumer
+    from:
+      uri: "kafka:eip.orders.placed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: selective-consumer-demo
+    steps:
+      - log: "Selective Consumer received order — containsHazmat=${header.containsHazmat}"
+      - choice:
+          when:
+            - simple: "${header.containsHazmat} == 'true'"
+              steps:
+                - log: "REJECTED — order contains hazmat, skipping"
+          otherwise:
+            steps:
+              - log: "ACCEPTED — forwarding non-hazmat order to eip.orders.accepted"
+              - to:
+                  uri: "kafka:eip.orders.accepted"
+                  parameters:
+                    brokers: "{{kafka.brokers}}"

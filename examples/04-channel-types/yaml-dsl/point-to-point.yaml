@@ -1,0 +1,23 @@
+# Point-to-Point Channel: a single consumer group ensures only one
+# consumer processes each message — competing consumers on one queue.
+- route:
+    id: point-to-point-consumer
+    from:
+      uri: "kafka:eip.orders.placed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: p2p-order-processor
+    steps:
+      - log: "P2P received order: ${header.kafka.KEY}"
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Processing order ${body[order_id]} — amount ${body[amount]}"
+      - marshal:
+          json:
+            library: Jackson
+      - to:
+          uri: "kafka:eip.orders.processed"
+          parameters:
+            brokers: "{{kafka.brokers}}"
+      - log: "Order ${header.kafka.KEY} → eip.orders.processed"

@@ -1,0 +1,28 @@
+# Resequencer: collects out-of-order messages in a batch window
+# and re-emits them sorted by the sequenceNumber header.
+- route:
+    id: batch-resequencer
+    from:
+      uri: "kafka:eip.orders.sequenced"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: resequencer-demo
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Received out-of-order message seq=${header.sequenceNumber}"
+      - resequence:
+          simple: "${header.sequenceNumber}"
+          batch-config:
+            batchSize: 10
+            batchTimeout: 5000
+          steps:
+            - log: "Resequenced message seq=${header.sequenceNumber}, order ${body[order_id]}"
+            - marshal:
+                json:
+                  library: Jackson
+            - to:
+                uri: "kafka:eip.orders.resequenced"
+                parameters:
+                  brokers: "{{kafka.brokers}}"

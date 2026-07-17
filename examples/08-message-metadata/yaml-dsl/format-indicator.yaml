@@ -1,0 +1,63 @@
+# Format Indicator pattern — sets metadata headers so consumers know
+# how to interpret and unmarshal the message body.
+
+# Producer: sets a contentType header so consumers know how to unmarshal
+- route:
+    id: format-indicator-producer
+    from:
+      uri: "kafka:eip.metadata.orders"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: format-producer
+    steps:
+      - setHeader:
+          name: contentType
+          constant: "application/json"
+      - setHeader:
+          name: schemaVersion
+          constant: "1.0"
+      - log: "Tagged message with contentType=${header.contentType}, schemaVersion=${header.schemaVersion}"
+      - to:
+          uri: "kafka:eip.metadata.orders.tagged"
+          parameters:
+            brokers: "{{kafka.brokers}}"
+
+# Consumer: inspects the format indicator header and routes accordingly
+- route:
+    id: format-indicator-consumer
+    from:
+      uri: "kafka:eip.metadata.orders.tagged"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: format-consumer
+    steps:
+      - log: "Received message — contentType=${header.contentType}, schemaVersion=${header.schemaVersion}"
+      - choice:
+          when:
+            - simple: "${header.contentType} == 'application/json'"
+              steps:
+                - unmarshal:
+                    json:
+                      library: Jackson
+                - log: "JSON format detected — order ${body[order_id]} deserialized successfully"
+                - marshal:
+                    json:
+                      library: Jackson
+                - to:
+                    uri: "kafka:eip.metadata.orders.processed"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+            - simple: "${header.contentType} == 'application/xml'"
+              steps:
+                - log: "XML format detected — would unmarshal with JAXB (not shown)"
+                - to:
+                    uri: "kafka:eip.metadata.orders.processed"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+          otherwise:
+            steps:
+              - log: "Unknown format '${header.contentType}' — routing to dead letter"
+              - to:
+                  uri: "kafka:eip.metadata.orders.dead"
+                  parameters:
+                    brokers: "{{kafka.brokers}}"

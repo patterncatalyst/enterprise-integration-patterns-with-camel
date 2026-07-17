@@ -1,0 +1,27 @@
+# Polling Consumer: pulls messages on demand rather than being event-driven.
+# A timer fires every 10 seconds and uses pollEnrich to grab the next
+# available message from Kafka.
+- route:
+    id: polling-consumer
+    from:
+      uri: "timer:poll-trigger"
+      parameters:
+        period: 10000
+        delay: 5000
+    steps:
+      - log: "Polling consumer triggered — checking for messages …"
+      - pollEnrich:
+          expression:
+            constant: "kafka:eip.consumer.poll?brokers={{kafka.brokers}}&groupId=polling-consumer&autoOffsetReset=earliest"
+          timeout: 5000
+      - choice:
+          when:
+            - simple: "${body} == null"
+              steps:
+                - log: "No message available during this poll cycle"
+          otherwise:
+            steps:
+              - unmarshal:
+                  json:
+                    library: Jackson
+              - log: "Polled message: order ${body[order_id]}, type=${body[event_type]}"

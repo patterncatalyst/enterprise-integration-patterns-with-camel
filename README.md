@@ -67,7 +67,7 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | `examples/37-testing-strategies` | Three-tier testing: unit (MockEndpoint), integration (REST Assured), Newman | Appendix S |
 | `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |
 
-Examples with `quarkus/` and `spring-boot/` subdirectories support both runtimes. Run with `mvn quarkus:dev` (Quarkus) or `mvn spring-boot:run` (Spring Boot) against the infrastructure stack.
+Examples with `quarkus/` and `spring-boot/` subdirectories support both runtimes. Ten examples also include a `yaml-dsl/` directory with standalone YAML routes for the Camel CLI. Run with `mvn quarkus:dev` (Quarkus), `mvn spring-boot:run` (Spring Boot), or `camel run *` (YAML DSL) against the infrastructure stack.
 
 ## Tutorial structure
 

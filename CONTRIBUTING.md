@@ -38,11 +38,12 @@ bundle exec jekyll serve
 ./scripts/setup-stack.sh                    # start infrastructure
 cd examples/<name>/quarkus && mvn quarkus:dev       # Quarkus with live reload
 cd examples/<name>/spring-boot && mvn spring-boot:run  # Spring Boot
+cd examples/<name>/yaml-dsl && camel run *             # YAML DSL (Camel CLI)
 ```
 
 ## Adding an example
 
-1. Create `examples/<chapter>-<name>/` with `quarkus/` and `spring-boot/` subdirectories
+1. Create `examples/<chapter>-<name>/` with `quarkus/` and `spring-boot/` subdirectories (add `yaml-dsl/` for patterns that translate cleanly to YAML DSL)
 2. Use `examples/domain-model` as a dependency for shared types
 3. Add the example to the CI matrix in `.github/workflows/examples.yml`
 4. Add a row to the examples table in `README.md`

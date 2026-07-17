@@ -1,0 +1,12 @@
+# Pulsar Event-Driven Consumer: push-based consumption from Pulsar
+# with a Shared subscription distributing messages across 3 consumers.
+- route:
+    id: event-driven-consumer-pulsar
+    from:
+      uri: "pulsar:persistent://public/default/eip.consumer.events"
+      parameters:
+        subscriptionName: event-driven-consumer
+        subscriptionType: Shared
+        numberOfConsumers: 3
+    steps:
+      - log: "Pulsar Event-Driven Consumer received: ${body}"

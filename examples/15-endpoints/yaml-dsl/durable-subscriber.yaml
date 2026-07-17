@@ -1,0 +1,13 @@
+# Durable Subscriber — Pulsar maintains subscription state (cursor)
+# even when this consumer is offline.  On reconnect, consumption
+# resumes from the last acknowledged message.
+- route:
+    id: durable-subscriber-pulsar
+    from:
+      uri: "pulsar:persistent://public/default/eip.orders.placed"
+      parameters:
+        subscriptionName: notification-service
+        subscriptionType: Shared
+        ackTimeoutMillis: 30000
+    steps:
+      - log: "Durable Subscriber [Pulsar] — received order: ${body}"

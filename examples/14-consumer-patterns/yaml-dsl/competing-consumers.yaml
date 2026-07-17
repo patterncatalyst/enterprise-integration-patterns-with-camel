@@ -1,0 +1,16 @@
+# Competing Consumers: multiple consumer threads process messages
+# from the same Kafka topic in parallel via the consumer group protocol.
+- route:
+    id: competing-consumers
+    from:
+      uri: "kafka:eip.consumer.compete"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: competing-consumers
+        autoOffsetReset: earliest
+        consumersCount: 3
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Competing consumer [thread=${threadName}] processing: order ${body[order_id]}, type=${body[event_type]}"

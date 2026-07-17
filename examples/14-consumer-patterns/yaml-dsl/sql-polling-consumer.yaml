@@ -1,0 +1,17 @@
+# SQL Polling Consumer: pulls rows from PostgreSQL on a schedule,
+# marks them as processing, and publishes them to Kafka.
+- route:
+    id: polling-consumer-sql
+    from:
+      uri: "sql:SELECT * FROM orders.orders WHERE status = 'PLACED' ORDER BY created_at LIMIT 10?onConsume=UPDATE orders.orders SET status = 'PROCESSING' WHERE id = :#id"
+      parameters:
+        delay: 30000
+    steps:
+      - log: "SQL Polling Consumer — processing order from DB: id=${body[id]}, customer=${body[customer_id]}, sku=${body[item_sku]}"
+      - marshal:
+          json:
+            library: Jackson
+      - to:
+          uri: "kafka:eip.orders.placed"
+          parameters:
+            brokers: "{{kafka.brokers}}"

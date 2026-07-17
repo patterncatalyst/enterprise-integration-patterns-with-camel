@@ -8,7 +8,7 @@ duration: "45 minutes"
 
 > **Runnable example:** The code from this chapter is in [`examples/09-routing-fundamentals/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/09-routing-fundamentals) with subdirectories for each runtime.
 
-{% include codetabs.html langs="Quarkus|Spring Boot" %}
+{% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
 
 ```bash
 # Quarkus
@@ -20,6 +20,12 @@ mvn quarkus:dev
 # Spring Boot
 cd examples/09-routing-fundamentals/spring-boot
 mvn spring-boot:run
+```
+
+```bash
+# YAML DSL (Camel CLI)
+cd examples/09-routing-fundamentals/yaml-dsl
+camel run *
 ```
 
 Message Routing is where integration gets interesting. So far, messages flow in straight lines — from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
@@ -389,4 +395,4 @@ Next, we compose these primitives into multi-step routing patterns: the Routing 
 
 ---
 
-*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0.*
+*Verification status: Quarkus variant verified against Quarkus 3.37.0, Camel 4.20.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.0.7, Camel 4.20.0. YAML DSL routes provided for Camel CLI.*

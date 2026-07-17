@@ -1,0 +1,37 @@
+# Content-Based Router: inspects each order and routes it to a
+# channel determined by message content — hazmat, international, or domestic.
+- route:
+    id: content-based-router
+    from:
+      uri: "kafka:eip.orders.placed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: routing-demo
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Order received: ${body[order_id]} to ${body[destination_country]}"
+      - choice:
+          when:
+            - simple: "${body[contains_hazmat]} == true"
+              steps:
+                - log: "HAZMAT order ${body[order_id]} → hazmat handler"
+                - to:
+                    uri: "kafka:eip.orders.hazmat"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+            - simple: "${body[destination_country]} != 'US'"
+              steps:
+                - log: "International order ${body[order_id]} → customs"
+                - to:
+                    uri: "kafka:eip.orders.international"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+          otherwise:
+            steps:
+              - log: "Domestic order ${body[order_id]} → standard"
+              - to:
+                  uri: "kafka:eip.orders.domestic"
+                  parameters:
+                    brokers: "{{kafka.brokers}}"

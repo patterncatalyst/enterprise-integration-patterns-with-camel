@@ -1,0 +1,89 @@
+# Datatype Channel: route each event type to its own dedicated topic.
+# A single inbound stream is split by type so that downstream consumers
+# subscribe only to the event type they care about.
+
+- route:
+    id: datatype-channel-router
+    from:
+      uri: "kafka:eip.orders.placed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: datatype-router
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Routing order ${body[order_id]} with status '${body[status]}'"
+      - choice:
+          when:
+            - simple: "${body[status]} == 'placed'"
+              steps:
+                - marshal:
+                    json:
+                      library: Jackson
+                - to:
+                    uri: "kafka:eip.orders.placed.typed"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+                - log: "→ eip.orders.placed.typed"
+            - simple: "${body[status]} == 'cancelled'"
+              steps:
+                - marshal:
+                    json:
+                      library: Jackson
+                - to:
+                    uri: "kafka:eip.orders.cancelled"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+                - log: "→ eip.orders.cancelled"
+            - simple: "${body[status]} == 'refunded'"
+              steps:
+                - marshal:
+                    json:
+                      library: Jackson
+                - to:
+                    uri: "kafka:eip.orders.refunded"
+                    parameters:
+                      brokers: "{{kafka.brokers}}"
+                - log: "→ eip.orders.refunded"
+          otherwise:
+            steps:
+              - marshal:
+                  json:
+                    library: Jackson
+              - to:
+                  uri: "kafka:eip.orders.unknown"
+                  parameters:
+                    brokers: "{{kafka.brokers}}"
+              - log: "→ eip.orders.unknown (unrecognised status)"
+
+# Dedicated consumers for each datatype channel
+- route:
+    id: datatype-channel-placed
+    from:
+      uri: "kafka:eip.orders.placed.typed"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: datatype-placed
+    steps:
+      - log: "Placed-channel consumer received: ${header.kafka.KEY}"
+
+- route:
+    id: datatype-channel-cancelled
+    from:
+      uri: "kafka:eip.orders.cancelled"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: datatype-cancelled
+    steps:
+      - log: "Cancelled-channel consumer received: ${header.kafka.KEY}"
+
+- route:
+    id: datatype-channel-refunded
+    from:
+      uri: "kafka:eip.orders.refunded"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: datatype-refunded
+    steps:
+      - log: "Refunded-channel consumer received: ${header.kafka.KEY}"

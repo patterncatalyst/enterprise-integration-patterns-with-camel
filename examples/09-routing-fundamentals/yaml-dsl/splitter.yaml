@@ -1,0 +1,25 @@
+# Splitter: breaks a batch order into individual line items
+# and publishes each one to its own message on the output topic.
+- route:
+    id: order-splitter
+    from:
+      uri: "kafka:eip.orders.batch"
+      parameters:
+        brokers: "{{kafka.brokers}}"
+        groupId: splitter-demo
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Batch received with ${body[items].size()} items"
+      - split:
+          jsonpath: "$.items[*]"
+          steps:
+            - log: "Processing item: ${body[item_sku]} qty=${body[quantity]}"
+            - marshal:
+                json:
+                  library: Jackson
+            - to:
+                uri: "kafka:eip.orders.individual"
+                parameters:
+                  brokers: "{{kafka.brokers}}"
