@@ -36,14 +36,21 @@ This starts Kafka (KRaft), Pulsar, Redis, PostgreSQL, and Apicurio Registry on P
 
 ## 3. Run an example
 
-Each example is a self-contained Camel Quarkus project:
+Core examples (chapters 04, 09, 12) have `quarkus/` and `spring-boot/` subdirectories — choose your runtime:
 
 ```bash
-cd examples/09-routing-fundamentals
+# Quarkus (Dev Mode with live reload)
+cd examples/09-routing-fundamentals/quarkus
 mvn quarkus:dev
+
+# Spring Boot
+cd examples/09-routing-fundamentals/spring-boot
+mvn spring-boot:run
 ```
 
-Quarkus Dev Mode starts with live reload — edit a route and the changes take effect immediately. Press `q` to stop.
+Quarkus Dev Mode starts with live reload — edit a route and the changes take effect immediately. Press `q` to stop. Spring Boot runs as a standard application; restart to pick up changes.
+
+Other examples are currently Quarkus-only (Spring Boot variants are being added progressively).
 
 ## 4. Run all examples
 

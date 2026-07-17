@@ -6,7 +6,21 @@ description: "Content-Based Router, Message Filter, Recipient List, and Splitter
 duration: "45 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/09-routing-fundamentals/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/09-routing-fundamentals) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/09-routing-fundamentals/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/09-routing-fundamentals) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/09-routing-fundamentals/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/09-routing-fundamentals/spring-boot
+mvn spring-boot:run
+```
 
 Message Routing is where integration gets interesting. So far, messages flow in straight lines — from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
 
@@ -34,6 +48,38 @@ A **Content-Based Router** inspects the message body or headers and routes the m
 Camel implements this with the `choice()` EIP, which is arguably the most-used pattern in any Camel application.
 
 ### How Camel models it
+
+The route logic is identical across runtimes — only the class annotations differ:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
+// Quarkus — CDI discovers the route via @ApplicationScoped
+@ApplicationScoped
+public class ContentBasedRouterRoute extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("kafka:eip.orders.placed?brokers={{kafka.brokers}}&groupId=shipping-router")
+            .routeId("content-based-router")
+            // route logic below...
+    }
+}
+```
+
+```java
+// Spring Boot — Spring discovers the route via @Component
+@Component
+public class ContentBasedRouterRoute extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("kafka:eip.orders.placed?brokers={{kafka.brokers}}&groupId=shipping-router")
+            .routeId("content-based-router")
+            // route logic below...
+    }
+}
+```
+
+The `choice()` DSL inside `configure()` is pure Camel — identical on both runtimes:
 
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=shipping-router")
@@ -294,6 +340,31 @@ The example above shows a common composition: split the message, then route each
 **Recipient lists with untrusted expressions.** If the recipient list reads destinations from message headers, a malicious sender could inject arbitrary endpoint URIs. Use `ignoreInvalidEndpoints()` and validate the header before using it.
 
 **Splitting without backpressure.** If you split a message into 10,000 parts and process them all in parallel, you'll overwhelm downstream systems. Use `streaming()` to process items incrementally, and consider throttling with `throttle()` before the downstream `to()`.
+
+## Runtime configuration
+
+The routing patterns above use the same Camel Java DSL on both Quarkus and Spring Boot. The differences are in project setup and configuration:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```properties
+# Quarkus — application.properties
+quarkus.application.name=eip-routing-fundamentals
+kafka.brokers=localhost:9092
+quarkus.http.port=8082
+quarkus.kafka.devservices.enabled=false
+quarkus.log.category."org.apache.camel".level=INFO
+```
+
+```properties
+# Spring Boot — application.properties
+spring.application.name=eip-routing-fundamentals
+kafka.brokers=localhost:9092
+server.port=8082
+logging.level.org.apache.camel=INFO
+```
+
+The `kafka.brokers` property placeholder is shared — both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key.
 
 ## References
 
