@@ -6,7 +6,21 @@ description: "Message Translator, Envelope Wrapper, Content Enricher, and Conten
 duration: "40 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/12-transformation/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/12-transformation) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/12-transformation/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/12-transformation) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/12-transformation/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/12-transformation/spring-boot
+mvn spring-boot:run
+```
 
 Messages rarely arrive in exactly the format the receiver needs. An external partner sends XML; your services expect JSON. Kafka events carry order IDs but not customer names — you need to look up the name before sending a notification. An audit log needs the full order, but a summary report needs only the total and status. Messages need to be translated, enriched, stripped down, wrapped, and unwrapped as they flow between systems.
 
@@ -43,6 +57,36 @@ A **Message Translator** transforms a message from one format/schema to another.
 3. **Semantic translation** — Different meanings (currency codes, status enums, date formats).
 
 ### How Camel models it
+
+The route logic is identical across runtimes — only the class annotations differ:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
+// Quarkus — CDI discovers the route via @ApplicationScoped
+@ApplicationScoped
+public class MessageTranslatorRoute extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("kafka:eip.orders.external?brokers={{kafka.brokers}}&groupId=translator-demo")
+            .routeId("message-translator")
+            // translation logic below...
+    }
+}
+```
+
+```java
+// Spring Boot — Spring discovers the route via @Component
+@Component
+public class MessageTranslatorRoute extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("kafka:eip.orders.external?brokers={{kafka.brokers}}&groupId=translator-demo")
+            .routeId("message-translator")
+            // translation logic below...
+    }
+}
+```
 
 Camel provides multiple approaches to message translation:
 
@@ -344,6 +388,34 @@ For external-facing outputs and PII-sensitive contexts, prefer allowlists.
 **Content filters that become stale.** If you add a new PII field (like `social_security_number`) to the order schema but forget to update the PII filter, it passes through to analytics. Pair content filters with schema registry checks — when the schema evolves, validate that the filter still covers all sensitive fields.
 
 **Envelope assumptions across services.** If the envelope format changes (adding a new metadata field, changing the version scheme), every wrapper/unwrapper needs to update. Publish the envelope schema in the registry and version it. Treat the envelope as a first-class schema, not an afterthought.
+
+## Runtime configuration
+
+The transformation patterns above use the same Camel Java DSL on both Quarkus and Spring Boot. The differences are in project setup and configuration:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```properties
+# Quarkus — application.properties
+quarkus.application.name=eip-transformation
+kafka.brokers=localhost:9092
+quarkus.redis.hosts=redis://localhost:6379
+quarkus.http.port=8082
+quarkus.kafka.devservices.enabled=false
+quarkus.log.category."org.apache.camel".level=INFO
+```
+
+```properties
+# Spring Boot — application.properties
+spring.application.name=eip-transformation
+kafka.brokers=localhost:9092
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+server.port=8082
+logging.level.org.apache.camel=INFO
+```
+
+The `kafka.brokers` property placeholder is shared — both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key. The Redis configuration differs: Quarkus uses `quarkus.redis.hosts` (full URL), while Spring Boot uses `spring.data.redis.host` and `spring.data.redis.port`.
 
 ## References
 

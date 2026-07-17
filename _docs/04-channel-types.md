@@ -6,7 +6,21 @@ description: "Point-to-point, publish-subscribe, and datatype channels — the t
 duration: "35 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/04-channel-types/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/04-channel-types) — run it with `mvn quarkus:dev` against the local stack.
+> **Runnable example:** The code from this chapter is in [`examples/04-channel-types/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/04-channel-types) with subdirectories for each runtime.
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```bash
+# Quarkus
+cd examples/04-channel-types/quarkus
+mvn quarkus:dev
+```
+
+```bash
+# Spring Boot
+cd examples/04-channel-types/spring-boot
+mvn spring-boot:run
+```
 
 The previous chapter introduced the Message Channel as one of six building blocks. But not all channels behave the same way. The most important design decision in any messaging architecture is the channel type: does a message go to *one* consumer or to *all* consumers? This chapter covers the three channel patterns that answer that question, shows how Kafka and Pulsar implement each one, and demonstrates how Camel routes connect to them.
 
@@ -44,6 +58,38 @@ In Pulsar, point-to-point semantics come from **subscription types**:
 - **Key-shared subscription** — Like shared, but messages with the same key always go to the same consumer. Preserves per-key ordering while scaling horizontally.
 
 ### How Camel models it
+
+The route logic is identical across runtimes — only the class annotations differ:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```java
+// Quarkus — CDI discovers the route via @ApplicationScoped
+@ApplicationScoped
+public class PointToPointRoute extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("kafka:eip.orders.placed?brokers={{kafka.brokers}}&groupId=inventory-service")
+            .routeId("point-to-point-consumer")
+            // route logic below...
+    }
+}
+```
+
+```java
+// Spring Boot — Spring discovers the route via @Component
+@Component
+public class PointToPointRoute extends RouteBuilder {
+    @Override
+    public void configure() {
+        from("kafka:eip.orders.placed?brokers={{kafka.brokers}}&groupId=inventory-service")
+            .routeId("point-to-point-consumer")
+            // route logic below...
+    }
+}
+```
+
+The Camel DSL inside `configure()` is pure Camel — identical on both runtimes:
 
 ```java
 // Kafka point-to-point: consumer group ensures single delivery
@@ -200,6 +246,36 @@ Datatype channels are orthogonal to the other two — you can have a point-to-po
 **Confusing Kafka topics with queues.** A Kafka topic is not a queue. Consuming a message doesn't delete it. Multiple consumer groups can read the same messages independently. If you want queue-like behavior (process-and-delete), use consumer groups with auto-commit — but understand that the messages remain on the topic until retention expires.
 
 **Not setting a consumer group.** If you connect a Kafka consumer without a `groupId`, Camel auto-generates one. Each restart gets a new group, which means the consumer replays from the beginning (or misses messages, depending on `auto.offset.reset`). Always set an explicit, stable `groupId`.
+
+## Runtime configuration
+
+The channel patterns above use the same Camel Java DSL on both Quarkus and Spring Boot. The differences are in project setup and configuration:
+
+{% include codetabs.html langs="Quarkus|Spring Boot" %}
+
+```properties
+# Quarkus — application.properties
+quarkus.application.name=eip-channel-types
+kafka.brokers=localhost:9092
+camel.component.pulsar.service-url=pulsar://localhost:6650
+quarkus.redis.hosts=redis://localhost:6379
+quarkus.http.port=8082
+quarkus.kafka.devservices.enabled=false
+quarkus.log.category."org.apache.camel".level=INFO
+```
+
+```properties
+# Spring Boot — application.properties
+spring.application.name=eip-channel-types
+kafka.brokers=localhost:9092
+camel.component.pulsar.service-url=pulsar://localhost:6650
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+server.port=8082
+logging.level.org.apache.camel=INFO
+```
+
+The `kafka.brokers` and `camel.component.pulsar.service-url` property placeholders are shared — both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key. The Redis configuration differs: Quarkus uses `quarkus.redis.hosts` (full URL), while Spring Boot uses `spring.data.redis.host` and `spring.data.redis.port`.
 
 ## References
 

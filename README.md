@@ -1,6 +1,6 @@
 # Enterprise Integration Patterns with Apache Camel
 
-A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woolf) — implemented with Apache Camel on Quarkus, backed by Kafka, Pulsar, and Redis, with runnable examples on Podman.
+A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woolf) — implemented with Apache Camel on Quarkus and Spring Boot, backed by Kafka, Pulsar, and Redis, with runnable examples on Podman.
 
 **[Read the tutorial](https://patterncatalyst.github.io/enterprise-integration-patterns-with-camel/)**
 
@@ -8,7 +8,7 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 
 - **37 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 18 deep-dive appendices.
 - **62 Excalidraw diagrams** — visual architecture and pattern flow diagrams with EIP stencil icons embedded throughout.
-- **26 runnable examples** — Camel Quarkus projects you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
+- **26 runnable examples** — Camel projects (Quarkus and Spring Boot variants) you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
 
@@ -23,8 +23,12 @@ cd enterprise-integration-patterns-with-camel
 ./scripts/setup-stack.sh
 
 # Run a Camel Quarkus example
-cd examples/09-routing-fundamentals
+cd examples/09-routing-fundamentals/quarkus
 mvn quarkus:dev
+
+# Or the Spring Boot variant
+cd examples/09-routing-fundamentals/spring-boot
+mvn spring-boot:run
 
 # Start with observability (Grafana, Loki, Tempo, Mimir)
 ./scripts/setup-stack.sh --lgtm
@@ -63,7 +67,7 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | `examples/37-testing-strategies` | Three-tier testing: unit (MockEndpoint), integration (REST Assured), Newman | Appendix S |
 | `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |
 
-Each example runs with `mvn quarkus:dev` against the infrastructure stack.
+Examples with `quarkus/` and `spring-boot/` subdirectories support both runtimes. Run with `mvn quarkus:dev` (Quarkus) or `mvn spring-boot:run` (Spring Boot) against the infrastructure stack.
 
 ## Tutorial structure
 
@@ -86,6 +90,7 @@ Each example runs with `mvn quarkus:dev` against the infrastructure stack.
 |-----------|------|
 | Apache Camel 4.x | Integration framework (Java DSL) |
 | Quarkus 3.x | Runtime (fast startup, Dev Services, native builds) |
+| Spring Boot 4.x | Runtime (Spring ecosystem, wide adoption) |
 | Apache Kafka (KRaft) | Primary messaging backbone |
 | Apache Pulsar | Multi-tenant messaging, geo-replication |
 | Redis | Caching, idempotent repositories, Pub/Sub |
