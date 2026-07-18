@@ -8,7 +8,7 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 
 - **37 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 18 deep-dive appendices.
 - **62 Excalidraw diagrams** — visual architecture and pattern flow diagrams with EIP stencil icons embedded throughout.
-- **26 runnable examples** — Camel projects (Quarkus and Spring Boot variants) you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
+- **27 runnable examples** — Camel projects (Quarkus and Spring Boot variants) you can build and run against a local Podman stack, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
 - **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
 
@@ -65,6 +65,7 @@ See [Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integra
 | `examples/32-kafka-consumer-tuning` | Throughput-tuned, safety-first, and static-membership consumers | Appendix N |
 | `examples/33-kafka-producer-tuning` | Batched, compressed, idempotent, and synchronous producers | Appendix O |
 | `examples/37-testing-strategies` | Three-tier testing: unit (MockEndpoint), integration (REST Assured), Newman | Appendix S |
+| `examples/38-kubernetes-deploy` | Standard Maven-based container builds and Kubernetes deployment on Minikube | Appendix T |
 | `examples/bond-trading` | Market data normalization, desk filtering, trade validation (16 patterns) | Appendix K |
 
 Examples with `quarkus/` and `spring-boot/` subdirectories support both runtimes. Ten examples also include a `yaml-dsl/` directory with standalone YAML routes for the Camel CLI. Run with `mvn quarkus:dev` (Quarkus), `mvn spring-boot:run` (Spring Boot), or `camel run *` (YAML DSL) against the infrastructure stack.
@@ -82,7 +83,7 @@ Examples with `quarkus/` and `spring-boot/` subdirectories support both runtimes
 | 6 | Message Transformation | Translator, Enricher, Content Filter, Normalizer, Canonical Model |
 | 7 | Messaging Endpoints | Gateway, Consumers, Dispatcher, Idempotent Receiver, Service Activator |
 | 8 | System Management | Control Bus, Wire Tap, Message History, Message Store |
-| 9 | Appendices | Spring Boot vs Quarkus, Kafka, Pulsar, Redis, Quarkus Flow, Drools, Observability, Loan Broker & Bond Trading case studies, Glossary, Virtual Threads, Consumer/Producer Tuning, Share Groups, Diagnostics, Kafka Connect Offsets, Testing Strategies |
+| 9 | Appendices | Spring Boot vs Quarkus, Kafka, Pulsar, Redis, Quarkus Flow, Drools, Observability, Kubernetes Deployment, Loan Broker & Bond Trading case studies, Glossary, Virtual Threads, Consumer/Producer Tuning, Share Groups, Diagnostics, Kafka Connect Offsets, Testing Strategies |
 
 ## Stack
 

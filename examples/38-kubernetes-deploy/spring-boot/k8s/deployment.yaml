@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eip-k8s-deploy
+  labels:
+    app: eip-k8s-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eip-k8s-deploy
+  template:
+    metadata:
+      labels:
+        app: eip-k8s-deploy
+    spec:
+      containers:
+        - name: eip-k8s-deploy
+          image: eip/eip-kubernetes-deploy-springboot:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8088
+          envFrom:
+            - configMapRef:
+                name: eip-k8s-config
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8088
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8088
+            initialDelaySeconds: 15
+            periodSeconds: 5

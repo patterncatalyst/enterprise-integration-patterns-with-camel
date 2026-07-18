@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eip-k8s-config
+data:
+  KAFKA_BROKERS: "eip-kafka-kafka-bootstrap.kafka.svc.cluster.local:9092"
+  SPRING_DATA_REDIS_HOST: "redis-master.redis.svc.cluster.local"
+  SPRING_DATA_REDIS_PORT: "6379"
