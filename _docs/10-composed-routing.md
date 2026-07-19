@@ -6,7 +6,7 @@ description: "Routing Slip, Process Manager, and Scatter-Gather — multi-step r
 duration: "45 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/10-composed-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) with subdirectories for each runtime.
+> **Runnable example:** The code from this chapter is in [`examples/10-composed-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) with Quarkus and Spring Boot subdirectories.
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 

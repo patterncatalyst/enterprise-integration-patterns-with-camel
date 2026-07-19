@@ -6,7 +6,7 @@ description: "Aggregator, Normalizer, and Canonical Data Model — patterns that
 duration: "40 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/13-aggregator/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) with subdirectories for each runtime.
+> **Runnable example:** The code from this chapter is in [`examples/13-aggregator/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) with Quarkus and Spring Boot subdirectories.
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 

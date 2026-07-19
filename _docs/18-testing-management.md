@@ -6,7 +6,7 @@ description: "Test Message, Detour, Smart Proxy, and Channel Adapter management 
 duration: "35 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/18-testing-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) with subdirectories for each runtime.
+> **Runnable example:** The code from this chapter is in [`examples/18-testing-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) with Quarkus and Spring Boot subdirectories.
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 

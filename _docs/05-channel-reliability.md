@@ -6,7 +6,7 @@ description: "Handling failure gracefully — invalid message channels, dead let
 duration: "35 minutes"
 ---
 
-> **Runnable example:** The code from this chapter is in [`examples/05-reliability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/05-reliability) with subdirectories for each runtime.
+> **Runnable example:** The code from this chapter is in [`examples/05-reliability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/05-reliability) with Quarkus and Spring Boot subdirectories.
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 
