@@ -1,6 +1,6 @@
 # Enterprise Integration Patterns with Apache Camel
 
-A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woolf) — implemented with Apache Camel on Quarkus and Spring Boot, backed by Kafka, Pulsar, and Redis, with runnable examples on Podman.
+A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woolf) — implemented with Apache Camel on three runtimes (Quarkus, Spring Boot, and YAML DSL), backed by Kafka, Pulsar, and Redis, with runnable examples on Podman.
 
 **[Read the tutorial](https://patterncatalyst.github.io/enterprise-integration-patterns-with-camel/)**
 
