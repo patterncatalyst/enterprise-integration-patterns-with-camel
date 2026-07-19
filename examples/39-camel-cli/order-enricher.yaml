@@ -1,0 +1,34 @@
+# Consumes express orders from Kafka, enriches each order with
+# customer data retrieved from Redis, and publishes the enriched
+# order to a downstream topic.
+- route:
+    id: order-enricher
+    from:
+      uri: "kafka:eip.orders.express"
+      parameters:
+        brokers: "{{camel.component.kafka.brokers}}"
+        groupId: "{{camel.component.kafka.group-id}}"
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Enriching express order ${body[orderId]} for customer ${body[customerId]}"
+      - setHeader:
+          name: RedisKey
+          simple: "customer:${body[customerId]}"
+      - toD:
+          uri: "redis-lettuce:{{camel.component.redis-lettuce.host}}:{{camel.component.redis-lettuce.port}}?command=GET&key=${header.RedisKey}"
+      - setHeader:
+          name: customerName
+          jsonpath: "$.name"
+      - setHeader:
+          name: customerTier
+          jsonpath: "$.tier"
+      - log: "Enriched order ${body[orderId]} — customer: ${header.customerName}, tier: ${header.customerTier}"
+      - marshal:
+          json:
+            library: Jackson
+      - to:
+          uri: "kafka:eip.orders.enriched"
+          parameters:
+            brokers: "{{camel.component.kafka.brokers}}"

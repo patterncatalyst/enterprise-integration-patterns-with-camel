@@ -1,0 +1,40 @@
+name: OrderHttpValidationTest
+description: "Verify order validation via REST endpoint"
+actions:
+  # --- Scenario 1: valid order via POST ---
+  - http:
+      client: "orderApi"
+      send:
+        method: POST
+        url: "http://localhost:8088/api/orders"
+        message:
+          headers:
+            Content-Type: application/json
+          body: |
+            {"orderId":"ORD-010","customerId":"C-110","item":"Cargo Net","quantity":5}
+  - http:
+      client: "orderApi"
+      receive:
+        status: 200
+        message:
+          body: |
+            {"status":"accepted","orderId":"ORD-010"}
+
+  # --- Scenario 2: invalid order (missing item) ---
+  - http:
+      client: "orderApi"
+      send:
+        method: POST
+        url: "http://localhost:8088/api/orders"
+        message:
+          headers:
+            Content-Type: application/json
+          body: |
+            {"orderId":"ORD-011","customerId":"C-111","quantity":3}
+  - http:
+      client: "orderApi"
+      receive:
+        status: 400
+        message:
+          body: |
+            {"status":"rejected","orderId":"ORD-011","reason":"item must not be null"}

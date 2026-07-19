@@ -1,0 +1,35 @@
+# Timer-driven route that generates sample orders every 3 seconds
+# and submits them to the REST API for end-to-end TUI monitoring.
+- route:
+    id: order-generator
+    from:
+      uri: "timer:ordergen?period=3000"
+    steps:
+      - choice:
+          when:
+            - simple: "${exchangeProperty.CamelTimerCounter} == null || ${exchangeProperty.CamelTimerCounter} % 5 == 1"
+              steps:
+                - setBody:
+                    constant: '{"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}'
+            - simple: "${exchangeProperty.CamelTimerCounter} % 5 == 2"
+              steps:
+                - setBody:
+                    constant: '{"orderId":"ORD-002","customerId":"C-102","item":"Pallet Jack","quantity":5}'
+            - simple: "${exchangeProperty.CamelTimerCounter} % 5 == 3"
+              steps:
+                - setBody:
+                    constant: '{"orderId":"ORD-003","customerId":"C-103","item":"Cargo Net","quantity":12}'
+            - simple: "${exchangeProperty.CamelTimerCounter} % 5 == 4"
+              steps:
+                - setBody:
+                    constant: '{"orderId":"ORD-004","customerId":"C-104","item":"Loading Dock Bumper","quantity":8}'
+          otherwise:
+            steps:
+              - setBody:
+                  constant: '{"orderId":"ORD-005","customerId":"C-105","item":"Freight Scale","quantity":1}'
+      - log: "Sending order: ${body}"
+      - setHeader:
+          name: Content-Type
+          constant: application/json
+      - to:
+          uri: "http://localhost:8088/api/orders"

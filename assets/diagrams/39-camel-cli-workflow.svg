@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 200" font-family="'Red Hat Text', system-ui, sans-serif" role="img">
+<defs><marker id="a" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker><marker id="am" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8650a"/></marker></defs>
+<rect x="10" y="10" width="900" height="180" rx="12" fill="#fafafa" stroke="#ddd"/>
+<text x="22" y="30" font-size="12" font-weight="700" fill="#555555">Camel CLI Prototype-to-Production Workflow</text>
+<rect x="30" y="60" width="130" height="55" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="95.0" y="85.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">YAML Prototype</text>
+<text x="95.0" y="102.5" font-size="11.5" fill="#555555" text-anchor="middle">order-router.yaml</text>
+<rect x="200" y="60" width="110" height="55" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
+<text x="255.0" y="85.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel run</text>
+<text x="255.0" y="102.5" font-size="11.5" fill="#555555" text-anchor="middle">--dev mode</text>
+<rect x="350" y="60" width="110" height="55" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="405.0" y="85.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel trace</text>
+<text x="405.0" y="102.5" font-size="11.5" fill="#555555" text-anchor="middle">live exchanges</text>
+<rect x="500" y="60" width="120" height="55" rx="9" fill="#eef4fb" stroke="#2f6db5" stroke-width="2"/>
+<text x="560.0" y="85.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel debug</text>
+<text x="560.0" y="102.5" font-size="11.5" fill="#555555" text-anchor="middle">breakpoints</text>
+<rect x="660" y="60" width="110" height="55" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
+<text x="715.0" y="85.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel export</text>
+<text x="715.0" y="102.5" font-size="11.5" fill="#555555" text-anchor="middle">--runtime=…</text>
+<rect x="810" y="60" width="80" height="55" rx="9" fill="#111111" stroke="#111111" stroke-width="2"/>
+<text x="850.0" y="85.5" font-size="13.5" font-weight="700" fill="#ffffff" text-anchor="middle">Maven</text>
+<text x="850.0" y="102.5" font-size="11.5" fill="#dddddd" text-anchor="middle">Project</text>
+<rect x="200" y="135" width="110" height="40" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
+<text x="255.0" y="153.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel get</text>
+<text x="255.0" y="170.0" font-size="11.5" fill="#555555" text-anchor="middle">routes, health</text>
+<rect x="350" y="135" width="110" height="40" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
+<text x="405.0" y="153.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel infra</text>
+<text x="405.0" y="170.0" font-size="11.5" fill="#555555" text-anchor="middle">kafka, redis</text>
+<rect x="500" y="135" width="120" height="40" rx="9" fill="#f4f4f4" stroke="#666666" stroke-width="1.5"/>
+<text x="560.0" y="153.0" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">camel shell</text>
+<text x="560.0" y="170.0" font-size="11.5" fill="#555555" text-anchor="middle">interactive</text>
+<path d="M160,87 L200,87" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M310,87 L350,87" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M460,87 L500,87" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M620,87 L660,87" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+<path d="M770,87 L810,87" fill="none" stroke="#b8650a" stroke-width="2" marker-end="url(#am)"/>
+</svg>

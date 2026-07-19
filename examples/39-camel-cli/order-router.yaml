@@ -1,0 +1,42 @@
+# REST API that accepts order submissions and routes each order
+# to a Kafka topic determined by its orderType header —
+# EXPRESS, STANDARD, or BULK.
+- rest:
+    path: /api/orders
+    post:
+      - to: "direct:route-order"
+      - consumes: application/json
+        produces: application/json
+
+- route:
+    id: route-order
+    from:
+      uri: "direct:route-order"
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Order received: ${body[orderId]} — type: ${header.orderType}"
+      - choice:
+          when:
+            - simple: "${header.orderType} == 'EXPRESS'"
+              steps:
+                - log: "EXPRESS order ${body[orderId]} → express topic"
+                - to:
+                    uri: "kafka:eip.orders.express"
+                    parameters:
+                      brokers: "{{camel.component.kafka.brokers}}"
+            - simple: "${header.orderType} == 'BULK'"
+              steps:
+                - log: "BULK order ${body[orderId]} → bulk topic"
+                - to:
+                    uri: "kafka:eip.orders.bulk"
+                    parameters:
+                      brokers: "{{camel.component.kafka.brokers}}"
+          otherwise:
+            steps:
+              - log: "STANDARD order ${body[orderId]} → standard topic"
+              - to:
+                  uri: "kafka:eip.orders.standard"
+                  parameters:
+                    brokers: "{{camel.component.kafka.brokers}}"

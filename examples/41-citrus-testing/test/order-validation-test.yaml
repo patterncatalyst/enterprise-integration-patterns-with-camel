@@ -1,0 +1,54 @@
+name: OrderValidationTest
+description: "Verify order validation route correctly routes valid and invalid orders"
+actions:
+  # --- Scenario 1: valid order ---
+  - send:
+      endpoint: "kafka:eip.orders.incoming"
+      message:
+        body: |
+          {"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}
+  - receive:
+      endpoint: "kafka:eip.orders.validated"
+      timeout: 10000
+      message:
+        body: |
+          {"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}
+
+  # --- Scenario 2: missing customerId ---
+  - send:
+      endpoint: "kafka:eip.orders.incoming"
+      message:
+        body: |
+          {"orderId":"ORD-002","item":"Pallet Jack","quantity":1}
+  - receive:
+      endpoint: "kafka:eip.orders.rejected"
+      timeout: 10000
+      message:
+        body: |
+          {"orderId":"ORD-002","item":"Pallet Jack","quantity":1}
+
+  # --- Scenario 3: zero quantity ---
+  - send:
+      endpoint: "kafka:eip.orders.incoming"
+      message:
+        body: |
+          {"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0}
+  - receive:
+      endpoint: "kafka:eip.orders.rejected"
+      timeout: 10000
+      message:
+        body: |
+          {"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0}
+
+  # --- Scenario 4: missing item ---
+  - send:
+      endpoint: "kafka:eip.orders.incoming"
+      message:
+        body: |
+          {"orderId":"ORD-004","customerId":"C-103","quantity":5}
+  - receive:
+      endpoint: "kafka:eip.orders.rejected"
+      timeout: 10000
+      message:
+        body: |
+          {"orderId":"ORD-004","customerId":"C-103","quantity":5}

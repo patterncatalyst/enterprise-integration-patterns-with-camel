@@ -1,0 +1,84 @@
+# REST API that accepts order submissions, validates each order,
+# and routes it to Kafka topics for downstream processing.
+# A second route consumes validated orders, transforms them,
+# and publishes to a processed-orders topic.
+
+- rest:
+    path: /api/orders
+    post:
+      - to: "direct:validate-order"
+      - consumes: application/json
+        produces: application/json
+
+- route:
+    id: validate-order
+    from:
+      uri: "direct:validate-order"
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Order received: ${body}"
+      - choice:
+          when:
+            - simple: "${body[orderId]} != null && ${body[customerId]} != null && ${body[item]} != null"
+              steps:
+                - setHeader:
+                    name: receivedAt
+                    simple: "${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSZ}"
+                - setHeader:
+                    name: processingNode
+                    simple: "tui-demo-node-1"
+                - log: "Order accepted: ${body[orderId]} — customer ${body[customerId]}, item: ${body[item]}"
+                - marshal:
+                    json:
+                      library: Jackson
+                - to:
+                    uri: "kafka:eip.orders.validated"
+                    parameters:
+                      brokers: "{{camel.component.kafka.brokers}}"
+                - setBody:
+                    simple: '{"status":"accepted","orderId":"${body[orderId]}"}'
+          otherwise:
+            steps:
+              - log:
+                  message: "Order rejected — missing required fields"
+                  loggingLevel: WARN
+              - setHeader:
+                  name: CamelHttpResponseCode
+                  constant: 400
+              - marshal:
+                  json:
+                    library: Jackson
+              - to:
+                  uri: "kafka:eip.orders.rejected"
+                  parameters:
+                    brokers: "{{camel.component.kafka.brokers}}"
+              - setBody:
+                  simple: '{"status":"rejected","reason":"missing required fields (orderId, customerId, item)"}'
+
+- route:
+    id: process-validated-orders
+    from:
+      uri: "kafka:eip.orders.validated"
+      parameters:
+        brokers: "{{camel.component.kafka.brokers}}"
+        groupId: "{{camel.component.kafka.group-id}}"
+    steps:
+      - unmarshal:
+          json:
+            library: Jackson
+      - log: "Processing validated order: ${body[orderId]}"
+      - delay:
+          constant: 100
+      - setHeader:
+          name: processingStatus
+          constant: "PROCESSING"
+      - log: "Order ${body[orderId]} status set to PROCESSING"
+      - marshal:
+          json:
+            library: Jackson
+      - to:
+          uri: "kafka:eip.orders.processed"
+          parameters:
+            brokers: "{{camel.component.kafka.brokers}}"

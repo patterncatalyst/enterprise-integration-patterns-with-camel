@@ -1,0 +1,76 @@
+# Order Validation Route
+# Validates incoming orders and routes to validated or rejected topics.
+#
+# Valid orders are enriched with a validatedAt header and published to
+# eip.orders.validated. Invalid orders are tagged with a rejectionReason
+# header and published to eip.orders.rejected.
+
+- route:
+    id: order-validation
+    from:
+      uri: kafka:eip.orders.incoming
+      steps:
+        - unmarshal:
+            json:
+              unmarshalType: java.util.Map
+        - choice:
+            when:
+              - simple: "${body[orderId]} == null"
+                steps:
+                  - setHeader:
+                      name: rejectionReason
+                      constant: "orderId must not be null"
+                  - log:
+                      message: "REJECTED — missing orderId: ${body}"
+                      loggingLevel: WARN
+                  - marshal:
+                      json: {}
+                  - to:
+                      uri: kafka:eip.orders.rejected
+              - simple: "${body[customerId]} == null"
+                steps:
+                  - setHeader:
+                      name: rejectionReason
+                      constant: "customerId must not be null"
+                  - log:
+                      message: "REJECTED — missing customerId for order ${body[orderId]}: ${body}"
+                      loggingLevel: WARN
+                  - marshal:
+                      json: {}
+                  - to:
+                      uri: kafka:eip.orders.rejected
+              - simple: "${body[item]} == null"
+                steps:
+                  - setHeader:
+                      name: rejectionReason
+                      constant: "item must not be null"
+                  - log:
+                      message: "REJECTED — missing item for order ${body[orderId]}: ${body}"
+                      loggingLevel: WARN
+                  - marshal:
+                      json: {}
+                  - to:
+                      uri: kafka:eip.orders.rejected
+              - simple: "${body[quantity]} == null || ${body[quantity]} <= 0"
+                steps:
+                  - setHeader:
+                      name: rejectionReason
+                      constant: "quantity must be greater than zero"
+                  - log:
+                      message: "REJECTED — invalid quantity for order ${body[orderId]}: ${body}"
+                      loggingLevel: WARN
+                  - marshal:
+                      json: {}
+                  - to:
+                      uri: kafka:eip.orders.rejected
+            otherwise:
+              steps:
+                - setHeader:
+                    name: validatedAt
+                    simple: "${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSZ}"
+                - log:
+                    message: "VALIDATED — order ${body[orderId]} for customer ${body[customerId]}"
+                - marshal:
+                    json: {}
+                - to:
+                    uri: kafka:eip.orders.validated
