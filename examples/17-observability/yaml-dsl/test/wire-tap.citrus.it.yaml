@@ -21,7 +21,7 @@ actions:
         run:
           integration:
             name: "wire-tap-monitor"
-            file: "../wire-tap-monitor.yaml"
+            file: "../wire-tap-monitor.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

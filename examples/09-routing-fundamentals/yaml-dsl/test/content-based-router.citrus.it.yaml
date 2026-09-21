@@ -13,7 +13,7 @@ actions:
         run:
           integration:
             name: "content-based-router"
-            file: "../content-based-router.yaml"
+            file: "../content-based-router.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

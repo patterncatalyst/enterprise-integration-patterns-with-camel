@@ -23,7 +23,7 @@ actions:
         run:
           integration:
             name: "pulsar-event-driven-consumer"
-            file: "../pulsar-event-driven-consumer.yaml"
+            file: "../pulsar-event-driven-consumer.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

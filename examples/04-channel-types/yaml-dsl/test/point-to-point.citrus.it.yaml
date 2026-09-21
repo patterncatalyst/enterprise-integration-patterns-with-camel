@@ -17,7 +17,7 @@ actions:
         run:
           integration:
             name: "point-to-point"
-            file: "../point-to-point.yaml"
+            file: "../point-to-point.camel.yaml"
             systemProperties:
               file: "../application.properties"
   - send:

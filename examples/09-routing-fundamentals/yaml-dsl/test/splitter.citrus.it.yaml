@@ -13,7 +13,7 @@ actions:
         run:
           integration:
             name: "order-splitter"
-            file: "../splitter.yaml"
+            file: "../splitter.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

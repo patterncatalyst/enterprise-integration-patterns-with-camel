@@ -30,7 +30,7 @@ actions:
         run:
           integration:
             name: "sql-polling-consumer"
-            file: "../sql-polling-consumer.yaml"
+            file: "../sql-polling-consumer.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

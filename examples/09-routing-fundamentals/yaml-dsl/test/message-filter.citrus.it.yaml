@@ -13,7 +13,7 @@ actions:
         run:
           integration:
             name: "message-filter"
-            file: "../message-filter.yaml"
+            file: "../message-filter.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

@@ -19,7 +19,7 @@ actions:
         run:
           integration:
             name: "durable-subscriber"
-            file: "../durable-subscriber.yaml"
+            file: "../durable-subscriber.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

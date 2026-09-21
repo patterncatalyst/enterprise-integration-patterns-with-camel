@@ -19,7 +19,7 @@ actions:
         run:
           integration:
             name: "event-message"
-            file: "../event-message.yaml"
+            file: "../event-message.camel.yaml"
             systemProperties:
               file: "../application.properties"
   - camel:

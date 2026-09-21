@@ -13,7 +13,7 @@ actions:
         run:
           integration:
             name: "datatype-channel"
-            file: "../datatype-channel.yaml"
+            file: "../datatype-channel.camel.yaml"
             systemProperties:
               file: "../application.properties"
   # --- Placed order ---

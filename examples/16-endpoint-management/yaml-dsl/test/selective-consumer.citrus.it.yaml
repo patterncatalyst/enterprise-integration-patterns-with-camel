@@ -21,7 +21,7 @@ actions:
         run:
           integration:
             name: "selective-consumer"
-            file: "../selective-consumer.yaml"
+            file: "../selective-consumer.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

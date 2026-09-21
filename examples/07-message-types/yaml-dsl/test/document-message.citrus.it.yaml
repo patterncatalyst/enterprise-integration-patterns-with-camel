@@ -19,7 +19,7 @@ actions:
         run:
           integration:
             name: "document-message"
-            file: "../document-message.yaml"
+            file: "../document-message.camel.yaml"
             systemProperties:
               file: "../application.properties"
   - camel:

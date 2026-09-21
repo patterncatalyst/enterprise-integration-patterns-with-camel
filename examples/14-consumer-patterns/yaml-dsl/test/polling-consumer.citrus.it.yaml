@@ -23,7 +23,7 @@ actions:
         run:
           integration:
             name: "polling-consumer"
-            file: "../polling-consumer.yaml"
+            file: "../polling-consumer.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

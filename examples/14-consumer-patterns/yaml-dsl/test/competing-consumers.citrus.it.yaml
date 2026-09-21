@@ -23,7 +23,7 @@ actions:
         run:
           integration:
             name: "competing-consumers"
-            file: "../competing-consumers.yaml"
+            file: "../competing-consumers.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

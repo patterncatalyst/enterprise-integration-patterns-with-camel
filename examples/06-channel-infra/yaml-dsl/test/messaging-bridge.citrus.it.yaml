@@ -21,7 +21,7 @@ actions:
         run:
           integration:
             name: "messaging-bridge"
-            file: "../messaging-bridge.yaml"
+            file: "../messaging-bridge.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

@@ -13,7 +13,7 @@ actions:
         run:
           integration:
             name: "message-bus"
-            file: "../message-bus.yaml"
+            file: "../message-bus.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

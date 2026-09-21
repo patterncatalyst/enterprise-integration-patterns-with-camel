@@ -13,7 +13,7 @@ actions:
         run:
           integration:
             name: "batch-resequencer"
-            file: "../resequencer.yaml"
+            file: "../resequencer.camel.yaml"
             systemProperties:
               file: "../application.properties"
 

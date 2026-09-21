@@ -17,7 +17,7 @@ actions:
         run:
           integration:
             name: "publish-subscribe"
-            file: "../publish-subscribe.yaml"
+            file: "../publish-subscribe.camel.yaml"
             systemProperties:
               file: "../application.properties"
   - send:

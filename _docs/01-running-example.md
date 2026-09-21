@@ -220,7 +220,7 @@ When you run the examples in later chapters, you'll follow a consistent pattern:
 2. **Run the route** — Most pattern examples are single route files that you run directly with the Camel CLI:
 
    ```bash
-   camel run content-based-router.yaml --dev
+   camel run content-based-router.camel.yaml --dev
    ```
 
    The `--dev` flag enables live reload — edit the route file and Camel restarts automatically. No Maven project, no build step, no waiting. For examples that need additional dependencies (like `camel-kafka` or `camel-sql`), the CLI resolves them automatically from the route file's imports.

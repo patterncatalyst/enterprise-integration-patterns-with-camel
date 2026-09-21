@@ -20,7 +20,7 @@ actions:
             - "8082"
           integration:
             name: "channel-adapter"
-            file: "../channel-adapter.yaml"
+            file: "../channel-adapter.camel.yaml"
             systemProperties:
               file: "../application.properties"
   - camel:

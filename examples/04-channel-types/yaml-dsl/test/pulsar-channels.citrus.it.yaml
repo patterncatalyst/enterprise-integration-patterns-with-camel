@@ -15,7 +15,7 @@ actions:
         run:
           integration:
             name: "pulsar-channels"
-            file: "../pulsar-channels.yaml"
+            file: "../pulsar-channels.camel.yaml"
             systemProperties:
               file: "../application.properties"
   # Send to Pulsar P2P topic
