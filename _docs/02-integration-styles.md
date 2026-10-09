@@ -406,6 +406,6 @@ Next, we enter the world of messaging systems — the six building blocks (chann
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — every Java snippet in this chapter compiles against Camel 4.22.0, and the messaging style it recommends is the one exercised by the rest of the tutorial (2026-09-14). The file, shared-database and RPI routes are illustrative and have no runnable example of their own.*
+*Verification status: <span class="status status--verified">verified</span> — every Java snippet in this chapter compiles against Camel 4.22.1, and the messaging style it recommends is the one exercised by the rest of the tutorial (2026-10-09). The file, shared-database and RPI routes are illustrative and have no runnable example of their own.*
 
 *To confirm on re-verification: all Java DSL routes compile against Camel 4.22 APIs; SQL component named parameter syntax is correct; Kafka component URI options are valid for camel-kafka 4.22; Resilience4j circuit breaker durations use the 4.22 string form (`.waitDurationInOpenState("10s")`) rather than the pre-4.22 integer seconds.*

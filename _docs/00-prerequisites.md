@@ -446,6 +446,6 @@ Next, we'll meet the shipping domain that drives every example in this tutorial 
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — the SDKMAN chain was run on a clean `fedora:44` container: SDKMAN installs, then `sdk install java 25.0.2-tem`, `sdk install maven` and `sdk install jbang` all succeed, reporting OpenJDK 25.0.2, Maven 3.9.16 and JBang 0.141.0. Separately, `setup-stack.sh` brings Kafka 4.3.1, Pulsar 4.2.4, Redis 8.10.1, PostgreSQL 18.6 and Apicurio 3.3.3 to healthy on Podman 5.8.4, and `init-schemas.sql` creates all five domain schemas (2026-09-14).*
+*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): the SDKMAN chain was run on a clean `fedora:44` container: SDKMAN installs, then `sdk install java 25.0.2-tem`, `sdk install maven` and `sdk install jbang` all succeed, reporting OpenJDK 25.0.2, Maven 3.9.16 and JBang 0.141.0. Separately, `setup-stack.sh` brings Kafka 4.3.1, Pulsar 4.2.4, Redis 8.10.1, PostgreSQL 18.6 and Apicurio 3.3.3 to healthy, and `init-schemas.sql` creates all five domain schemas (2026-09-14).*
 
 *Not verified here: the SDKMAN install commands, which need a clean machine to test honestly.*

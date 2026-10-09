@@ -63,4 +63,4 @@ curl -X POST http://localhost:8082/payments/process \
 
 ---
 
-*Verification status: Quarkus variant verified against Quarkus 3.39.3, Camel 4.22.0 on Podman (2026-07-11). Spring Boot variant compiles against Spring Boot 4.1.1, Camel 4.22.0.*
+*Verification status: both variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); the chapter footer records the integration-test result on Docker Engine (2026-10-09).*

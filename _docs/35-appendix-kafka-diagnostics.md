@@ -293,4 +293,4 @@ Most Kafka issues in integration routes fall into three categories: **consumer l
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `examples/35-kafka-diagnostics/kafka-diagnostics.sh` was run against the compose stack on 2026-09-16 with `examples/09-routing-fundamentals` consuming: it reported six consumer groups with lag and `Stable` state, zero under-replicated partitions, and `--dump` produced a 1072-line thread dump and a heap summary.*
+*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): `examples/35-kafka-diagnostics/kafka-diagnostics.sh` was run against the compose stack on 2026-09-16 with `examples/09-routing-fundamentals` consuming: it reported six consumer groups with lag and `Stable` state, zero under-replicated partitions, and `--dump` produced a 1072-line thread dump and a heap summary.*

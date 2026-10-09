@@ -490,4 +490,4 @@ Next, we compose these primitives into multi-step routing patterns: the Routing 
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.0 (Quarkus 3.39.3 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers (2026-09-14). The 4.22 splitter options added here were run against the live stack on 2026-09-15: `maxFailedRecords(5)` completes a 10-item batch with 3 bad items and aborts one with 8 bad items at the fifth failure, and `group(25)` splits 60 items into batches of 25, 25 and 10.*
+*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine (2026-10-09). The 4.22 splitter options added here were run against the live stack on 2026-09-15: `maxFailedRecords(5)` completes a 10-item batch with 3 bad items and aborts one with 8 bad items at the fifth failure, and `group(25)` splits 60 items into batches of 25, 25 and 10.*

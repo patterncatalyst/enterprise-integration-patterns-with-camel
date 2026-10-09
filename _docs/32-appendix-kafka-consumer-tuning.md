@@ -306,4 +306,4 @@ This reduces rebalance impact from "all consumers paused" to "only affected part
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — all three tuned consumers run against live Kafka 4.3.1 and receive messages, with zero errors (2026-09-14).*
+*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): all three tuned consumers run against live Kafka 4.3.1 and receive messages, with zero errors (2026-09-14).*

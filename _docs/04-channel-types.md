@@ -307,4 +307,4 @@ Next, we tackle what happens when things go wrong — invalid messages, dead let
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.0 (Quarkus 3.39.3 / Spring Boot 4.1.1) and their 16 Citrus integration tests pass against live containers (2026-09-14).*
+*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 16 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

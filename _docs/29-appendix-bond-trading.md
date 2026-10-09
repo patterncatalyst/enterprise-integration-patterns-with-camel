@@ -450,6 +450,6 @@ Two case studies, two different shapes of the same patterns — proving that EIP
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — re-verified end to end on both runtimes on 2026-09-17. Every stage shows traffic: all three feed adapters, the normalizer, the desk distributor, all three desk filters and the trade validator, with zero errors. Patterns 5 to 7 are illustrative and are not exercised.*
+*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): re-verified end to end on both runtimes on 2026-09-17. Every stage shows traffic: all three feed adapters, the normalizer, the desk distributor, all three desk filters and the trade validator, with zero errors. Patterns 5 to 7 are illustrative and are not exercised.*
 
 *The example's rejected trade orders used to be logged and dropped, which the README described as a Dead Letter Channel. It was neither pattern — the order simply vanished. Per the distinction this tutorial draws in [Chapter 5]({% link _docs/05-channel-reliability.md %}), a consumer that understands a message and rejects it on business grounds wants an **Invalid Message Channel**, so rejected orders now go to `bond.orders.invalid`. Verified by injecting a negative quantity and a negative limit price and seeing both arrive.*

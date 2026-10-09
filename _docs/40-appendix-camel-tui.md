@@ -667,4 +667,4 @@ For production monitoring with alerting, dashboards, and historical data, you st
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — the demo routes run on Camel CLI 4.22.0 against the live stack, with the generator driving orders end to end through validation, Kafka and the processing route with zero errors (2026-09-14). The TUI screens themselves are described from use, not captured by an automated check.*
+*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): the demo routes run on Camel CLI 4.22.0 against the live stack, with the generator driving orders end to end through validation, Kafka and the processing route with zero errors (2026-09-14). The TUI screens themselves are described from use, not captured by an automated check.*

@@ -257,11 +257,18 @@ class EipTests implements EipTestSupport {
                     )
             );
 
+            // The poller marks the row PROCESSING after the exchange that
+            // published it completes, so the update can land just after the
+            // Kafka record is received: poll for it instead of reading once.
             t.then(
-                sql(dataSource)
-                    .query()
-                    .statement("SELECT status FROM orders.orders WHERE id = '${order_id}'")
-                    .validate("status", "PROCESSING")
+                repeatOnError()
+                    .times(10)
+                    .actions(
+                        sql(dataSource)
+                            .query()
+                            .statement("SELECT status FROM orders.orders WHERE id = '${order_id}'")
+                            .validate("status", "PROCESSING")
+                    )
             );
 
         }
