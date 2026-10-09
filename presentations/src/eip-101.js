@@ -2020,7 +2020,7 @@ divider(pres, "09", "Case Studies &\nRunning Examples",
     "and lightweight streaming for moderate-throughput scenarios. " +
     "PostgreSQL stores application state — orders, payments, inventory — and the outbox table " +
     "for the Transactional Outbox pattern. " +
-    "Everything runs on Podman containers, orchestrated by a simple compose file."
+    "Everything runs in containers on Docker Engine, orchestrated by a simple compose file."
   );
 }
 
@@ -2304,7 +2304,7 @@ divider(pres, "10", "Closing",
   addBullets(s, bsub([
     { text: "\"Enterprise Integration Patterns\" — Hohpe & Woolf", sub: "The definitive reference. Available in print and as a free online pattern catalog at enterpriseintegrationpatterns.com." },
     { text: "The tutorial site — all 65 patterns with runnable examples", sub: "Chapter-by-chapter walkthroughs with Apache Camel on Quarkus, complete with diagrams." },
-    { text: "GitHub repository — runnable Camel Quarkus projects", sub: "Clone, build, and run every example locally with Podman containers for infrastructure." },
+    { text: "GitHub repository — runnable Camel Quarkus projects", sub: "Clone, build, and run every example locally with Docker Compose for infrastructure." },
     { text: "Apache Camel documentation — camel.apache.org", sub: "Comprehensive documentation for every component, EIP, and data format." },
     { text: "Camel in Action (2nd Edition) — Ibsen & Anstey", sub: "The practitioner's guide to building integration solutions with Apache Camel." },
   ]));
@@ -2316,7 +2316,7 @@ divider(pres, "10", "Closing",
     "Our tutorial site walks through all 65 patterns with detailed explanations, architecture " +
     "diagrams, and runnable code examples. Each chapter covers a pattern category and builds " +
     "on the shipping domain running example. " +
-    "The GitHub repository contains all the runnable examples. Clone it, run the Podman " +
+    "The GitHub repository contains all the runnable examples. Clone it, run the Docker Compose " +
     "compose stack to start Kafka, Pulsar, Redis, and PostgreSQL, and then run any example " +
     "with 'mvn quarkus:dev'. You can see every pattern in action. " +
     "The Apache Camel documentation is excellent and comprehensive. And 'Camel in Action' by " +

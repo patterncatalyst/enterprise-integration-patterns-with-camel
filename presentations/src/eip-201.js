@@ -84,7 +84,7 @@ function bsub(items) {
     fontFace: FONT.body, fontSize: 15, color: COLOR.white,
     align: "left", valign: "middle",
   });
-  s.addText("Kafka  |  Pulsar  |  Redis  |  PostgreSQL  |  Podman", {
+  s.addText("Kafka  |  Pulsar  |  Redis  |  PostgreSQL  |  Docker", {
     x: 6.20, y: 5.80, w: 6.60, h: 0.35,
     fontFace: FONT.mono, fontSize: 12, color: "FFD9D9",
     align: "left", valign: "middle",
@@ -129,10 +129,10 @@ function bsub(items) {
     { text: "Java 17+ fundamentals", sub: "Records, lambdas, streams, CDI basics — we use modern Java throughout" },
     { text: "Apache Camel concepts", sub: "Routes, exchanges, processors, components — at least conceptual level" },
     { text: "Messaging basics", sub: "Topics, queues, consumer groups, partitions — Kafka or similar" },
-    { text: "Container tooling", sub: "Podman or Docker for running the infrastructure stack locally" },
+    { text: "Container tooling", sub: "Docker Engine and docker compose for the local infrastructure stack" },
     { text: "Maven basics", sub: "Running mvn quarkus:dev and reading pom.xml dependencies" },
   ]));
-  addNotes(s, "Before we dive in, let us set expectations. This is a 201-level deck — it assumes you already know what the Enterprise Integration Patterns are, either from EIP 101 or from reading the Hohpe and Woolf book. You should be comfortable with modern Java — we use records, lambdas, and CDI injection heavily. Familiarity with messaging concepts like topics, consumer groups, and partitions will help, though we cover Kafka architecture in Section 02. You will need Podman or Docker installed locally to run the infrastructure stack, and Maven to build and run the Quarkus examples. If any of these are unfamiliar, the tutorial site at the companion GitHub repo walks through setup step by step.");
+  addNotes(s, "Before we dive in, let us set expectations. This is a 201-level deck — it assumes you already know what the Enterprise Integration Patterns are, either from EIP 101 or from reading the Hohpe and Woolf book. You should be comfortable with modern Java — we use records, lambdas, and CDI injection heavily. Familiarity with messaging concepts like topics, consumer groups, and partitions will help, though we cover Kafka architecture in Section 02. You will need Docker Engine installed locally to run the infrastructure stack, and Maven to build and run the Quarkus examples. If any of these are unfamiliar, the tutorial site at the companion GitHub repo walks through setup step by step.");
 }
 
 // ============================================================================
@@ -343,15 +343,15 @@ divider("01", "The Camel\nRuntime", "Apache Camel 4.x — the integration framew
 // SECTION 02 — Infrastructure Stack  (8 slides)
 // ============================================================================
 
-divider("02", "Infrastructure\nStack", "Kafka, Pulsar, Redis, PostgreSQL on Podman",
-  "Section 02 walks through the infrastructure stack that powers our shipping domain examples. We will examine each technology — Kafka with KRaft, Pulsar, Redis, and PostgreSQL — and how Camel connects to each one. We also cover the Podman compose stack that spins up the entire environment with a single command. Understanding this infrastructure is essential for running the examples yourself.");
+divider("02", "Infrastructure\nStack", "Kafka, Pulsar, Redis, PostgreSQL on Docker Engine",
+  "Section 02 walks through the infrastructure stack that powers our shipping domain examples. We will examine each technology — Kafka with KRaft, Pulsar, Redis, and PostgreSQL — and how Camel connects to each one. We also cover the Docker Compose stack that spins up the entire environment with a single command. Understanding this infrastructure is essential for running the examples yourself.");
 
 // Slide 15: The shipping domain stack — diagram
 {
   const s = S();
   addDiagramSlide(s, "INFRASTRUCTURE STACK", "The Shipping Domain Stack", "01-stack-architecture",
     "Figure 2.1 — Complete infrastructure stack: Camel services, Kafka, Pulsar, Redis, PostgreSQL");
-  addNotes(s, "This diagram shows the full stack for our shipping domain. At the center is Kafka, acting as the primary messaging backbone — all order, payment, inventory, and shipping events flow through Kafka topics. Pulsar provides multi-tenant messaging for scenarios that need topic-level isolation and geo-replication. Redis serves as the caching layer and idempotent repository — we store claim checks and deduplication keys there. PostgreSQL backs the outbox pattern and provides durable message stores. The Camel Quarkus services sit on top, each consuming from and producing to these systems. Everything runs in Podman containers orchestrated by a compose file, making the entire stack reproducible on any developer machine.");
+  addNotes(s, "This diagram shows the full stack for our shipping domain. At the center is Kafka, acting as the primary messaging backbone — all order, payment, inventory, and shipping events flow through Kafka topics. Pulsar provides multi-tenant messaging for scenarios that need topic-level isolation and geo-replication. Redis serves as the caching layer and idempotent repository — we store claim checks and deduplication keys there. PostgreSQL backs the outbox pattern and provides durable message stores. The Camel Quarkus services sit on top, each consuming from and producing to these systems. Everything runs in containers on Docker Engine, orchestrated by a compose file, making the entire stack reproducible on any developer machine.");
 }
 
 // Slide 16: Kafka with KRaft — diagram
@@ -420,10 +420,10 @@ divider("02", "Infrastructure\nStack", "Kafka, Pulsar, Redis, PostgreSQL on Podm
   addNotes(s, "PostgreSQL is the durable state store that makes several EIP patterns production-safe. The Transactional Outbox pattern is perhaps the most important: when a service processes an order, it writes the updated order state AND the outbound event to the same database transaction. A separate process — either Debezium CDC or a polling route — reads the outbox table and relays events to Kafka. This guarantees that the event is published if and only if the business operation succeeded. The message store pattern uses PostgreSQL to persist every exchange for audit and replay. The JDBC-backed aggregation repository ensures that in-progress aggregations survive application restarts — critical for the scatter-gather and aggregator patterns that collect responses over time. Quarkus Dev Services starts a PostgreSQL container automatically in dev mode.");
 }
 
-// Slide 21: Podman compose stack — code slide
+// Slide 21: Docker Compose stack — code slide
 {
   const s = S();
-  addCodeSlide(s, "INFRASTRUCTURE STACK", "The Podman Compose Stack", "Java", [
+  addCodeSlide(s, "INFRASTRUCTURE STACK", "The Docker Compose Stack", "Java", [
     '# Start the base infrastructure stack',
     '$ ./scripts/setup-stack.sh',
     '',
@@ -437,13 +437,13 @@ divider("02", "Infrastructure\nStack", "Kafka, Pulsar, Redis, PostgreSQL on Podm
     '$ ./scripts/setup-stack.sh --lgtm',
     '',
     '# Verify services are running:',
-    '$ podman ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}"',
+    '$ docker ps --format "table {{.Names}}\\t{{.Status}}\\t{{.Ports}}"',
     '',
     '# Directory structure:',
     '#   examples/_infra/compose.yaml       — base services',
     '#   examples/_infra/compose-lgtm.yaml  — observability overlay',
   ], "Figure 2.5 — One command to start the entire infrastructure stack");
-  addNotes(s, "The setup-stack.sh script is your single command to start everything. It uses Podman Compose to bring up Kafka in KRaft mode, Pulsar in standalone mode, Redis, and PostgreSQL — all with the right port mappings, health checks, and initial configuration. The --lgtm flag adds the observability stack: Grafana for dashboards, Loki for log aggregation, Tempo for distributed tracing, and Mimir for metrics. This is the same stack we cover in Section 09. The compose files live in examples/_infra/ and are designed to be idempotent — running setup-stack.sh twice will not create duplicate containers. Health checks ensure each service is actually ready before the script exits. This matters because Camel routes will fail fast if they try to connect to a Kafka broker that is not yet accepting connections.");
+  addNotes(s, "The setup-stack.sh script is your single command to start everything. It uses docker compose on Docker Engine to bring up Kafka in KRaft mode, Pulsar in standalone mode, Redis, and PostgreSQL — all with the right port mappings, health checks, and initial configuration. The --lgtm flag adds the observability stack: Grafana for dashboards, Loki for log aggregation, Tempo for distributed tracing, and Mimir for metrics. This is the same stack we cover in Section 09. The compose files live in examples/_infra/ and are designed to be idempotent — running setup-stack.sh twice will not create duplicate containers. Health checks ensure each service is actually ready before the script exits. This matters because Camel routes will fail fast if they try to connect to a Kafka broker that is not yet accepting connections.");
 }
 
 // Slide 22: Running an example
@@ -2542,7 +2542,7 @@ divider("12", "Closing\n& Appendices", "Key takeaways, reference catalogs, and r
     { code: "12", name: "loan-broker",                purpose: "Case study — 13 patterns composed end-to-end", codeColor: COLOR.govern },
     { code: "13", name: "bond-trading",               purpose: "Case study — 16 patterns for market data processing", codeColor: COLOR.red },
   ], { colW: [0.80, 2.80, 8.49], rowH: 0.38 });
-  addNotes(s, "This table catalogs all seventeen runnable example projects in the tutorial repository. Each example is a self-contained Quarkus application that you can start with mvn quarkus:dev. The examples use the full Podman infrastructure stack: Kafka for the messaging backbone, Pulsar for multi-tenant messaging, PostgreSQL for JDBC aggregation, idempotent repositories, and the outbox pattern, and Redis for content enrichment caching and Pub/Sub. The two case studies — Loan Broker and Bond Trading — are the capstone examples that compose many patterns into complete applications. To run any example, start the infrastructure with setup-stack.sh, navigate to the example directory, and run mvn quarkus:dev.");
+  addNotes(s, "This table catalogs all seventeen runnable example projects in the tutorial repository. Each example is a self-contained Quarkus application that you can start with mvn quarkus:dev. The examples use the full Docker Compose infrastructure stack: Kafka for the messaging backbone, Pulsar for multi-tenant messaging, PostgreSQL for JDBC aggregation, idempotent repositories, and the outbox pattern, and Redis for content enrichment caching and Pub/Sub. The two case studies — Loan Broker and Bond Trading — are the capstone examples that compose many patterns into complete applications. To run any example, start the infrastructure with setup-stack.sh, navigate to the example directory, and run mvn quarkus:dev.");
 }
 
 // Slide 122: Resources
