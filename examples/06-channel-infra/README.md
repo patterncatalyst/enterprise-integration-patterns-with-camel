@@ -30,7 +30,7 @@ camel run *
 
 ## Infrastructure
 
-Requires Kafka, Pulsar, and PostgreSQL from the Podman stack.
+Requires Kafka, Pulsar, and PostgreSQL from the compose stack.
 
 ## Data flow
 

@@ -11,7 +11,7 @@ _layouts/       — Jekyll layouts
 _includes/      — Jekyll includes
 assets/         — CSS, diagrams (SVG + Excalidraw source)
 examples/       — runnable Camel projects (Quarkus + Spring Boot variants)
-  _infra/       — Podman compose stack
+  _infra/       — Docker Compose stack
   domain-model/ — shared canonical entities
 presentations/  — EIP 101 + EIP 201 PPTX decks
 scripts/        — setup-stack.sh, generate_diagram.py
@@ -43,29 +43,27 @@ cd examples/<name>/yaml-dsl && camel run *             # YAML DSL (Camel CLI)
 
 ## Running the tests
 
-The integration tests use Testcontainers, which looks for a Docker socket.
-Docker is not a dependency of this project — point it at Podman instead:
+The integration tests use Testcontainers, which talks to Docker Engine on
+`/var/run/docker.sock` — the same engine the dev stack runs on, on the
+`default` docker context. If the daemon is down, or your user is not in the
+`docker` group, they fail with "Could not find a valid Docker environment":
 
 ```bash
-systemctl --user enable --now podman.socket
-export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+docker info >/dev/null && echo ok
 ```
-
-Skip this and the tests either fail with "Could not find a valid Docker
-environment" or, if you have Docker installed, quietly run on a different
-engine than the rest of the project.
 
 The tests and the dev stack **cannot both be up** — both bind 9092, 6379, 5432
 and 6650. Stop the stack first:
 
 ```bash
-podman-compose -p eip -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 ./scripts/build-all-examples.sh --with-tests     # ~2 hours, sequential
 ./scripts/build-all-examples.sh 09-routing       # or just one
 ```
 
-`build-all-examples.sh` exports `DOCKER_HOST` for you when the Podman socket is
-present. Running `mvn verify` directly in an example directory does not.
+`build-all-examples.sh --with-tests` runs `mvn verify` per project after checking
+the Docker daemon. Running `mvn verify` directly in an example directory works
+the same way.
 
 ## Adding an example
 

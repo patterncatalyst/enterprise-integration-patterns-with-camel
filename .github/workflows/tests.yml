@@ -151,10 +151,12 @@ jobs:
           jbang --version
 
           jbang trust add https://github.com/citrusframework/citrus/
+          # citrus-jbang drives the Camel CLI itself; keep its source trusted.
           jbang trust add https://github.com/apache/camel/
 
           jbang citrus@citrusframework/citrus --version
-          jbang camel@apache/camel --version
+          jbang app install --name camel org.apache.camel:camel-launcher:4.22.1
+          camel version
       - name: Run tests
         env:
           CITRUS_CAMEL_JBANG_DUMP_INTEGRATION_OUTPUT: "true"

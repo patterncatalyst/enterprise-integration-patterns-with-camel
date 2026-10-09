@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 ## Infrastructure
 
-Requires **Kafka** from the Podman stack.
+Requires **Kafka** from the compose stack.
 
 ## Kafka topics
 

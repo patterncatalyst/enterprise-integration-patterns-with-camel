@@ -14,7 +14,8 @@ A chaptered tutorial site covering all 65 Enterprise Integration Patterns (Hohpe
 ## Stack
 
 - Apache Camel 4.x with Camel Quarkus on Quarkus 3.x and Camel Spring Boot
-- Kafka (KRaft), Pulsar, Redis, PostgreSQL on Podman
+- Kafka (KRaft), Pulsar, Redis, PostgreSQL on Docker Engine (`docker compose`); Fedora/RHEL hosts
+- Optional deployment paths: minikube (Appendix T, docker driver + containerd) and OpenShift Local (Appendix Z, `openshift/`)
 - Jekyll for the tutorial site (light amber theme, Red Hat fonts)
 
 ## Structure
@@ -26,13 +27,14 @@ _layouts/       — Jekyll layouts
 _includes/      — Jekyll includes (excalidraw.html, codetabs.html)
 assets/         — CSS, JS (codetabs.js), diagrams (SVG + Excalidraw source)
 examples/       — runnable examples, each with subdirectories per runtime
-  _infra/       — Podman compose stack (Kafka, Pulsar, Redis, PostgreSQL)
+  _infra/       — Docker Compose stack (Kafka, Pulsar, Redis, PostgreSQL)
   domain-model/ — shared canonical entities (framework-agnostic POJOs)
   NN-name/      — per-chapter examples
     quarkus/    — Camel Quarkus variant
     spring-boot/ — Camel Spring Boot variant
     yaml-dsl/   — YAML DSL variant (where applicable)
-scripts/        — setup-stack.sh, generate_diagram.py
+scripts/        — setup-stack.sh, setup-minikube-stack.sh, generate_diagram.py
+openshift/      — OpenShift Local (CRC) scripts, Helm chart and evidence (Appendix Z)
 ```
 
 ## Build commands

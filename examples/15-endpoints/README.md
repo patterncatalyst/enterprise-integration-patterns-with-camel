@@ -30,7 +30,7 @@ camel run *
 
 ## Infrastructure
 
-Kafka, Pulsar, and PostgreSQL from the Podman stack (full stack minus Redis).
+Kafka, Pulsar, and PostgreSQL from the compose stack (full stack minus Redis).
 
 ## Data flow
 

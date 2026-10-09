@@ -6,9 +6,9 @@ and message flow — all without leaving the terminal.
 
 ## Prerequisites
 
-- **JBang with Camel CLI** — `jbang app install camel@apache/camel` (see Appendix U)
+- **JBang with Camel CLI** — `jbang app install --name camel org.apache.camel:camel-launcher:4.22.1` (see Appendix U)
 - **Java 25+** — `java -version`
-- **Kafka** — running from the Podman stack (`./scripts/setup-stack.sh`)
+- **Kafka** — running from the compose stack (`./scripts/setup-stack.sh`)
 
 ## Running
 

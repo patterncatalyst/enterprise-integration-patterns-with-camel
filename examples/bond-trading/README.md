@@ -88,6 +88,6 @@ You can also inspect Kafka topics via the Kafka UI at <http://localhost:8090>.
 
 ---
 
-*Verification status: **both runtimes verified end to end** against the Podman stack on 2026-09-17 (Quarkus 3.39.3 / Spring Boot 4.1.1, Camel 4.22.0). Every stage shows traffic — all three feed adapters, the normalizer, the desk distributor, all three desk filters and the trade validator — with no errors on either runtime.*
+*Verification status: **both runtimes verified end to end** against the compose stack on 2026-09-17 (Quarkus 3.39.3 / Spring Boot 4.1.1, Camel 4.22.0). Every stage shows traffic — all three feed adapters, the normalizer, the desk distributor, all three desk filters and the trade validator — with no errors on either runtime.*
 
 *Two corrections came out of that. The Spring Boot variant had only ever been compiled. And pattern 16 was listed as a **Dead Letter Channel** whose invalid orders were "logged and dropped" — which is neither pattern: the order simply vanished. Chapter 5 draws the distinction this case study needed, between a dead letter (delivery failed after retries) and an invalid message (the consumer understood it and rejected it). Rejected orders now go to `bond.orders.invalid`, verified by injecting a negative quantity and a negative limit price and seeing both arrive.*

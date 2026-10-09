@@ -73,6 +73,6 @@ behind; `kafka-share-groups.sh --delete --group <name>` removes them.
 
 ## Verified
 
-2026-09-16, against Kafka 4.3.1 in the Podman stack. Nine orders split 3/3/3
+2026-09-16, against Kafka 4.3.1 in the compose stack. Nine orders split 3/3/3
 across three workers on a three-partition topic; accepted and rejected messages
 did not reappear on a second pass; released messages did.

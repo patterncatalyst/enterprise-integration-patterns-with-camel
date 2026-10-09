@@ -24,7 +24,7 @@ This example has no demo data generator — it relies on messages on `eip.orders
 
 ## Infrastructure
 
-Requires Kafka from the Podman stack.
+Requires Kafka from the compose stack.
 
 ## Data flow
 

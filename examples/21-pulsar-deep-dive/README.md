@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 ## Infrastructure
 
-Requires **Pulsar** from the Podman stack. The Pulsar broker runs on `localhost:6650` with the admin interface on `localhost:8080`.
+Requires **Pulsar** from the compose stack. The Pulsar broker runs on `localhost:6650` with the admin interface on `localhost:8080`.
 
 ## Pulsar topics
 
@@ -44,8 +44,8 @@ Requires **Pulsar** from the Podman stack. The Pulsar broker runs on `localhost:
 Use the Pulsar admin CLI to inspect topics and subscriptions:
 
 ```bash
-podman exec -it pulsar bin/pulsar-admin topics list public/default
-podman exec -it pulsar bin/pulsar-admin topics subscriptions persistent://public/default/eip.orders.placed
+docker exec -it pulsar bin/pulsar-admin topics list public/default
+docker exec -it pulsar bin/pulsar-admin topics subscriptions persistent://public/default/eip.orders.placed
 ```
 
 ---

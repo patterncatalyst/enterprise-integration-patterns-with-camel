@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 ## Infrastructure
 
-Requires **Kafka** and **Redis** from the Podman stack.
+Requires **Kafka** and **Redis** from the compose stack.
 
 ## Kafka topics
 
@@ -58,7 +58,7 @@ Requires **Kafka** and **Redis** from the Podman stack.
 6. Observe the distributed lock route firing every 60 seconds in the logs
 7. Inspect Redis keys:
    ```bash
-   podman exec eip-redis redis-cli keys '*'
+   docker exec eip-redis redis-cli keys '*'
    ```
 
 ---

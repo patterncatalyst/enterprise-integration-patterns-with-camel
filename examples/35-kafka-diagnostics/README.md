@@ -45,13 +45,13 @@ is a leading blank line, and `COORDINATOR (ID)` splits into two whitespace
 fields. Parsing with `NR==1`, or counting back from `NF`, both give the wrong
 column. The script locates the header by content instead.
 
-A third, milder one: on rootless Podman, container processes are host
+A third, milder one: container processes are visible as host
 processes, so a plain `pgrep -f quarkus-run.jar` also matches Apicurio inside
 its container. Anything launched from `/deployments` is a container.
 
 ## Verified
 
-2026-09-16, against the Podman stack with `examples/09-routing-fundamentals`
+2026-09-16, against the compose stack with `examples/09-routing-fundamentals`
 running: six consumer groups reported with lag and `Stable` state, zero
 under-replicated partitions, and `--dump` produced a 1072-line thread dump and
 a heap summary with no deadlocks.

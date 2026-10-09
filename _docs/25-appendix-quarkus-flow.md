@@ -206,4 +206,4 @@ public class InventoryChecker {
 ---
 
 *Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.0 (Quarkus 3.39.3 / Spring Boot 4.1.1) and their 3 Citrus integration tests pass against live containers (2026-09-14).*
-Example `25-quarkus-flow` compiles and runs against the Podman stack.*
+Example `25-quarkus-flow` compiles and runs against the compose stack.*

@@ -59,7 +59,7 @@ value — a string that comes from outside the application — so it sets
 
 ## Verified
 
-2026-09-15, both runtimes, against flagd v0.16.3 in the Podman stack:
+2026-09-15, both runtimes, against flagd v0.16.3 in the compose stack:
 the detour enriches while `enrichment-enabled` is on, ENTERPRISE and VIP orders
 resolve `hazmat-compliance-v2` to `v2` while STANDARD gets `v1`, and the
 fractional flag split 31 orders 29/2 between the legacy and new algorithms.

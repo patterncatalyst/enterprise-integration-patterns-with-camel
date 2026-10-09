@@ -2,13 +2,13 @@
 title: "Examples"
 permalink: /examples/
 order: 100
-description: "Runnable Apache Camel Quarkus examples for every pattern category, built with the shipping domain on Podman."
+description: "Runnable Apache Camel Quarkus examples for every pattern category, built with the shipping domain on Docker Engine."
 ---
 
 Each pattern category has a corresponding runnable Quarkus project under `examples/`. Every example:
 
 - Uses **Apache Camel on Quarkus** with the Java DSL and shipping domain
-- Runs against the local **Podman stack** (Kafka, Pulsar, Redis, PostgreSQL)
+- Runs against the local **compose stack** (Kafka, Pulsar, Redis, PostgreSQL)
 - Can be started with a single command: `mvn quarkus:dev`
 
 ## Getting started
@@ -76,7 +76,7 @@ mvn quarkus:dev
 
 ## Infrastructure
 
-The shared Podman stack provides all backing services:
+The shared compose stack provides all backing services:
 
 ```bash
 # Base stack: Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio, Kafka UI

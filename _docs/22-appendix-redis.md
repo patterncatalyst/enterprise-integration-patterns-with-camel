@@ -28,7 +28,7 @@ mvn spring-boot:run
 
 ## Redis in the shipping domain
 
-Our Podman stack runs Redis on port 6379. In the shipping domain, Redis serves four roles:
+Our compose stack runs Redis on port 6379. In the shipping domain, Redis serves four roles:
 
 | Role | Pattern | Example |
 |------|---------|---------|

@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 ## Infrastructure
 
-Requires Kafka and PostgreSQL from the Podman stack.
+Requires Kafka and PostgreSQL from the compose stack.
 
 ## Data flow
 

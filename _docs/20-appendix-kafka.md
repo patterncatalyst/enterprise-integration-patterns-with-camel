@@ -28,7 +28,7 @@ mvn spring-boot:run
 
 {% include excalidraw.html file="20-kafka-architecture" alt="Kafka cluster architecture" caption="Figure K.1 — Kafka cluster with KRaft, partitions, and consumer groups" %}
 
-In our Podman stack, we run a single KRaft broker (no ZooKeeper). In production, you'd run 3+ brokers for fault tolerance.
+In our compose stack, we run a single KRaft broker (no ZooKeeper). In production, you'd run 3+ brokers for fault tolerance.
 
 ## Partitioning strategy
 

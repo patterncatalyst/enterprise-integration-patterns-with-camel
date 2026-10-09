@@ -41,7 +41,7 @@ warning, no log line, nothing. It looks exactly like Dev Services being broken.
 
 That is why this example scopes the property to `%prod` and `%test` and leaves
 `%dev` alone. Every other example in the repo sets it unconditionally, because
-they are all built to run against the Podman stack.
+they are all built to run against the compose stack.
 
 ## Verified
 
@@ -57,5 +57,5 @@ the bean language, which Quarkus registers only when `camel-quarkus-bean` is
 present — and the Citrus test dependencies were quietly supplying `camel-bean`
 on the *test* classpath. Dev mode ran, the tests passed, and the artefact you
 would actually ship failed at startup. This is exactly what
-`scripts/verify-all-runtime.sh` exists to catch. Testcontainers needs `DOCKER_HOST` pointed at the
-Podman socket — see [CONTRIBUTING.md](../../CONTRIBUTING.md#running-the-tests).
+`scripts/verify-all-runtime.sh` exists to catch. Testcontainers needs the Docker daemon reachable on the
+default context — see [CONTRIBUTING.md](../../CONTRIBUTING.md#running-the-tests).

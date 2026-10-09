@@ -172,7 +172,7 @@ A quick-reference glossary of terms used throughout this tutorial, organized by 
 
 **Partition** — A shard of a Kafka topic. Partitions provide parallelism and ordering guarantees (within a partition). Messages with the same key go to the same partition.
 
-**Podman** — A daemonless container runtime. Used instead of Docker in this tutorial. All compose files work with `podman-compose` or `podman compose`.
+**Docker Engine** — The container engine (`docker-ce`) this tutorial runs on. The compose files run with the Docker Compose v2 plugin (`docker compose`), and the integration tests reach the same engine through Testcontainers.
 
 **Quarkus** — A Kubernetes-native Java framework. Provides fast startup, live reload, Dev Services (automatic test containers), and native compilation via GraalVM.
 

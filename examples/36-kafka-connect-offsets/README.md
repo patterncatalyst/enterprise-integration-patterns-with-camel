@@ -6,7 +6,7 @@ The offset-management lifecycle from Appendix R, run against a real connector.
 ./scripts/setup-stack.sh
 
 cd examples/36-kafka-connect-offsets
-podman-compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
+docker compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
 ./connect-offsets-demo.sh
 ```
 
@@ -18,7 +18,7 @@ needed for this appendix, and it is another JVM to keep warm.
 The chapter covers both. Strimzi's `KafkaConnector` CRD needs a Kubernetes
 cluster, which for this repo means the minikube stack from Appendix T — a lot
 of moving parts to demonstrate three HTTP calls. The REST API is the same
-mechanism underneath and runs on the Podman stack, so that is what the script
+mechanism underneath and runs on the compose stack, so that is what the script
 uses. The CRD annotations in the chapter map onto these endpoints one to one.
 
 ## What the script does
@@ -39,11 +39,11 @@ They ship in `libs/` but are only discovered through `plugin.path`. Pointing
 delays the REST port by minutes — so the compose file copies just the
 `connect-file` jar into a directory of its own.
 
-**podman-compose resolves relative volume paths against the first `-f` file's
+**Compose resolves relative volume paths against the first `-f` file's
 directory**, not the file that declares the volume. A `./connect-data` mount
 declared here lands in `examples/_infra/` when you pass the base compose first.
 There is no bind mount now; the script writes the source file in with
-`podman exec`.
+`docker exec`.
 
 **The image runs as a non-root user**, so the source file goes under `/tmp`.
 Anything at the filesystem root fails to create.
@@ -55,7 +55,7 @@ in a lot of older documentation now fails with `ClassNotFoundException`. Use
 
 ## Verified
 
-2026-09-16, against Kafka 4.3.1 and Connect 4.3.1 in the Podman stack. The
+2026-09-16, against Kafka 4.3.1 and Connect 4.3.1 in the compose stack. The
 connector read 10 records and reported byte position 328; after `PATCH` to
 position 0 and a resume, the topic held 20 records; `DELETE` returned the
 connector to no offsets.

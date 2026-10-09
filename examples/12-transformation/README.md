@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 ## Infrastructure
 
-Requires Kafka and Redis from the Podman stack. On startup, the `RedisProductCatalog` bean seeds product data into Redis hashes (Quarkus uses CDI `@Startup`; Spring Boot uses `@PostConstruct`).
+Requires Kafka and Redis from the compose stack. On startup, the `RedisProductCatalog` bean seeds product data into Redis hashes (Quarkus uses CDI `@Startup`; Spring Boot uses `@PostConstruct`).
 
 ## Data flow
 

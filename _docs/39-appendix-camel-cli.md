@@ -24,31 +24,18 @@ The `--port` flag matters: the embedded HTTP server defaults to 8080, which the 
 
 ## Installation
 
-As of Camel 4.22 the canonical way to install the CLI is a one-line web
-installer:
-
-```bash
-# macOS / Linux
-curl -fsSL https://camel.apache.org/install.sh | sh
-
-# Windows (PowerShell)
-irm https://camel.apache.org/install.ps1 | iex
-```
-
-The installer pulls from Maven Central, verifies the download against its
-SHA-256, checks you have a Java 17+ runtime, and installs per-user — it never
-needs `sudo`.
-
-The older route still works and is what the rest of this tutorial assumes you
-may have used, since it also gets you [JBang](https://www.jbang.dev/), which
-several examples use directly:
+This tutorial installs the CLI from its pinned Maven Central artifact,
+`org.apache.camel:camel-launcher`, through [JBang](https://www.jbang.dev/),
+which several examples also use directly. Pin it to the Camel line the Quarkus
+platform BOM pins (4.22.1 for Quarkus 3.40.1), so the CLI and the Maven
+examples agree on Camel:
 
 ```bash
 # Install JBang (if not already installed)
 curl -Ls https://sh.jbang.dev | bash -s - app setup
 
-# Install the Camel CLI
-jbang app install camel@apache/camel
+# Install the Camel CLI, pinned
+jbang app install --name camel org.apache.camel:camel-launcher:4.22.1
 ```
 
 Verify the installation:
@@ -58,31 +45,29 @@ camel version
 ```
 
 ```
-Apache Camel CLI 4.22.0
+Apache Camel CLI 4.22.1
 ```
 
-The CLI ships as a single binary that delegates to JBang under the hood. When you run `camel run`, JBang resolves Camel dependencies, downloads them once, caches them locally, and starts the Camel runtime — no Maven, Gradle, or IDE required.
+Two other install paths exist and this tutorial avoids both. Camel 4.22's web
+installer (`camel.apache.org/install.sh`) always fetches the newest launcher,
+so the version floats. The `camel@apache/camel` JBang catalog alias runs the
+CLI source from GitHub at `HEAD`, adds the Apache snapshot repository, and
+makes JBang ask you to trust the source.
+
+The CLI ships as a single launcher jar that JBang runs. When you run `camel run`, it resolves Camel dependencies, downloads them once, caches them locally, and starts the Camel runtime — no Maven, Gradle, or IDE required.
 
 ### Upgrading
 
-Camel 4.22 added a self-updater, which is the simplest path if you installed
-with the web installer:
+Upgrading is a re-install at the new pinned version:
 
 ```bash
-camel self-update
+jbang app install --force --name camel org.apache.camel:camel-launcher:<version>
+camel version
 ```
 
-It checks for a newer launcher release and installs it. If the CLI came from a
-package manager it declines and tells you that manager's upgrade command
-instead, rather than fighting it.
-
-For a JBang-installed CLI:
-
-```bash
-jbang app install --force camel@apache/camel
-```
-
-Either way, verify with `camel version`.
+Camel 4.22 also added `camel self-update`, which moves a web-installed launcher
+to the newest release; with a pinned JBang install, re-install instead so the
+version stays an explicit choice.
 
 Do not confuse `camel self-update` with `camel update`, covered later in this
 appendix — that one runs OpenRewrite recipes against *your project's* source to
@@ -470,7 +455,7 @@ camel get endpoint
 
 ## Infrastructure services
 
-The CLI can spin up infrastructure containers for local development using Testcontainers. This is useful when you want to prototype a route without running the full Podman stack from `scripts/setup-stack.sh`.
+The CLI can spin up infrastructure containers for local development using Testcontainers. This is useful when you want to prototype a route without running the full compose stack from `scripts/setup-stack.sh`.
 
 ### Listing available services
 
@@ -563,9 +548,9 @@ That is the setting that makes JFR useful for the profiling work described in
 [Appendix K]({% link _docs/31-appendix-virtual-threads.md %}) and
 [Appendix Q]({% link _docs/35-appendix-kafka-diagnostics.md %}).
 
-### How it relates to the Podman stack
+### How it relates to the compose stack
 
-The `camel infra` containers are ephemeral — data is lost when you stop them. For persistent development environments, use the Podman stack (`./scripts/setup-stack.sh`) described in Chapter 0. The CLI containers are best for quick experiments and throwaway prototypes.
+The `camel infra` containers are ephemeral — data is lost when you stop them. For persistent development environments, use the compose stack (`./scripts/setup-stack.sh`) described in Chapter 0. The CLI containers are best for quick experiments and throwaway prototypes.
 
 ## Interactive shell
 
@@ -895,13 +880,13 @@ Three files, no build tooling, no pom.xml.
 
 ### Step 2: Start infrastructure
 
-If you are not running the Podman stack, use the CLI to spin up Kafka and Redis:
+If you are not running the compose stack, use the CLI to spin up Kafka and Redis:
 
 ```bash
 camel infra run kafka redis
 ```
 
-Or use the existing Podman stack:
+Or use the existing compose stack:
 
 ```bash
 ./scripts/setup-stack.sh
@@ -985,7 +970,7 @@ The entire lifecycle — from a blank YAML file to a production Kubernetes deplo
 - **`camel run` is a zero-config runtime** — write a YAML route, run it, and dependencies are resolved automatically. No Maven project needed for prototyping.
 - **`camel trace` is your primary debugging tool** — see every exchange, every routing decision, every processing step in real time. Filter by route or failure status.
 - **`camel get` commands provide operational visibility** — route status, health checks, Kafka consumer lag, and endpoint statistics from the command line.
-- **`camel infra` spins up infrastructure on demand** — Kafka, Redis, PostgreSQL containers without touching Docker Compose or Podman files.
+- **`camel infra` spins up infrastructure on demand** — Kafka, Redis, PostgreSQL containers without touching the compose files.
 - **`camel export` bridges prototype and production** — generate a complete Quarkus or Spring Boot Maven project from your YAML routes. Same route files, production-grade runtime.
 - **`camel update` keeps routes current** — OpenRewrite recipes handle mechanical migration tasks when upgrading Camel versions.
 - **The CLI inspects any Camel application** — not just CLI-launched routes. Use `camel ps`, `camel get`, and `camel trace` against Quarkus and Spring Boot services with the management component enabled.

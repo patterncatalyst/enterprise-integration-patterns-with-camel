@@ -215,7 +215,7 @@ You can scale competing consumers at two levels:
 
 1. **Within a single application** — Increase `consumersCount` to add more consumer threads. Each thread is assigned partitions by Kafka's group coordinator. Maximum useful value = partition count of the topic.
 
-2. **Across multiple application instances** — Deploy multiple copies of the service (via Kubernetes replicas, Podman instances, etc.). Each instance joins the same consumer group and is assigned a subset of partitions.
+2. **Across multiple application instances** — Deploy multiple copies of the service (via Kubernetes replicas, extra containers, etc.). Each instance joins the same consumer group and is assigned a subset of partitions.
 
 {% include excalidraw.html file="14-consumer-scaling" alt="Two application instances each with two consumer threads, distributing 12 Kafka partitions evenly — 3 partitions per thread" caption="Figure 14.1 — Competing consumer scaling: 2 instances × 2 threads = 4 consumers, each assigned 3 of 12 partitions." %}
 

@@ -11,9 +11,9 @@ Two YAML DSL routes demonstrating the Camel CLI workflow from prototype to produ
 
 ## Prerequisites
 
-- **JBang with Camel CLI** — `jbang app install camel@apache/camel`
+- **JBang with Camel CLI** — `jbang app install --name camel org.apache.camel:camel-launcher:4.22.1`
 - **Java 25+**
-- **Kafka + Redis** — start the Podman stack from the project root:
+- **Kafka + Redis** — start the compose stack from the project root:
   ```bash
   ./scripts/setup-stack.sh
   ```

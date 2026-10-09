@@ -40,12 +40,12 @@ lifecycle against a real connector:
 ```bash
 ./scripts/setup-stack.sh
 cd examples/36-kafka-connect-offsets
-podman-compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
+docker compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
 ./connect-offsets-demo.sh
 ```
 
 It uses the REST API rather than the Strimzi CRDs, because the REST API is the
-same mechanism underneath and runs on the Podman stack — the CRD annotations
+same mechanism underneath and runs on the compose stack — the CRD annotations
 below map onto these endpoints one to one. The script proves the rewind rather
 than asserting it: the topic goes from 10 records to 20 after the `PATCH`.
 
@@ -208,7 +208,7 @@ Kafka Connect stores offsets in an internal compacted topic. The default topic n
 
 ```bash
 # Inspect the offset storage topic
-podman exec eip-kafka /opt/kafka/bin/kafka-console-consumer.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-console-consumer.sh \
   --bootstrap-server localhost:9092 \
   --topic connect-offsets \
   --from-beginning \
@@ -244,4 +244,4 @@ When the Camel route has a bug and you need to reprocess, you reset the Camel co
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `examples/36-kafka-connect-offsets/connect-offsets-demo.sh` was run against Kafka and Connect 4.3.1 in the Podman stack on 2026-09-16. A FileStreamSourceConnector read 10 records and reported byte position 328; after `PATCH`ing the position to 0 and resuming, the topic held 20 records; `DELETE` returned it to no offsets. The Strimzi CRD path is not covered by the example.*
+*Verification status: <span class="status status--verified">verified</span> — `examples/36-kafka-connect-offsets/connect-offsets-demo.sh` was run against Kafka and Connect 4.3.1 in the compose stack on 2026-09-16. A FileStreamSourceConnector read 10 records and reported byte position 328; after `PATCH`ing the position to 0 and resuming, the topic held 20 records; `DELETE` returned it to no offsets. The Strimzi CRD path is not covered by the example.*

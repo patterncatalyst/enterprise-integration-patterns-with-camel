@@ -6,26 +6,24 @@ Quick-start guide for running the EIP tutorial examples locally.
 
 | Tool | Minimum | Install |
 |------|---------|---------|
-| Java | 25 (LTS) | `sdk install java 25.0.2-tem` ([SDKMAN](https://sdkman.io/)) |
+| Java | 25 (LTS) | `sdk install java 25.0.4-tem` ([SDKMAN](https://sdkman.io/)) |
 | Maven | 3.9+ | `sdk install maven` |
-| JBang | latest | `curl -Ls https://sh.jbang.dev \| bash -s - app setup` |
-| Camel CLI | latest | `jbang app install camel@apache/camel` |
-| Podman | 4.x+ | [podman.io](https://podman.io/) |
-| Podman Compose | 1.x+ | `pip install podman-compose` |
+| JBang | 0.142+ | `curl -Ls https://sh.jbang.dev \| bash -s - app setup` |
+| Camel CLI | 4.22.1 | `jbang app install --name camel org.apache.camel:camel-launcher:4.22.1` |
+| Docker Engine | 29.x | `docker-ce` from Docker's Fedora/RHEL repository |
+| Docker Compose | v2 plugin | `docker-compose-plugin` (run as `docker compose`) |
 
-Docker is **not** required — not even for the integration tests. But if you
-intend to run them, point Testcontainers at Podman's socket, or it will go
-looking for a Docker one:
+Hosts: Fedora or RHEL. Docker Engine runs both the local stack and the
+Testcontainers-backed integration tests; no desktop application is needed.
+Check the daemon answers on the default context before running anything:
 
 ```bash
-systemctl --user enable --now podman.socket
-export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+docker context show               # default
+docker info >/dev/null && echo ok # ok
 ```
 
-Without this, the tests either fail with "Could not find a valid Docker
-environment" or — if you happen to have Docker installed — silently run on
-Docker while everything else runs on Podman. `scripts/build-all-examples.sh`
-sets it for you; `mvn verify` on its own does not.
+Optional, for the deployment appendices: minikube 1.39+ and kubectl 1.36
+(Appendix T), OpenShift Local (`crc`) with `oc` and Helm (Appendix Z).
 
 For detailed installation instructions, see [Chapter 0 — Prerequisites & Setup](https://patterncatalyst.github.io/enterprise-integration-patterns-with-camel/docs/00-prerequisites/).
 
@@ -42,7 +40,7 @@ cd enterprise-integration-patterns-with-camel
 ./scripts/setup-stack.sh
 ```
 
-This starts Kafka (KRaft), Pulsar, Redis, PostgreSQL, and Apicurio Registry on Podman. To include the observability stack (Grafana, Loki, Tempo, Mimir):
+This starts Kafka (KRaft), Pulsar, Redis, PostgreSQL, and Apicurio Registry with `docker compose`. To include the observability stack (Grafana, Loki, Tempo, Mimir):
 
 ```bash
 ./scripts/setup-stack.sh --lgtm
@@ -70,8 +68,8 @@ Quarkus Dev Mode starts with live reload — edit a route and the changes take e
 
 ## 4. Run all examples
 
-Use the build script. It walks the per-runtime subdirectories, points
-Testcontainers at Podman, and summarises what passed and failed:
+Use the build script. It walks the per-runtime subdirectories, checks the
+Docker daemon, and summarises what passed and failed:
 
 ```bash
 ./scripts/build-all-examples.sh              # compile only
@@ -83,7 +81,7 @@ strictly sequential — and needs the dev stack **down**, since the tests bind t
 same ports:
 
 ```bash
-podman-compose -p eip -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 ```
 
 To build a single example, pass a filter:

@@ -36,30 +36,28 @@ camel plugin get
 
 You should see `test` in the list of installed plugins.
 
-### Point Testcontainers at Podman
+### Docker Engine for Testcontainers
 
-Citrus starts its infrastructure through **Testcontainers**, which looks for a
-Docker socket. This tutorial runs on Podman, and Docker is not a dependency —
-but Testcontainers will not find Podman on its own. Export this once:
+Citrus starts its infrastructure through **Testcontainers**, which talks to
+Docker Engine on `/var/run/docker.sock` (the `default` docker context) — the
+same engine the development stack runs on. Nothing needs exporting; the daemon
+just has to be up and your user in the `docker` group:
 
 ```bash
-systemctl --user enable --now podman.socket
-export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+docker info >/dev/null && echo ok
 ```
 
-Without it you will either see "Could not find a valid Docker environment", or
-— if Docker happens to be installed — tests that pass while running on a second
-container engine you did not intend to use.
+Without it you will see "Could not find a valid Docker environment".
 
-Ryuk, the cleanup sidecar, works against rootless Podman; you do not need
-`TESTCONTAINERS_RYUK_DISABLED`, and disabling it leaves containers behind when
-a run is interrupted.
+Leave Ryuk, the cleanup sidecar, enabled; disabling it with
+`TESTCONTAINERS_RYUK_DISABLED` leaves containers behind when a run is
+interrupted.
 
 Finally, shut the dev stack down before running tests. Citrus brings up its own
 Kafka, Redis, PostgreSQL and Pulsar on the same ports:
 
 ```bash
-podman-compose -p eip -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 ```
 
 ### Dependencies
@@ -81,29 +79,13 @@ Additional connectors are available for databases (`citrus-sql`), JMS (`citrus-j
 
 ### Infrastructure prerequisites
 
-Citrus uses Testcontainers to manage infrastructure. You need either Docker or Podman running on your machine. The first test run pulls container images (Kafka, etc.) — subsequent runs reuse cached images.
+Citrus uses Testcontainers to manage infrastructure on Docker Engine. The first test run pulls container images (Kafka, etc.) — subsequent runs reuse cached images.
 
-**Testcontainers picks its own container engine**, independently of the Podman stack the rest of this tutorial uses. Unless you tell it otherwise it looks for a Docker socket, so on a machine with both engines installed the tests quietly run on Docker while `setup-stack.sh` runs on Podman — two engines, two sets of containers, and no warning that you are not testing against what you think you are.
-
-Podman works fine; it just has to be pointed at:
+To watch a run's infrastructure while it is in progress:
 
 ```bash
-systemctl --user enable --now podman.socket
-
-export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
-export TESTCONTAINERS_RYUK_DISABLED=true
+docker ps --filter label=com.docker.compose.project
 ```
-
-`scripts/build-all-examples.sh` does this for you: if the Podman socket exists and `DOCKER_HOST` is unset, it exports both before running the tests and prints which engine it chose. Set `DOCKER_HOST` yourself to override it.
-
-To confirm which engine actually served a run, look for the containers while it is in progress:
-
-```bash
-podman ps    # test infrastructure here means Podman served the run
-docker ps    # here means Docker did
-```
-
-One caveat when the two engines share a machine: with `DOCKER_HOST` exported, the `docker` CLI talks to Podman too, so both commands list the same containers. Unset it in that shell if you need to tell them apart.
 
 ### Stop the development stack first
 
@@ -125,7 +107,7 @@ Further up the container engine's own output is the real reason —
 development stack down before running the tests:
 
 ```bash
-podman-compose -p eip -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 ```
 
 For the same reason the examples' tests must run one at a time rather than in

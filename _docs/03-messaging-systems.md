@@ -333,7 +333,7 @@ camel run message-router.yaml --dev
 For routes that consume from Kafka, make sure the local stack is running (`./scripts/setup-stack.sh`). You can publish test messages to `eip.orders.placed` using the Kafka UI at `http://localhost:8090` or from the command line:
 
 ```bash
-podman exec eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
   --bootstrap-server localhost:9092 \
   --topic eip.orders.placed
 ```

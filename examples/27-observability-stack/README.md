@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 ## Infrastructure
 
-Requires **Kafka** and the **LGTM stack** (Grafana, Loki, Tempo, Mimir, OTel Collector) from the Podman compose stack.
+Requires **Kafka** and the **LGTM stack** (Grafana, Loki, Tempo, Mimir, OTel Collector) from the Docker Compose stack.
 
 ## Kafka topics
 

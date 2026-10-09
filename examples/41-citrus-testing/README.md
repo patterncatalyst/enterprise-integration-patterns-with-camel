@@ -13,9 +13,9 @@ endpoints, and verifies that expected outputs appear on real output topics and r
 
 ## Prerequisites
 
-- JBang with the Camel CLI installed (`jbang app install camel@apache/camel`)
+- JBang with the Camel CLI installed (`jbang app install --name camel org.apache.camel:camel-launcher:4.22.1`)
 - Java 25+
-- Docker or Podman (for Testcontainers-managed infrastructure)
+- Docker Engine on the default context (for Testcontainers-managed infrastructure)
 
 ## Setup
 

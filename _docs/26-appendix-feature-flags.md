@@ -140,7 +140,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=ab-test")
     .toD("direct:${header.routingAlgorithm}");
 ```
 
-## Running flagd in the Podman stack
+## Running flagd in the compose stack
 
 Add flagd to `compose.yaml`:
 
@@ -194,4 +194,4 @@ few seconds after the routes start. Note the property name — `camel.main.`, no
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `examples/26-feature-flags/` was run on both runtimes against flagd v0.16.3 in the Podman stack on 2026-09-15. The detour enriches while `enrichment-enabled` is on; ENTERPRISE and VIP orders resolve `hazmat-compliance-v2` to `v2` while STANDARD gets `v1`; and the fractional flag split 31 orders 29/2 between the legacy and new routing algorithms, consistent with its 90/10 targeting.*
+*Verification status: <span class="status status--verified">verified</span> — `examples/26-feature-flags/` was run on both runtimes against flagd v0.16.3 in the compose stack on 2026-09-15. The detour enriches while `enrichment-enabled` is on; ENTERPRISE and VIP orders resolve `hazmat-compliance-v2` to `v2` while STANDARD gets `v1`; and the fractional flag split 31 orders 29/2 between the legacy and new routing algorithms, consistent with its 90/10 targeting.*

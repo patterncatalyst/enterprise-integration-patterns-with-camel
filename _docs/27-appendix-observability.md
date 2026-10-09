@@ -462,7 +462,7 @@ java -jar target/quarkus-app/quarkus-run.jar &
 
 for i in 1 2 3 4 5; do
   echo "{\"order_id\":\"ORD-100$i\",\"customer\":\"acme\",\"amount\":$((i*250)).50}"
-done | podman exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
+done | docker exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
   --bootstrap-server localhost:9092 --topic eip.orders.placed
 ```
 

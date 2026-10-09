@@ -26,7 +26,7 @@ Send an order and watch any of them classify it:
 
 ```bash
 echo '{"order_id":"DSL-1","amount":640.00,"item_sku":"W-1"}' \
-  | podman exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
+  | docker exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
       --bootstrap-server localhost:9092 --topic eip.orders.placed
 ```
 
@@ -54,7 +54,7 @@ seconds after its routes start.
 
 ## Verified
 
-2026-09-15, all three runtimes against the Podman stack. Each classifies
+2026-09-15, all three runtimes against the compose stack. Each classifies
 `amount > 500` as `HIGH_VALUE` and the rest as `STANDARD`, with identical log
 output: Quarkus (DSL-3/DSL-4), Spring Boot (DSL-1/DSL-2), YAML DSL via
 `camel run` (DSL-5/DSL-6). The YAML file also validates clean against the

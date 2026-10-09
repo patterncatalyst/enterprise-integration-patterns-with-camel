@@ -19,7 +19,7 @@ mvn quarkus:dev
 
 ## Dev Services — automatic infrastructure
 
-When you run `mvn quarkus:dev`, Quarkus Dev Services automatically starts containers for your dependencies. No Podman compose needed during development:
+When you run `mvn quarkus:dev`, Quarkus Dev Services automatically starts containers for your dependencies. No compose stack needed during development:
 
 ```properties
 # application.properties — Dev Services start these automatically
@@ -54,7 +54,7 @@ All containers are cleaned up when dev mode exits.
 > ```
 >
 > Every other example in this tutorial sets that property unconditionally,
-> because they are all built to run against the Podman stack. That is also why
+> because they are all built to run against the compose stack. That is also why
 > Dev Services never fire in any of them.
 
 ### Dev Services configuration
@@ -77,14 +77,14 @@ You can customize the containers that Dev Services provisions:
 
 Multiple services can share the same Dev Services container by setting `%dev.quarkus.kafka.devservices.service-name=shared-kafka` — services with the same `service-name` reuse one container. This lets you run `mvn quarkus:dev` in two terminals with both services on the same broker.
 
-### When to use Dev Services vs. the Podman stack
+### When to use Dev Services vs. the compose stack
 
 | Scenario | Use |
 |----------|-----|
 | Single-service development | Dev Services (automatic, zero config) |
-| Multi-service integration testing | Podman stack (shared Kafka across services) |
-| Full-stack demo | Podman stack + LGTM overlay |
-| CI/CD | Podman stack (reproducible) |
+| Multi-service integration testing | compose stack (shared Kafka across services) |
+| Full-stack demo | compose stack + LGTM overlay |
+| CI/CD | compose stack (reproducible) |
 
 ## Live reload
 
@@ -241,7 +241,7 @@ This logs each processor the exchange passes through, including headers and body
 
 ## Common pitfalls
 
-**Port conflicts with Dev Services** — If the Podman stack is already running, Dev Services will try to start duplicate containers. Disable Dev Services for the conflicting service:
+**Port conflicts with Dev Services** — If the compose stack is already running, Dev Services will try to start duplicate containers. Disable Dev Services for the conflicting service:
 
 ```properties
 %dev.quarkus.kafka.devservices.enabled=false
@@ -250,7 +250,7 @@ This logs each processor the exchange passes through, including headers and body
 
 **Stale CamelContext after refactoring** — Renaming a `RouteBuilder` class sometimes leaves the old route registered alongside the new one. Press `s` in the dev mode terminal to force a full restart, or stop and restart dev mode entirely.
 
-**Orphaned containers** — If dev mode is killed with `kill -9` instead of `Ctrl+C`, Dev Services containers are not cleaned up. Remove them with `podman rm -f $(podman ps -q --filter label=quarkus-dev-service)`.
+**Orphaned containers** — If dev mode is killed with `kill -9` instead of `Ctrl+C`, Dev Services containers are not cleaned up. Remove them with `docker rm -f $(docker ps -q --filter label=quarkus-dev-service)`.
 
 **Native build differences** — Code that works in dev mode may fail in a native build due to GraalVM restrictions. Custom processors that use reflection need `@RegisterForReflection`; Camel Quarkus extensions handle most reflection registration automatically. Test periodically with `mvn package -Dnative`.
 

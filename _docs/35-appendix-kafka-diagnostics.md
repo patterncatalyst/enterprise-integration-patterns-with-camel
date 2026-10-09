@@ -6,7 +6,7 @@ description: "Collecting broker logs, consumer group state, topic metadata, JMX 
 duration: "20 minutes"
 ---
 
-When a Kafka-backed integration route stalls — consumer lag climbs, messages disappear, or throughput drops — you need a systematic approach to collecting diagnostic data. This appendix covers the tools and commands for gathering the information you need to diagnose Kafka issues, from the local Podman stack through production Kubernetes deployments.
+When a Kafka-backed integration route stalls — consumer lag climbs, messages disappear, or throughput drops — you need a systematic approach to collecting diagnostic data. This appendix covers the tools and commands for gathering the information you need to diagnose Kafka issues, from the local compose stack through production Kubernetes deployments.
 
 ## Diagnostic data categories
 
@@ -22,17 +22,17 @@ Kafka diagnostics fall into five categories, each answering different questions:
 
 ## Broker logs
 
-### Local Podman stack
+### Local compose stack
 
 ```bash
 # Stream broker logs (follow mode)
-podman logs -f eip-kafka
+docker logs -f eip-kafka
 
 # Last 200 lines
-podman logs --tail 200 eip-kafka
+docker logs --tail 200 eip-kafka
 
 # Grep for specific errors
-podman logs eip-kafka 2>&1 | grep -i "error\|exception\|warn"
+docker logs eip-kafka 2>&1 | grep -i "error\|exception\|warn"
 ```
 
 ### What to look for
@@ -48,7 +48,7 @@ podman logs eip-kafka 2>&1 | grep -i "error\|exception\|warn"
 
 ### Adjusting broker log level
 
-For the Podman stack, set the `KAFKA_LOG4J_ROOT_LOGLEVEL` environment variable:
+For the compose stack, set the `KAFKA_LOG4J_ROOT_LOGLEVEL` environment variable:
 
 ```yaml
 # compose.yaml
@@ -68,11 +68,11 @@ For specific debugging scenarios:
 
 ```bash
 # List all topics
-podman exec eip-kafka /opt/kafka/bin/kafka-topics.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-topics.sh \
   --bootstrap-server localhost:9092 --list
 
 # Describe a specific topic (partitions, replicas, ISR)
-podman exec eip-kafka /opt/kafka/bin/kafka-topics.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-topics.sh \
   --bootstrap-server localhost:9092 \
   --describe --topic eip.orders.placed
 ```
@@ -91,7 +91,7 @@ Topic: eip.orders.placed  PartitionCount: 3  ReplicationFactor: 1
 ### Check topic-level configuration overrides
 
 ```bash
-podman exec eip-kafka /opt/kafka/bin/kafka-configs.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-configs.sh \
   --bootstrap-server localhost:9092 \
   --entity-type topics --entity-name eip.orders.placed \
   --describe
@@ -100,7 +100,7 @@ podman exec eip-kafka /opt/kafka/bin/kafka-configs.sh \
 ### Check disk usage per topic
 
 ```bash
-podman exec eip-kafka /opt/kafka/bin/kafka-log-dirs.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-log-dirs.sh \
   --bootstrap-server localhost:9092 \
   --describe --topic-list eip.orders.placed
 ```
@@ -114,14 +114,14 @@ Consumer group state is usually the first thing to check when messages are "stuc
 ### List consumer groups
 
 ```bash
-podman exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
   --bootstrap-server localhost:9092 --list
 ```
 
 ### Describe a consumer group (lag, assignment)
 
 ```bash
-podman exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
   --bootstrap-server localhost:9092 \
   --describe --group inventory-service
 ```
@@ -155,7 +155,7 @@ inventory-service eip.orders.placed  2          1103            1200            
 ### Check consumer group state
 
 ```bash
-podman exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
   --bootstrap-server localhost:9092 \
   --describe --group inventory-service --state
 ```
@@ -175,14 +175,14 @@ When you need to reprocess messages (after a bug fix, for example):
 
 ```bash
 # Dry run first — see what would change
-podman exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
   --bootstrap-server localhost:9092 \
   --group inventory-service \
   --topic eip.orders.placed \
   --reset-offsets --to-earliest --dry-run
 
 # Execute the reset (group must have no active consumers)
-podman exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-consumer-groups.sh \
   --bootstrap-server localhost:9092 \
   --group inventory-service \
   --topic eip.orders.placed \
@@ -215,7 +215,7 @@ Kafka exposes hundreds of metrics via JMX. For integration route debugging, focu
 | `kafka.producer:type=producer-metrics,client-id=*,buffer-available-bytes` | Remaining buffer space |
 | `kafka.producer:type=producer-metrics,client-id=*,request-latency-avg` | Average round-trip time |
 
-### Exposing JMX metrics in the Podman stack
+### Exposing JMX metrics in the compose stack
 
 ```yaml
 # compose.yaml — add JMX exporter to Kafka
@@ -239,7 +239,7 @@ When Kafka issues are JVM-related (GC pauses, thread contention, memory pressure
 
 ```bash
 # Get the JVM PID inside the container
-podman exec eip-kafka bash -c 'jcmd 1 Thread.print'
+docker exec eip-kafka bash -c 'jcmd 1 Thread.print'
 ```
 
 Look for:
@@ -251,10 +251,10 @@ Look for:
 
 ```bash
 # Trigger a heap dump (large file — ensure disk space)
-podman exec eip-kafka bash -c 'jcmd 1 GC.heap_dump /tmp/kafka-heap.hprof'
+docker exec eip-kafka bash -c 'jcmd 1 GC.heap_dump /tmp/kafka-heap.hprof'
 
 # Copy it out of the container
-podman cp eip-kafka:/tmp/kafka-heap.hprof ./kafka-heap.hprof
+docker cp eip-kafka:/tmp/kafka-heap.hprof ./kafka-heap.hprof
 ```
 
 Analyze with Eclipse MAT, VisualVM, or `jhat` to find memory leaks.
@@ -283,7 +283,7 @@ When something goes wrong, work through this checklist:
 
 1. **Check consumer group lag** — is the consumer falling behind? (`kafka-consumer-groups.sh --describe`)
 2. **Check consumer group state** — is the group stable or rebalancing? (`--state`)
-3. **Check broker logs** — any errors, warnings, or rebalance entries? (`podman logs`)
+3. **Check broker logs** — any errors, warnings, or rebalance entries? (`docker logs`)
 4. **Check topic metadata** — are all partitions healthy with leaders and ISR? (`kafka-topics.sh --describe`)
 5. **Check Camel route logs** — is the route processing messages or stuck?
 6. **Check JMX metrics** — request latency, under-replicated partitions, buffer usage
@@ -293,4 +293,4 @@ Most Kafka issues in integration routes fall into three categories: **consumer l
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `examples/35-kafka-diagnostics/kafka-diagnostics.sh` was run against the Podman stack on 2026-09-16 with `examples/09-routing-fundamentals` consuming: it reported six consumer groups with lag and `Stable` state, zero under-replicated partitions, and `--dump` produced a 1072-line thread dump and a heap summary.*
+*Verification status: <span class="status status--verified">verified</span> — `examples/35-kafka-diagnostics/kafka-diagnostics.sh` was run against the compose stack on 2026-09-16 with `examples/09-routing-fundamentals` consuming: it reported six consumer groups with lag and `Stable` state, zero under-replicated partitions, and `--dump` produced a 1072-line thread dump and a heap summary.*

@@ -840,7 +840,7 @@ public class PostgresChatMemoryStore implements ChatMemoryStore {
 }
 ```
 
-This integrates naturally with the PostgreSQL instance in the tutorial's Podman stack.
+This integrates naturally with the PostgreSQL instance in the tutorial's compose stack.
 
 ## RAG (Retrieval-Augmented Generation)
 
@@ -892,7 +892,7 @@ When a `RetrievalAugmentor` bean is present, the LangChain4j Chat component auto
 
 ### Embedding stores
 
-LangChain4j supports multiple embedding stores. For the tutorial's Podman stack, PostgreSQL with pgvector is a natural choice:
+LangChain4j supports multiple embedding stores. For the tutorial's compose stack, PostgreSQL with pgvector is a natural choice:
 
 ```properties
 # Quarkus
@@ -1079,7 +1079,7 @@ Keep this distinct from the catalog server in the next section. They share a nam
 | Exposes | Your application's `ai-tool` routes | The Apache Camel Catalog |
 | Audience | Agents and MCP clients calling your business logic | AI coding assistants helping you write routes |
 | Runs | Inside your application | As a standalone JBang process |
-| Artifact | `camel-mcp-server` | `camel@apache/camel-mcp-server` via JBang |
+| Artifact | `camel-mcp-server` | `org.apache.camel:camel-jbang-mcp:4.22.1:runner` via JBang |
 
 The embedded server does not implement a transport of its own. It bridges the tool registry to whatever MCP server the hosting runtime provides — Quarkus' MCP extension, Spring AI's MCP server, or the Vert.x engine bundled with Camel Main.
 
@@ -1181,8 +1181,9 @@ To use the Camel MCP Server with Claude Code, add it to your MCP configuration:
 {
   "mcpServers": {
     "camel": {
+      "type": "stdio",
       "command": "jbang",
-      "args": ["camel@apache/camel", "mcp"]
+      "args": ["-Dquarkus.log.level=WARN", "org.apache.camel:camel-jbang-mcp:4.22.1:runner"]
     }
   }
 }

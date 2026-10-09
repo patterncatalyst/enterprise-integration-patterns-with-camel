@@ -30,7 +30,7 @@ camel run *
 
 ## Infrastructure
 
-Kafka from the Podman stack.
+Kafka from the compose stack.
 
 ## Data flow
 

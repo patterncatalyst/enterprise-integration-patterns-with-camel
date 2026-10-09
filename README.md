@@ -1,6 +1,6 @@
 # Enterprise Integration Patterns with Apache Camel
 
-A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woolf) — implemented with Apache Camel on three runtimes (Quarkus, Spring Boot, and YAML DSL), backed by Kafka, Pulsar, and Redis, with runnable examples on Podman.
+A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woolf) — implemented with Apache Camel on three runtimes (Quarkus, Spring Boot, and YAML DSL), backed by Kafka, Pulsar, and Redis, with runnable examples on Docker Engine.
 
 **[Read the tutorial](https://patterncatalyst.github.io/enterprise-integration-patterns-with-camel/)**
 
@@ -8,9 +8,9 @@ A comprehensive guide to the **65 Enterprise Integration Patterns** (Hohpe & Woo
 
 - **44 tutorial chapters** — 10 parts covering all 65 EIP patterns, from integration styles through system management, plus 25 deep-dive appendices.
 - **67 Excalidraw diagrams** — visual architecture and pattern flow diagrams with EIP stencil icons embedded throughout.
-- **37 runnable examples** — Camel projects (Quarkus and Spring Boot variants) you can build and run against a local Podman stack, plus operational scripts for the Kafka appendices, including Loan Broker and Bond Trading case studies.
+- **37 runnable examples** — Camel projects (Quarkus and Spring Boot variants) you can build and run against a local compose stack, plus operational scripts for the Kafka appendices, including Loan Broker and Bond Trading case studies.
 - **Shipping domain** — A consistent e-commerce scenario (orders, inventory, payments, shipping, notifications) that drives every pattern example.
-- **Local infrastructure** — One-command Podman stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
+- **Local infrastructure** — One-command compose stack with Kafka (KRaft), Pulsar, Redis, PostgreSQL, Apicurio Registry, and an optional LGTM observability overlay (Grafana, Loki, Tempo, Mimir).
 
 ## Quick start
 
@@ -34,15 +34,14 @@ mvn spring-boot:run
 ./scripts/setup-stack.sh --lgtm
 ```
 
-Running the integration tests? Point Testcontainers at Podman first — it looks
-for a Docker socket by default, and Docker is not a dependency of this project:
+Running the integration tests? Testcontainers uses the same Docker Engine as the
+stack, on the default context — check the daemon answers first:
 
 ```bash
-systemctl --user enable --now podman.socket
-export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+docker info >/dev/null && echo ok
 
 # Tests bind the same ports as the dev stack, so stop it first
-podman-compose -p eip -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 ./scripts/build-all-examples.sh --with-tests
 ```
 

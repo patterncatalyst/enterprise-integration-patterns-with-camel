@@ -90,6 +90,6 @@ You can also inspect Kafka topics via the Kafka UI at <http://localhost:8090>.
 
 ---
 
-*Verification status: **both runtimes verified end to end** against the Podman stack on 2026-09-17 (Quarkus 3.39.3 / Spring Boot 4.1.1, Camel 4.22.0). A POSTed request returns 202 with its requestId, is enriched with credit data, fans out to all three banks, and the aggregator selects the lowest approved rate and publishes to `loan.results`.*
+*Verification status: **both runtimes verified end to end** against the compose stack on 2026-09-17 (Quarkus 3.39.3 / Spring Boot 4.1.1, Camel 4.22.0). A POSTed request returns 202 with its requestId, is enriched with credit data, fans out to all three banks, and the aggregator selects the lowest approved rate and publishes to `loan.results`.*
 
 *The Spring Boot variant had previously only been compiled, and did not in fact work: its gateway returned an empty HTTP 500. `restConfiguration()` sets `bindingMode(json)`, so Camel already serialises the response, and the route marshalled it a second time — which Quarkus tolerated by double-encoding the body and camel-servlet turned into a 500 with no exception logged. The redundant marshal is gone from both runtimes.*

@@ -32,7 +32,7 @@ camel run *
 
 ## Infrastructure
 
-Requires Kafka, Pulsar, and Redis from the Podman stack.
+Requires Kafka, Pulsar, and Redis from the compose stack.
 
 ## Data flow
 

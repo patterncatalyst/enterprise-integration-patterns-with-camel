@@ -2,11 +2,11 @@
 title: "Prerequisites & Setup"
 order: 0
 part: getting-started
-description: "Install Java 25, JBang, the Camel CLI, Maven, Podman, and the tools you need to run every example locally."
+description: "Install Java 25, JBang, the Camel CLI, Maven, Docker Engine, and the tools you need to run every example locally."
 duration: "30 minutes"
 ---
 
-Before you write a single route, you need a working development environment. This chapter walks you through every tool — Java, JBang, the Camel CLI, Maven, Podman, an IDE — and finishes with a smoke test that proves the whole stack is healthy. If you already have these tools installed, skim the version checks and jump to the stack verification at the end.
+Before you write a single route, you need a working development environment. This chapter walks you through every tool — Java, JBang, the Camel CLI, Maven, Docker Engine, an IDE — and finishes with a smoke test that proves the whole stack is healthy. If you already have these tools installed, skim the version checks and jump to the stack verification at the end.
 
 ## Java 25
 
@@ -17,11 +17,7 @@ Every example in this tutorial runs on **Java 25** (the current long-term-suppor
 [SDKMAN](https://sdkman.io/) manages parallel JDK installations and makes switching between versions painless. It needs `zip` and `unzip` present first — without them the installer stops with `Looking for unzip... Not found.`, which is easy to miss if you pipe it to `bash`:
 
 ```bash
-# Fedora / RHEL
 sudo dnf install -y zip unzip
-
-# Debian / Ubuntu
-sudo apt-get install -y zip unzip
 ```
 
 Then install SDKMAN itself:
@@ -34,16 +30,16 @@ source "$HOME/.sdkman/bin/sdkman-init.sh"
 Then install Java 25:
 
 ```bash
-sdk install java 25.0.2-tem
+sdk install java 25.0.4-tem
 ```
 
-This installs the Temurin (Eclipse Adoptium) distribution — a solid, well-tested OpenJDK build. Other distributions work too (`25.0.2-graal`, `25.0.2-amzn`, etc.); the runtime is the same OpenJDK underneath.
+This installs the Temurin (Eclipse Adoptium) distribution — a solid, well-tested OpenJDK build. Other distributions work too (`sdk list java` shows them); the runtime is the same OpenJDK underneath.
 
 Verify:
 
 ```bash
 java -version
-# openjdk version "25.0.2" ...
+# openjdk version "25.0.4" ...
 ```
 
 ### Why Java 25?
@@ -70,21 +66,25 @@ Verify:
 
 ```bash
 jbang --version
-# 0.141.x
+# 0.142.x
 ```
 
 ### Installing the Camel CLI
 
+Install it from its pinned Maven Central artifact, on the same Camel line the Quarkus platform BOM pins:
+
 ```bash
-jbang app install camel@apache/camel
+jbang app install --name camel org.apache.camel:camel-launcher:4.22.1
 ```
 
 This installs the `camel` command globally. Verify:
 
 ```bash
 camel version
-# Apache Camel CLI (JBang) 4.22.0
+# Apache Camel CLI 4.22.1
 ```
+
+Do not install the `camel@apache/camel` catalog alias: it runs the CLI source from GitHub at `HEAD`, adds the Apache snapshot repository, and makes JBang ask you to trust the source.
 
 ### What the Camel CLI gives you
 
@@ -145,7 +145,7 @@ mvn -version
 Make sure Maven reports the Java 25 JDK you just installed. If it picks up an older JDK, set `JAVA_HOME` explicitly:
 
 ```bash
-export JAVA_HOME=$(sdk home java 25.0.2-tem)
+export JAVA_HOME=$(sdk home java 25.0.4-tem)
 ```
 
 ### Maven settings for this tutorial
@@ -154,106 +154,80 @@ No special `settings.xml` is needed. All dependencies come from Maven Central, a
 
 | Dependency | Version |
 |-----------|---------|
-| Apache Camel | 4.22.0 |
-| Camel Quarkus | 3.39.0 |
-| Quarkus | 3.39.3 |
-| Camel Spring Boot | 4.22.0 |
+| Apache Camel | 4.22.1 |
+| Camel Quarkus | 3.40.0 |
+| Quarkus | 3.40.1 (LTS) |
+| Camel Spring Boot | 4.22.1 |
 | Spring Boot | 4.1.1 |
-| Camel CLI (JBang) | 4.22.0 |
+| Camel CLI (`camel-launcher`) | 4.22.1 |
 | Drools | 10.2.0 |
 
-You'll see these in the `<dependencyManagement>` section of every `pom.xml`. When a new Camel release ships, upgrading is a BOM version bump in Maven and `camel version set 4.x.x` for the CLI.
+You'll see these in the `<dependencyManagement>` section of every `pom.xml`. When a new Camel release ships, upgrading is a BOM version bump in Maven and a re-install of `camel-launcher` at the new version for the CLI.
 
-## Podman & podman-compose
+## Docker Engine & Docker Compose
 
-The local infrastructure — Kafka, Pulsar, Redis, PostgreSQL, Apicurio, and the optional LGTM observability stack — runs in containers managed by **Podman**. Podman is a daemonless, rootless container engine that runs OCI containers; if you're used to Docker, the CLI is almost identical.
+The local infrastructure — Kafka, Pulsar, Redis, PostgreSQL, Apicurio, and the optional LGTM observability stack — runs in containers on **Docker Engine** (`docker-ce`), driven by the **Docker Compose v2 plugin** (`docker compose`, with a space). The same engine runs the Testcontainers-backed integration tests, so there is exactly one container engine in play. No desktop application is needed. The instructions target Fedora and RHEL hosts (bare metal or VM).
 
-### Why Podman over Docker?
+### Installing Docker Engine
 
-Podman runs containers without a root daemon, which means no `sudo`, no Docker socket to secure, and a smaller attack surface on your workstation. Every `docker` command you know has a `podman` equivalent. The compose files in this tutorial use standard Compose syntax and work with both engines — but we'll reference `podman` and `podman-compose` throughout.
+Docker Engine comes from Docker's own repository, not the distribution's. On **Fedora**:
 
-You do **not** need Docker for this tutorial, including for the integration tests. But the tests need one extra setting to stay on Podman — see [Testcontainers and the container socket](#testcontainers-and-the-container-socket) below, because the failure mode there is confusing rather than loud.
-
-### Installing Podman
-
-**Fedora / RHEL / CentOS Stream:**
 ```bash
-sudo dnf install -y podman podman-compose
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
 ```
 
-**Ubuntu / Debian:**
+On **RHEL**, use the RHEL repository file instead:
+
 ```bash
-sudo apt-get update
-sudo apt-get install -y podman
-pip install podman-compose
+sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo systemctl enable --now docker
 ```
 
-**macOS (via Homebrew):**
+Let your user talk to the daemon without `sudo`, then log out and back in (or run `newgrp docker`):
+
 ```bash
-brew install podman podman-compose
-podman machine init
-podman machine start
+sudo usermod -aG docker "$USER"
 ```
-
-On macOS, Podman runs a lightweight Linux VM behind the scenes. The `podman machine init` step creates it; `podman machine start` boots it. You only need to do this once.
-
-**Windows (via WSL2):**
-Install Podman Desktop from [podman-desktop.io](https://podman-desktop.io) or use Podman inside your WSL2 distribution.
 
 Verify:
 
+{% raw %}
 ```bash
-podman --version
-# podman version 5.x.x
+docker version --format '{{.Server.Version}}'
+# 29.x
 
-podman-compose --version
-# podman-compose version 1.x.x
+docker compose version
+# Docker Compose version v5.x
+
+docker context show
+# default
 ```
+{% endraw %}
 
-### Testcontainers and the container socket
+`docker context show` must print `default`, the local daemon on `/var/run/docker.sock`. Every script in this repository, and Testcontainers, talks to that socket. Use `docker compose`, never the legacy `docker-compose` binary.
+
+### Testcontainers and the Docker socket
 
 The Citrus integration tests — the ones behind `mvn verify` in most examples —
-start their own throwaway containers through **Testcontainers**. Testcontainers
-does not know about Podman. It looks for a Docker socket, and if it finds one it
-uses it without comment.
-
-That produces two failure modes, neither of which announces itself:
-
-- **Docker is installed.** The tests quietly run on Docker while every other
-  thing in this tutorial runs on Podman. Everything passes, so nothing looks
-  wrong — you just have two container engines in play and containers appearing
-  somewhere you are not looking for them.
-- **Docker is not installed.** The tests fail with "Could not find a valid
-  Docker environment", which reads like a missing dependency and sends people
-  off to install Docker they do not need.
-
-The fix is one environment variable. Podman's socket speaks the Docker API, so
-pointing Testcontainers at it is all that is required:
+start their own throwaway containers through **Testcontainers**, which finds
+Docker Engine on `/var/run/docker.sock` with no configuration. If the daemon is
+not running, or your user is not in the `docker` group, the tests fail with
+"Could not find a valid Docker environment". Fix the daemon, not the tests:
 
 ```bash
-systemctl --user enable --now podman.socket
-export DOCKER_HOST="unix://${XDG_RUNTIME_DIR}/podman/podman.sock"
+systemctl is-active docker        # active
+docker info >/dev/null && echo ok # ok
 ```
 
-Confirm the socket is live and answering:
+`scripts/build-all-examples.sh` runs the same check before it builds anything.
 
-```bash
-curl -s --unix-socket "${XDG_RUNTIME_DIR}/podman/podman.sock" \
-  http://d/v1.41/version
-```
-
-You should get JSON back naming `Podman Engine` and an `ApiVersion` of 1.41 or
-higher — that API compatibility is the whole reason this works.
-
-`scripts/build-all-examples.sh` does this for you — it exports `DOCKER_HOST`
-automatically whenever the Podman socket exists and you have not already chosen
-an engine. Running `mvn verify` yourself in a single example directory does
-not, so export it in your shell.
-
-Ryuk, the sidecar Testcontainers uses to reap leftover containers, works fine
-against rootless Podman. You may see advice to set
-`TESTCONTAINERS_RYUK_DISABLED=true`; you do not need it here, and turning Ryuk
-off means interrupted runs leave containers behind.
+Leave Ryuk, the sidecar Testcontainers uses to reap leftover containers,
+enabled; turning it off (`TESTCONTAINERS_RYUK_DISABLED=true`) means interrupted
+runs leave containers behind.
 
 One more thing that will bite you: **the integration tests and the dev stack
 cannot both be running.** Both bind 9092, 6379, 5432 and 6650. The symptom is a
@@ -261,32 +235,23 @@ container failing to start with something unhelpful like "Local Docker Compose
 exited abnormally". Shut the stack down first:
 
 ```bash
-podman-compose -p eip -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 ```
 
-### Rootless containers and resource limits
+### Resource limits
 
-The compose files in `examples/_infra/` set `mem_limit` on memory-hungry services (Kafka gets 1 GB, Redis gets 512 MB). On Linux with cgroups v2, these limits work out of the box in rootless mode. On macOS, the limits are enforced inside the Podman machine VM — make sure you allocated enough memory when you initialized it:
+The compose files in `examples/_infra/` set `mem_limit` on memory-hungry services (Kafka gets 1 GB, Redis gets 512 MB). On Fedora and RHEL with cgroups v2 these limits work out of the box. Plan for about 8 GB of free memory and 4 CPUs for the full stack (base + LGTM); the base stack alone (Kafka, Pulsar, Redis, PostgreSQL, Apicurio) fits in 4 GB.
 
-```bash
-podman machine init --memory 8192 --cpus 4
-```
+### Host ports
 
-8 GB and 4 CPUs is comfortable for the full stack (base + LGTM). If you only run the base stack (Kafka, Pulsar, Redis, PostgreSQL, Apicurio), 4 GB is enough.
+Every service publishes on a fixed host port (see the port map below). On Fedora Server and RHEL, Cockpit owns port 9090; nothing in this tutorial uses it. If a port is already taken, `ss -ltnp | grep :<port>` names the process.
 
 ## GitHub CLI (`gh`)
 
 The `gh` CLI is optional but useful: it lets you clone the tutorial repo, check GitHub Actions status, and interact with issues and pull requests from the terminal.
 
 ```bash
-# Fedora / RHEL
 sudo dnf install -y gh
-
-# macOS
-brew install gh
-
-# Ubuntu / Debian
-sudo apt-get install -y gh
 ```
 
 Authenticate:
@@ -358,7 +323,7 @@ The bootstrap script handles everything:
 ./scripts/setup-stack.sh
 ```
 
-This runs `podman-compose up -d` against the base compose file, waits for health checks, and reports status. First run pulls images — expect a few minutes depending on your connection.
+This runs `docker compose up -d` against the base compose file, waits for health checks, and reports status. First run pulls images — expect a few minutes depending on your connection.
 
 ### Starting the full stack (with observability)
 
@@ -389,18 +354,18 @@ After `setup-stack.sh` completes, verify each service:
 
 ```bash
 # Kafka — list topics (should return empty or internal topics)
-podman exec eip-kafka /opt/kafka/bin/kafka-topics.sh \
+docker exec eip-kafka /opt/kafka/bin/kafka-topics.sh \
   --bootstrap-server localhost:9092 --list
 
 # Pulsar — check broker status
-podman exec eip-pulsar bin/pulsar-admin brokers healthcheck
+docker exec eip-pulsar bin/pulsar-admin brokers healthcheck
 
 # Redis — ping
-podman exec eip-redis redis-cli ping
+docker exec eip-redis redis-cli ping
 # PONG
 
 # PostgreSQL — check schemas
-podman exec eip-postgres psql -U eipuser -d eipdb \
+docker exec eip-postgres psql -U eipuser -d eipdb \
   -c "SELECT schema_name FROM information_schema.schemata \
       WHERE schema_name NOT IN ('pg_catalog','information_schema','pg_toast','public');"
 # orders, inventory, payments, shipping, notifications
@@ -415,14 +380,14 @@ If all five checks pass, your environment is ready for every example in this tut
 
 ```bash
 # Stop all services (data volumes are preserved)
-podman-compose -f examples/_infra/compose.yaml down
+docker compose -p eip -f examples/_infra/compose.yaml down
 
 # Stop including LGTM
-podman-compose -f examples/_infra/compose.yaml \
+docker compose -p eip -f examples/_infra/compose.yaml \
   -f examples/_infra/compose.lgtm.yaml down
 
 # Full cleanup (removes volumes — you lose all data)
-podman-compose -f examples/_infra/compose.yaml down -v
+docker compose -p eip -f examples/_infra/compose.yaml down -v
 ```
 
 ## Turning off the demo data generators
@@ -472,8 +437,8 @@ describe unless you turn something off. The Citrus integration tests set them to
 - Java 25 via SDKMAN, Maven 3.9+, and how to ensure they're wired together.
 - JBang and the Camel CLI — the fastest way to run, inspect, and prototype Camel routes from single files.
 - The tutorial workflow: prototype with `camel run --dev`, inspect with `camel get` / `camel trace`, promote with `camel export --runtime=quarkus` (or `--runtime=spring-boot`).
-- Podman and podman-compose for rootless container management, and why the
-  integration tests need `DOCKER_HOST` pointed at the Podman socket.
+- Docker Engine and the `docker compose` plugin on the default context, which
+  serve both the local stack and the Testcontainers-backed integration tests.
 - The two-tier local stack: base infrastructure and optional LGTM observability.
 - How to verify that every service is healthy and ready.
 
