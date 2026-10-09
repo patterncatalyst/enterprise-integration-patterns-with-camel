@@ -25,7 +25,7 @@ mvn spring-boot:run
 ```bash
 # YAML DSL (Camel CLI)
 cd examples/06-channel-infra/yaml-dsl
-camel run *
+camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 ```
 
 The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world — how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.

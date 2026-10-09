@@ -23,7 +23,7 @@ mvn spring-boot:run
 
 # YAML DSL (Camel CLI — no Maven required)
 cd examples/17-observability/yaml-dsl
-camel run *
+camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 ```
 
 > **Note:** The YAML DSL variant includes only the declarative EIP routes. Data generators and Java-specific patterns (custom aggregation strategies, CDI beans) remain in the Quarkus and Spring Boot variants.

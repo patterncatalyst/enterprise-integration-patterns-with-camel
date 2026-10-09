@@ -25,7 +25,7 @@ mvn spring-boot:run
 ```bash
 # YAML DSL (Camel CLI)
 cd examples/17-observability/yaml-dsl
-camel run *
+camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 ```
 
 A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
