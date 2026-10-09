@@ -124,7 +124,7 @@ To build a single example, pass a filter:
 | 28 | `examples/32-kafka-consumer-tuning` | Throughput-tuned, safety-first, static-membership consumers |
 | 29 | `examples/33-kafka-producer-tuning` | Batched, compressed, idempotent, synchronous producers |
 | 30 | `examples/37-testing-strategies` | Three-tier testing: unit, integration, Newman |
-| 31 | `examples/38-kubernetes-deploy` | Kubernetes deployment on Minikube with Strimzi Kafka |
+| 31 | `examples/38-kubernetes-deploy` | Kubernetes deployment on minikube with Strimzi Kafka; OpenShift Local via `openshift/` (Appendix Z) |
 | 32 | `examples/39-camel-cli` | CLI prototype-to-production workflow (YAML DSL) |
 | 33 | `examples/40-camel-tui` | TUI dashboard demo with order validation (YAML DSL) |
 | 34 | `examples/41-citrus-testing` | End-to-end integration testing with Citrus (YAML DSL) |

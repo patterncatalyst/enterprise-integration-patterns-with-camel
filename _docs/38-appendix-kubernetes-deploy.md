@@ -569,7 +569,7 @@ minikube stop -p eip
 
 To run the same example on OpenShift, with images built inside the cluster and
 Routes instead of NodePorts, see
-[Appendix Z]({% link _docs/44-appendix-openshift-local.md %}).
+[Appendix Z]({{ '/docs/44-appendix-openshift-local/' | relative_url }}).
 
 ---
 
