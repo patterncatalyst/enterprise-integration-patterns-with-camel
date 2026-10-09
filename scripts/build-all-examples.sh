@@ -16,11 +16,16 @@ set -uo pipefail
 
 cd "$(dirname "$0")/.." || exit 1
 
-MVN_ARGS=(-B package -DskipTests)
+# -ntp is not cosmetic. After a version bump the Quarkus test bootstrap
+# downloads deployment artifacts from inside the surefire JVM; Maven's
+# transfer listener then prints through surefire's console capture, whose
+# lazy class init needs the Quarkus test class loader the bootstrap is
+# holding. The test JVM deadlocks with no output (seen on 3.39 -> 3.40).
+MVN_ARGS=(-B -ntp package -DskipTests)
 FILTERS=()
 for arg in "$@"; do
   case "$arg" in
-    --with-tests) MVN_ARGS=(-B verify) ;;
+    --with-tests) MVN_ARGS=(-B -ntp verify) ;;
     *) FILTERS+=("$arg") ;;
   esac
 done
