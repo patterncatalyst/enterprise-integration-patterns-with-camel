@@ -16,14 +16,15 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson.version>2.18.2</jackson.version>
+        <!-- jackson-annotations is versioned major.minor only from 2.20 on -->
+        <jackson-annotations.version>2.22</jackson-annotations.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson-annotations.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

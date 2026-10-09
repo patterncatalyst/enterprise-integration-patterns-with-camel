@@ -20,9 +20,9 @@
 
     <properties>
         <java.version>25</java.version>
-        <camel.version>4.22.0</camel.version>
-        <citrus.version>5.0.1</citrus.version>
-        <otel.instrumentation.version>2.31.1</otel.instrumentation.version>
+        <camel.version>4.22.1</camel.version>
+        <citrus.version>5.0.2</citrus.version>
+        <otel.instrumentation.version>2.32.0</otel.instrumentation.version>
     </properties>
 
     <dependencyManagement>

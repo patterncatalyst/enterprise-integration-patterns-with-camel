@@ -20,7 +20,7 @@
 
     <properties>
         <java.version>25</java.version>
-        <camel.version>4.22.0</camel.version>
+        <camel.version>4.22.1</camel.version>
     </properties>
 
     <dependencyManagement>

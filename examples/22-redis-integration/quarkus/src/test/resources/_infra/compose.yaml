@@ -35,7 +35,7 @@ services:
       - eip-net
 
   kafka-ui:
-    image: docker.io/provectuslabs/kafka-ui:v0.7.2
+    image: ghcr.io/kafbat/kafka-ui:v1.5.0
     ports:
       - "8090:8080"
     environment:
@@ -49,7 +49,7 @@ services:
       - eip-net
 
   redis:
-    image: docker.io/library/redis:8.10.1-alpine
+    image: docker.io/library/redis:8.10.2-alpine
     ports:
       - "6379:6379"
     volumes:

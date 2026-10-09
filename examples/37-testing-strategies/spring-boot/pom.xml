@@ -20,7 +20,7 @@
 
     <properties>
         <java.version>25</java.version>
-        <camel.version>4.22.0</camel.version>
+        <camel.version>4.22.1</camel.version>
     </properties>
 
     <dependencyManagement>
@@ -91,7 +91,7 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>5.5.1</version>
+            <version>6.1.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -125,7 +125,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
-                        <version>3.5.0</version>
+                        <version>3.6.4</version>
                         <executions>
                             <execution>
                                 <id>newman-run</id>

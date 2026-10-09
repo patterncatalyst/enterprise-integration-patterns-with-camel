@@ -20,10 +20,10 @@
 
     <properties>
         <java.version>25</java.version>
-        <camel.version>4.22.0</camel.version>
-        <openfeature.version>1.22.1</openfeature.version>
+        <camel.version>4.22.1</camel.version>
+        <openfeature.version>1.23.0</openfeature.version>
         <flagd.provider.version>0.14.2</flagd.provider.version>
-        <citrus.version>5.0.1</citrus.version>
+        <citrus.version>5.0.2</citrus.version>
     </properties>
 
     <dependencyManagement>

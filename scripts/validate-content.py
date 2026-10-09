@@ -23,7 +23,7 @@ import sys
 import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DEFAULT_CATALOG = "/tmp/camel-catalog-4.22.0.jar"
+DEFAULT_CATALOG = "/tmp/camel-catalog-4.22.1.jar"
 CATALOG_GAV = "org/apache/camel/camel-catalog/{v}/camel-catalog-{v}.jar"
 
 # Endpoint URIs appear as from("x:.."), .to("x:.."), uri: "x:..", and friends.
@@ -183,7 +183,7 @@ def main():
         print(f"catalog: {len(schemes)} component schemes from {args.catalog}")
     else:
         print(f"catalog: NOT FOUND at {args.catalog}")
-        print(f"  fetch with: curl -sO https://repo1.maven.org/maven2/{CATALOG_GAV.format(v='4.22.0')}")
+        print(f"  fetch with: curl -sO https://repo1.maven.org/maven2/{CATALOG_GAV.format(v='4.22.1')}")
 
     check_schemes(schemes, findings)
     check_yaml_shape(findings)

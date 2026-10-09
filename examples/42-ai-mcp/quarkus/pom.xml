@@ -15,15 +15,15 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <quarkus.platform.version>3.39.3</quarkus.platform.version>
+        <quarkus.platform.version>3.40.1</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.quarkiverse.langchain4j</groupId>
+                <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-langchain4j-bom</artifactId>
-                <version>1.7.4</version>
+                <version>${quarkus.platform.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
