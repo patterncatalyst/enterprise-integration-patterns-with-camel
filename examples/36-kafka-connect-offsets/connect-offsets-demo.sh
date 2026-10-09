@@ -22,6 +22,11 @@ step() { printf '\n\033[1m── %s ──\033[0m\n' "$1"; }
 note() { printf '   \033[2m%s\033[0m\n' "$1"; }
 jq_() { python3 -m json.tool 2>/dev/null || cat; }
 
+# Connect takes 30-60 s to answer after `up -d`; wait rather than fail.
+for _ in $(seq 1 60); do
+  curl -sf -m 5 "$CONNECT/" >/dev/null 2>&1 && break
+  sleep 2
+done
 if ! curl -sf -m 5 "$CONNECT/" >/dev/null 2>&1; then
   printf '\033[31m   Connect is not answering on %s\033[0m\n' "$CONNECT"
   note "Start it with:"
