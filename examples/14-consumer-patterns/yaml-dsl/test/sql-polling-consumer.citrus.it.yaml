@@ -13,9 +13,9 @@ configuration:
     - name: dataSource
       type: org.postgresql.ds.PGSimpleDataSource
       properties:
-        url: "jdbc:postgresql://localhost:5432/eip"
-        user: "eip"
-        password: "eip"
+        url: "jdbc:postgresql://localhost:5432/eipdb"
+        user: "eipuser"
+        password: "eippass"
 actions:
   - testcontainers:
       compose:

@@ -78,9 +78,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=eip
-      - POSTGRES_USER=eip
-      - POSTGRES_PASSWORD=eip
+      - POSTGRES_DB=eipdb
+      - POSTGRES_USER=eipuser
+      - POSTGRES_PASSWORD=eippass
       - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
     volumes:
       - postgres-data:/var/lib/postgresql:Z
@@ -93,7 +93,7 @@ services:
       - "-c"
       - "shared_buffers=128MB"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U eip -d eip"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U eipuser -d eipdb"]
       interval: 5s
       timeout: 3s
       retries: 12
