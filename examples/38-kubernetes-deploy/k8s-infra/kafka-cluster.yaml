@@ -1,12 +1,37 @@
-apiVersion: kafka.strimzi.io/v1beta2
+# Strimzi 1.2.0: kafka.strimzi.io/v1 only. KRaft is the only mode, so the
+# broker and controller roles live on a KafkaNodePool and there is no
+# ZooKeeper block. One dual-role node with ephemeral storage, sized for a
+# 4 CPU / 8 GiB minikube profile.
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: eip-kafka
+spec:
+  replicas: 1
+  roles:
+    - controller
+    - broker
+  storage:
+    type: ephemeral
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+---
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: eip-kafka
   namespace: kafka
 spec:
   kafka:
-    version: 3.9.0
-    replicas: 1
+    # Strimzi 1.2.0's default Kafka version.
+    version: 4.3.1
     listeners:
       - name: plain
         port: 9092
@@ -18,26 +43,5 @@ spec:
       transaction.state.log.min.isr: 1
       default.replication.factor: 1
       min.insync.replicas: 1
-      inter.broker.protocol.version: "3.9"
-    storage:
-      type: ephemeral
-    resources:
-      requests:
-        memory: 1Gi
-        cpu: 500m
-      limits:
-        memory: 2Gi
-        cpu: "1"
-  zookeeper:
-    replicas: 1
-    storage:
-      type: ephemeral
-    resources:
-      requests:
-        memory: 512Mi
-        cpu: 250m
-      limits:
-        memory: 1Gi
-        cpu: 500m
   entityOperator:
     topicOperator: {}

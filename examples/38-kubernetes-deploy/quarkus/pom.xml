@@ -14,7 +14,7 @@
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <quarkus.platform.version>3.39.3</quarkus.platform.version>
+        <quarkus.platform.version>3.40.1</quarkus.platform.version>
     </properties>
 
     <dependencyManagement>
@@ -79,10 +79,6 @@
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-container-image-jib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-kubernetes</artifactId>
         </dependency>
         <dependency>
@@ -91,6 +87,22 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <!-- OpenShift Local (Appendix Z): openshift/build-images.sh activates this
+         profile to run a binary S2I build in the cluster. Inactive otherwise,
+         so mvn verify and the minikube image are unchanged.
+         quarkus-container-image-openshift alone generates no BuildConfig. -->
+    <profiles>
+        <profile>
+            <id>openshift</id>
+            <dependencies>
+                <dependency>
+                    <groupId>io.quarkus</groupId>
+                    <artifactId>quarkus-openshift</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>

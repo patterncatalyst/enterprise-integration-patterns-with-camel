@@ -1,0 +1,13 @@
+# Runtime image for the Spring Boot variant: the executable jar from
+# `mvn package` on a pinned UBI 10 OpenJDK 25 runtime. Build from
+# examples/38-kubernetes-deploy/spring-boot:
+#   mvn -B package -DskipTests
+#   docker build -f Containerfile -t eip/eip-k8s-deploy-springboot:1.0 .
+FROM registry.access.redhat.com/ubi10/openjdk-25-runtime:1.24-15
+
+COPY --chown=185 target/eip-kubernetes-deploy-springboot-1.0.0-SNAPSHOT.jar /deployments/app.jar
+
+EXPOSE 8088
+USER 185
+
+ENTRYPOINT [ "java", "-jar", "/deployments/app.jar" ]

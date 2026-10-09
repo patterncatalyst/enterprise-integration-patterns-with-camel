@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: eip-k8s-deploy
-          image: eip/eip-kubernetes-deploy-springboot:latest
+          image: eip/eip-k8s-deploy-springboot:1.0
           imagePullPolicy: Never
           ports:
             - containerPort: 8088
