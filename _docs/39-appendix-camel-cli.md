@@ -895,10 +895,10 @@ Or use the existing compose stack:
 ### Step 3: Run in dev mode
 
 ```bash
-camel run --dev *.yaml
+camel run --dev *.yaml --port=8088
 ```
 
-The CLI resolves dependencies, starts the REST API on port 8088, connects to Kafka and Redis, and begins processing.
+The CLI resolves dependencies, starts the REST API on port 8088 (the `--port` flag; without it the server takes 8080, which the stack's Pulsar already holds), connects to Kafka and Redis, and begins processing.
 
 ### Step 4: Test the routes
 
@@ -910,7 +910,7 @@ curl -X POST http://localhost:8088/api/orders \
   -H "orderType: EXPRESS" \
   -d '{
     "orderId": "ORD-9001",
-    "customerId": "CUST-42",
+    "customerId": "C-500",
     "item": "Wireless Headphones",
     "quantity": 2
   }'
