@@ -1,0 +1,63 @@
+# values.yaml — eip on OpenShift Local.
+#
+# The env contract matches the minikube path (Appendix T): KAFKA_BROKERS and
+# QUARKUS_REDIS_HOSTS override application.properties, so the Quarkus
+# example runs unchanged.
+
+# Images come from the internal registry: build-images.sh pushes ImageStream
+# tags <service>:<imageTag> into the release namespace.
+registry: image-registry.openshift-image-registry.svc:5000
+imageTag: v1
+
+# The ubi10/openjdk-25 S2I image starts the app with run-java.sh, which sets
+# -XX:MaxRAMPercentage from JAVA_MAX_MEM_RATIO (default 80). 50 leaves room
+# for metaspace, threads and buffers inside the limits below. The image
+# ignores JAVA_MAX_RAM_RATIO.
+javaMaxMemRatio: "50"
+
+# Extra keys for the shared ConfigMap (<release>-app-config).
+config: {}
+
+kafka:
+  enabled: true
+  # Kafka CR name (openshift/infra/kafka.yaml); bootstrap <cluster>-kafka-bootstrap:9092
+  cluster: eip
+
+# Redis for the Content Enricher's customer cache: the official image runs
+# under restricted-v2 (any UID; /data is an emptyDir). No persistence, no auth.
+redis:
+  enabled: true
+  image: docker.io/library/redis:8.10.2-alpine
+
+# ── Platform tier (openshift/platform/) ─────────────────────────────────────
+# Both off by default: a plain install renders only the core above.
+
+# Custom Metrics Autoscaler: a Kafka-lag ScaledObject for every service
+# that has a `keda:` block below.
+keda:
+  enabled: false
+
+# Red Hat build of OpenTelemetry: the operator injects the OpenTelemetry
+# Java agent into the JVM pods; traces go to otel-lgtm here.
+observability:
+  enabled: false
+  lgtmImage: docker.io/grafana/otel-lgtm:0.36.0
+
+# One Deployment + Service per entry. Keys are the ImageStream names and
+# must match SERVICES in openshift/lib.sh.
+#   port:            HTTP port the service listens on (quarkus.http.port)
+#   route:           edge-TLS Route
+#   routeHealthPath: path capture-evidence.sh checks through the Route
+#   javaToolOptions: JVM -D flags (run-java.sh never reads a Containerfile)
+#   env:             service-specific environment
+#   instrument:      false to skip Java-agent injection
+#   keda:            {topic, consumerGroup, lagThreshold, minReplicas, maxReplicas}
+services:
+  # Appendix T's example: REST -> Kafka -> Redis enrichment -> Kafka.
+  eip-k8s-deploy:
+    port: 8088
+    route: true
+    # Competing Consumers on eip.orders.incoming (3 partitions). minReplicas
+    # stays 1 because the same pod also serves the REST API.
+    keda: {topic: eip.orders.incoming, consumerGroup: k8s-order-processor, lagThreshold: "20", minReplicas: 1, maxReplicas: 3}
+    resources: {requests: {cpu: 150m, memory: 320Mi}, limits: {cpu: 750m, memory: 640Mi}}

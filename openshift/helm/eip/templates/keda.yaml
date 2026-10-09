@@ -1,0 +1,35 @@
+{{- if .Values.keda.enabled }}
+{{- range $name, $svc := .Values.services }}
+{{- with $svc.keda }}
+---
+# Kafka-lag scaling for {{ $name }}. The Custom Metrics Autoscaler ships
+# core KEDA only (no HTTP add-on). KEDA never scales a consumer group past
+# the topic's partition count.
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ $name }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    {{- include "chart.labels" $ | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ $name }}
+  pollingInterval: 15
+  cooldownPeriod: {{ .cooldownPeriod | default 120 }}
+  minReplicaCount: {{ .minReplicas | default 0 }}
+  maxReplicaCount: {{ .maxReplicas | default 10 }}
+  triggers:
+    - type: kafka
+      metadata:
+        # Fully qualified: the KEDA operator runs in openshift-keda, where the
+        # short Service name does not resolve ("no such host").
+        bootstrapServers: {{ $.Values.kafka.cluster }}-kafka-bootstrap.{{ $.Release.Namespace }}.svc.cluster.local:9092
+        consumerGroup: {{ .consumerGroup | default $name }}
+        topic: {{ required (printf "services.%s.keda.topic is required" $name) .topic }}
+        lagThreshold: {{ .lagThreshold | default "5" | quote }}
+        offsetResetPolicy: earliest
+        allowIdleConsumers: "false"
+{{- end }}
+{{- end }}
+{{- end }}

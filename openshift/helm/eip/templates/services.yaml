@@ -1,0 +1,38 @@
+{{- range $name, $svc := .Values.services }}
+{{- $scaled := and $.Values.keda.enabled $svc.keda }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    {{- include "chart.labels" $ | nindent 4 }}
+spec:
+  {{- if not $scaled }}
+  # Omitted when a ScaledObject owns the replica count, so Helm and the HPA
+  # do not fight.
+  replicas: 1
+  {{- end }}
+  # The selector never changes (it is immutable).
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ $name }}
+  template:
+    {{- include "chart.podTemplate" (dict "root" $ "name" $name "svc" $svc) | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    {{- include "chart.labels" $ | nindent 4 }}
+spec:
+  selector:
+    app.kubernetes.io/name: {{ $name }}
+  ports:
+    - name: http
+      port: {{ $svc.port | default 8080 }}
+      targetPort: http
+---
+{{- end }}

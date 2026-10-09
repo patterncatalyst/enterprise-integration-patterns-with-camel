@@ -1,0 +1,27 @@
+# Host access on OpenShift Local is through the router, never NodePorts,
+# port-forward or tunnels: https://<route>-<namespace>.apps-crc.testing,
+# edge TLS, plain HTTP redirected. capture-evidence.sh checks each Route's
+# health-check-path with the cluster's ingress CA.
+{{- range $name, $svc := .Values.services }}
+{{- if $svc.route }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ $name }}
+  labels:
+    app.kubernetes.io/name: {{ $name }}
+    {{- include "chart.labels" $ | nindent 4 }}
+  annotations:
+    health-check-path: {{ $svc.routeHealthPath | default "/q/health/ready" | quote }}
+spec:
+  to:
+    kind: Service
+    name: {{ $name }}
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}
+{{- end }}

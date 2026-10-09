@@ -1,0 +1,6 @@
+{{ .Release.Name }} is deploying into {{ .Release.Namespace }}.
+
+  Rollout:      ./openshift/deploy.sh waits on `oc rollout status` per Deployment
+  Route hosts:  oc get routes -n {{ .Release.Namespace }}
+  Evidence:     ./openshift/capture-evidence.sh
+  Tear down:    ./openshift/teardown.sh   (then crc stop)

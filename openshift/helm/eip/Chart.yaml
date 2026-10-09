@@ -1,0 +1,10 @@
+apiVersion: v2
+name: eip
+description: >-
+  Enterprise Integration Patterns with Apache Camel on OpenShift Local (CRC):
+  the Camel Quarkus services (images from openshift/build-images.sh), Redis,
+  edge-TLS Routes, and opt-in platform flags (keda, observability). Kafka
+  comes from the AMQ Streams operator (openshift/install-infra.sh).
+type: application
+version: 0.1.0
+appVersion: "v1"

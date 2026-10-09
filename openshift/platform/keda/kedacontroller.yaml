@@ -1,0 +1,15 @@
+# The Custom Metrics Autoscaler operand: KEDA's operator, metrics API server
+# and admission webhooks, watching every namespace. It runs in
+# openshift-keda, so ScaledObject triggers must use fully qualified Service
+# names (<svc>.<ns>.svc.cluster.local).
+apiVersion: keda.sh/v1alpha1
+kind: KedaController
+metadata:
+  name: keda
+  namespace: openshift-keda
+spec:
+  watchNamespace: ""
+  operator:
+    logLevel: info
+  metricsServer:
+    logLevel: "0"

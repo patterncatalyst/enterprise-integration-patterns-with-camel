@@ -1,0 +1,22 @@
+# Shared env contract. Only the ConfigMap lives in this file: the pod
+# checksum hashes it.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-app-config
+  labels:
+    {{- include "chart.labels" . | nindent 4 }}
+data:
+  QUARKUS_PROFILE: "prod"
+  JAVA_OPTS_APPEND: "-Duser.timezone=UTC"
+  JAVA_MAX_MEM_RATIO: {{ .Values.javaMaxMemRatio | quote }}
+  {{- if .Values.kafka.enabled }}
+  # kafka.brokers in the examples' application.properties
+  KAFKA_BROKERS: "{{ .Values.kafka.cluster }}-kafka-bootstrap:9092"
+  {{- end }}
+  {{- if .Values.redis.enabled }}
+  QUARKUS_REDIS_HOSTS: "redis://redis:6379"
+  {{- end }}
+  {{- range $k, $v := .Values.config }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}

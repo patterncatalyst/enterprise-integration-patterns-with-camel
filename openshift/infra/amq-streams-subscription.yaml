@@ -1,0 +1,21 @@
+# AMQ Streams (Red Hat's build of Strimzi) from the redhat-operators catalog.
+#
+# Installed into openshift-operators, so the default "global-operators"
+# OperatorGroup makes it watch every namespace. The version is pinned:
+# installPlanApproval Manual plus startingCSV means OLM proposes exactly this
+# CSV, and install_operator (lib.sh) approves only that InstallPlan.
+# Re-check the newest CSV in the channel before each use (references/versions.md).
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: amq-streams
+  namespace: openshift-operators
+  labels:
+    app.kubernetes.io/part-of: eip
+spec:
+  name: amq-streams
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  channel: amq-streams-3.2.x
+  startingCSV: amqstreams.v3.2.1-14
+  installPlanApproval: Manual

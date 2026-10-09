@@ -1,0 +1,64 @@
+# Kafka for eip on OpenShift Local: one KRaft dual-role node and a
+# plain listener on 9092. Bootstrap address inside the project:
+#   eip-kafka-bootstrap:9092
+# and, from other namespaces (KEDA runs in openshift-keda):
+#   eip-kafka-bootstrap.eip.svc.cluster.local:9092
+#
+# - kafka.strimzi.io/v1: AMQ Streams 3.2 deprecates v1beta2; node pools and
+#   KRaft are the only mode, so the strimzi.io/node-pools and strimzi.io/kraft
+#   annotations are gone.
+# - No entityOperator: topics auto-create on first produce, and teardown has
+#   no KafkaTopic finalizers to wait on. Add one (and KafkaTopic CRs) only if
+#   the project needs managed topics; teardown deletes KafkaTopics first.
+# - Explicit requests/limits and a small volume, to fit a 20 GiB VM.
+# - No securityContext: the operator's pods run under restricted-v2 with a
+#   UID from the namespace range.
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  labels:
+    strimzi.io/cluster: eip
+spec:
+  replicas: 1
+  roles:
+    - controller
+    - broker
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      memory: 1536Mi
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: 5Gi
+        deleteClaim: true
+---
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: eip
+spec:
+  kafka:
+    # Must be a version the installed AMQ Streams ships (3.2: 4.1.x, 4.2.x).
+    version: 4.2.0
+    metadataVersion: 4.2-IV1
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+    config:
+      auto.create.topics.enable: true
+      # Three partitions per auto-created topic, as in the compose and
+      # minikube stacks: the ceiling for competing consumers (and for KEDA).
+      num.partitions: 3
+      offsets.topic.replication.factor: 1
+      transaction.state.log.replication.factor: 1
+      transaction.state.log.min.isr: 1
+      default.replication.factor: 1
+      min.insync.replicas: 1
