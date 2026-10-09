@@ -150,11 +150,13 @@ jobs:
           source "/home/runner/.sdkman/bin/sdkman-init.sh"
           jbang --version
 
-          jbang trust add https://github.com/citrusframework/citrus/
           # citrus-jbang drives the Camel CLI itself; keep its source trusted.
           jbang trust add https://github.com/apache/camel/
 
-          jbang citrus@citrusframework/citrus --version
+          # Pinned Maven Central artifact, matching the POMs' citrus.version —
+          # not the citrus@citrusframework/citrus catalog alias, which floats. The
+          # jar has no Main-Class, so --main avoids JBang's chooser prompt.
+          jbang --main main.CitrusJBang org.citrusframework:citrus-jbang:5.0.2 --version
           jbang app install --name camel org.apache.camel:camel-launcher:4.22.1
           camel version
       - name: Run tests
@@ -164,7 +166,7 @@ jobs:
           CITRUS_TESTCONTAINERS_REGISTRY_MIRROR: "mirror.gcr.io"
         run: |
           source "/home/runner/.sdkman/bin/sdkman-init.sh"
-          jbang citrus@citrusframework/citrus run examples/${{ matrix.example }}/yaml-dsl/test
+          jbang --main main.CitrusJBang org.citrusframework:citrus-jbang:5.0.2 run examples/${{ matrix.example }}/yaml-dsl/test
       - uses: actions/upload-artifact@v4
         if: always()
         with:
