@@ -19,7 +19,7 @@ HDR="${4:-}"
 BODY="${5:-}"
 
 DIR="examples/$EX"
-LOG="${TMPDIR:-/tmp}/jbang-$EX.log"
+LOG="${TMPDIR:-/tmp}/jbang-${EX//\//_}.log"
 [ -d "$DIR" ] || { echo "no such example: $DIR"; exit 2; }
 
 cd "$DIR" || exit 1
@@ -40,6 +40,16 @@ if [ -n "$URL" ]; then
          -X POST "$URL" -H 'Content-Type: application/json' \
          ${HDR:+-H "$HDR"} -d "$BODY")
   echo "  POST $URL -> HTTP $code  $(head -c 140 /tmp/jbang-resp.txt)"
+fi
+
+# Consumer-only examples need fresh records (same option as
+# verify-example-runtime.sh):
+#   SEED_TOPIC=eip.orders.placed SEED='{"order_id":"DSL-1","amount":640.00}' ./scripts/verify-jbang-example.sh ...
+if [ -n "${SEED_TOPIC:-}" ] && [ -n "${SEED:-}" ]; then
+  sleep 5   # let the consumer join its group
+  printf '%s\n' "$SEED" | docker exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
+    --bootstrap-server localhost:9092 --topic "$SEED_TOPIC" \
+    && echo "  seeded $(printf '%s\n' "$SEED" | grep -c .) record(s) on $SEED_TOPIC"
 fi
 
 sleep 14

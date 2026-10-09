@@ -48,8 +48,26 @@ if [ -n "$URL" ]; then
   echo "  POST $URL -> HTTP $code  $(head -c 120 /tmp/verify-resp.txt)"
 fi
 
+# Consumer-only examples need fresh records: the other runtime shares the
+# consumer group and has already committed whatever was on the topic.
+#   SEED_TOPIC=eip.orders.placed SEED='{"order_id":"DSL-1","amount":640.00}' ./scripts/verify-example-runtime.sh ...
+if [ -n "${SEED_TOPIC:-}" ] && [ -n "${SEED:-}" ]; then
+  sleep 5   # let the consumer join its group
+  printf '%s\n' "$SEED" | docker exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
+    --bootstrap-server localhost:9092 --topic "$SEED_TOPIC" \
+    && echo "  seeded $(printf '%s\n' "$SEED" | grep -c .) record(s) on $SEED_TOPIC"
+fi
+
 # Let timer-driven routes turn over.
 sleep 12
+
+# A Spring Boot app with no web starter and no camel.main.run-controller
+# starts, logs "Started", and then exits on its own. Catch that here.
+if ! kill -0 $PID 2>/dev/null; then
+  trap - EXIT
+  echo "  RESULT: process exited on its own after startup (nothing keeps the JVM alive)"
+  exit 1
+fi
 
 kill -TERM $PID 2>/dev/null
 wait $PID 2>/dev/null
