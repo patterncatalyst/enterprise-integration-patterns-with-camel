@@ -37,7 +37,7 @@ package-lock.json
 .DS_Store
 Thumbs.db
 
-# Podman / Docker
+# Containers
 *.pid
 
 # Secrets / local overrides

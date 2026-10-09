@@ -11,8 +11,6 @@ services:
       - PULSAR_STANDALONE_USE_ZOOKEEPER=0
     volumes:
       - pulsar-data:/pulsar/data:Z
-    devices:
-      - "/dev/null:/dev/null:rwm"
     mem_limit: 2g
     healthcheck:
       test: ["CMD-SHELL", "bin/pulsar-admin brokers healthcheck"]

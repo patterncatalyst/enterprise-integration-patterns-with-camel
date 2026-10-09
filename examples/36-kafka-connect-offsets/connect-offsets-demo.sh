@@ -8,7 +8,7 @@
 #
 # Requires the base stack plus the Connect worker:
 #   ./scripts/setup-stack.sh
-#   podman-compose -p eip -f examples/_infra/compose.yaml \
+#   docker compose -p eip -f examples/_infra/compose.yaml \
 #                  -f examples/36-kafka-connect-offsets/compose.connect.yaml up -d connect
 
 set -uo pipefail
@@ -25,7 +25,7 @@ jq_() { python3 -m json.tool 2>/dev/null || cat; }
 if ! curl -sf -m 5 "$CONNECT/" >/dev/null 2>&1; then
   printf '\033[31m   Connect is not answering on %s\033[0m\n' "$CONNECT"
   note "Start it with:"
-  note "  podman-compose -p eip -f examples/_infra/compose.yaml \\"
+  note "  docker compose -p eip -f examples/_infra/compose.yaml \\"
   note "                 -f examples/36-kafka-connect-offsets/compose.connect.yaml up -d connect"
   exit 1
 fi
@@ -43,7 +43,7 @@ consumed() {                      # how many records reached the topic
   # kafka-get-offsets.sh, not kafka-run-class.sh kafka.tools.GetOffsetShell --
   # that class moved to org.apache.kafka.tools in Kafka 4.x, and the old
   # invocation fails with ClassNotFoundException.
-  podman exec eip-kafka /opt/kafka/bin/kafka-get-offsets.sh \
+  docker exec eip-kafka /opt/kafka/bin/kafka-get-offsets.sh \
     --bootstrap-server localhost:9092 --topic "$TOPIC" 2>/dev/null \
     | awk -F: '{s+=$3} END {print s+0}'
 }
@@ -51,16 +51,16 @@ consumed() {                      # how many records reached the topic
 # ─────────────────────────────────────────────────────────────────────────────
 step "Setup: a source file with 10 orders"
 # Written straight into the container: see the note in compose.connect.yaml
-# about podman-compose and relative volume paths.
+# about relative volume paths.
 ORDERS=""
 for i in $(seq 1 10); do ORDERS="$ORDERS{\"order_id\":\"CN-$i\",\"amount\":$((i * 25))}
 "; done
-podman exec eip-connect mkdir -p /tmp/connect-data
-printf '%s' "$ORDERS" | podman exec -i eip-connect sh -c "cat > $SRC"
-note "wrote $(podman exec eip-connect sh -c "wc -l < $SRC" 2>/dev/null | tr -d ' ') lines to $SRC -> $TOPIC"
+docker exec eip-connect mkdir -p /tmp/connect-data
+printf '%s' "$ORDERS" | docker exec -i eip-connect sh -c "cat > $SRC"
+note "wrote $(docker exec eip-connect sh -c "wc -l < $SRC" 2>/dev/null | tr -d ' ') lines to $SRC -> $TOPIC"
 
 curl -s -X DELETE "$CONNECT/connectors/$NAME" >/dev/null 2>&1
-podman exec eip-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 \
+docker exec eip-kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 \
   --delete --topic "$TOPIC" >/dev/null 2>&1
 sleep 3
 

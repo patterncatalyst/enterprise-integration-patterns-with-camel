@@ -1,10 +1,15 @@
-# Multi-stage build for Camel Quarkus EIP examples
-# Usage: podman build -f Containerfile --build-arg PROJECT=09-routing-fundamentals -t eip-routing .
+# Multi-stage build for the Camel Quarkus EIP examples.
+# Usage (from examples/):
+#   docker build -f Containerfile --build-arg PROJECT=09-routing-fundamentals/quarkus -t eip-routing:1.0 .
+#
+# Newest UBI with the newest JDK, pinned to exact tags. Re-check with
+#   skopeo list-tags docker://registry.access.redhat.com/ubi10/openjdk-25
+#   skopeo list-tags docker://registry.access.redhat.com/ubi10/openjdk-25-runtime
 
-ARG PROJECT=09-routing-fundamentals
+ARG PROJECT=09-routing-fundamentals/quarkus
 
 # Stage 1: Build
-FROM registry.access.redhat.com/ubi9/openjdk-25:latest AS builder
+FROM registry.access.redhat.com/ubi10/openjdk-25:1.24-15 AS builder
 ARG PROJECT
 USER root
 WORKDIR /build
@@ -12,11 +17,10 @@ WORKDIR /build
 COPY ${PROJECT}/pom.xml ./pom.xml
 COPY ${PROJECT}/src ./src
 
-RUN mvn package -DskipTests -Dquarkus.package.jar.type=uber-jar
+RUN mvn -B package -DskipTests -Dquarkus.package.jar.type=uber-jar
 
 # Stage 2: Runtime
-FROM registry.access.redhat.com/ubi9/openjdk-25-runtime:latest
-ARG PROJECT
+FROM registry.access.redhat.com/ubi10/openjdk-25-runtime:1.24-15
 ENV JAVA_OPTS_APPEND="-Dquarkus.http.host=0.0.0.0"
 
 COPY --from=builder /build/target/*-runner.jar /deployments/app.jar

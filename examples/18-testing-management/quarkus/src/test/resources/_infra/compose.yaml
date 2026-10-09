@@ -24,8 +24,6 @@ services:
       - CLUSTER_ID=RUlQQ2FtZWxQYXR0ZXJucw
     volumes:
       - kafka-data:/var/lib/kafka/data:Z
-    devices:
-      - "/dev/null:/dev/null:rwm"
     mem_limit: 1g
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 9092"]

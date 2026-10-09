@@ -15,7 +15,7 @@ set -uo pipefail
 
 RUN="$$"
 BS="localhost:9092"
-K="podman exec eip-kafka /opt/kafka/bin"
+K="docker exec eip-kafka /opt/kafka/bin"
 
 say()  { printf '\n\033[1m── %s ──\033[0m\n' "$1"; }
 note() { printf '   \033[2m%s\033[0m\n' "$1"; }
@@ -35,7 +35,7 @@ drop_topic() {
 produce() {                       # produce <topic> <prefix> <count>
   local topic="$1" prefix="$2" n="$3"
   for i in $(seq 1 "$n"); do echo "{\"order_id\":\"$prefix-$i\",\"amount\":$((i * 50))}"; done \
-    | podman exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
+    | docker exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
         --bootstrap-server "$BS" --topic "$topic" >/dev/null 2>&1
 }
 
@@ -46,7 +46,7 @@ new_group() {                     # new_group <group> -- read from the beginning
 
 consume() {                       # consume <topic> <group> <count> [--release|--reject]
   local topic="$1" group="$2" count="$3"; shift 3
-  timeout 120 podman exec eip-kafka /opt/kafka/bin/kafka-console-share-consumer.sh \
+  timeout 120 docker exec eip-kafka /opt/kafka/bin/kafka-console-share-consumer.sh \
     --bootstrap-server "$BS" --topic "$topic" --group "$group" \
     --max-messages "$count" --timeout-ms 30000 "$@" 2>/dev/null \
     | grep -oE '"order_id":"[A-Z]+-[0-9]+"' | sed 's/.*:"//; s/"//' | sort -V | tr '\n' ' '

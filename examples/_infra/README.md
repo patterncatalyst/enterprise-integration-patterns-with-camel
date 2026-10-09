@@ -1,6 +1,6 @@
 # EIP Local Infrastructure Stack
 
-Podman compose files for the Enterprise Integration Patterns tutorial.
+Docker Compose files (Docker Engine, `docker compose` v2 plugin) for the Enterprise Integration Patterns tutorial.
 Two composable layers: the **base stack** (messaging + data) and an optional
 **LGTM overlay** (observability).
 
@@ -8,17 +8,17 @@ Two composable layers: the **base stack** (messaging + data) and an optional
 > Citrus tests start their own Kafka, Redis, PostgreSQL and Pulsar through
 > Testcontainers, on the same host ports (9092, 6379, 5432, 6650). Bring this
 > stack down before running them, and note that Testcontainers needs
-> `DOCKER_HOST` pointed at the Podman socket — see
+> the Docker daemon reachable on the default context — see
 > [CONTRIBUTING.md](../../CONTRIBUTING.md#running-the-tests).
 
 ## Quick start
 
 ```bash
 # Base stack only (Kafka, Pulsar, Redis, PostgreSQL, Apicurio, Kafka UI)
-podman-compose -f compose.yaml up -d
+docker compose -p eip -f compose.yaml up -d
 
 # Base + LGTM observability (adds Grafana, Loki, Tempo, Mimir, OTel Collector)
-podman-compose -f compose.yaml -f compose.lgtm.yaml up -d
+docker compose -p eip -f compose.yaml -f compose.lgtm.yaml up -d
 ```
 
 Or use the one-command bootstrap from the project root:
@@ -94,10 +94,10 @@ The init script creates five domain schemas with seed data:
 
 ```bash
 # Stop and remove containers (keep volumes)
-podman-compose -f compose.yaml -f compose.lgtm.yaml down
+docker compose -p eip -f compose.yaml -f compose.lgtm.yaml down
 
 # Stop, remove containers AND volumes (full reset)
-podman-compose -f compose.yaml -f compose.lgtm.yaml down -v
+docker compose -p eip -f compose.yaml -f compose.lgtm.yaml down -v
 ```
 
 ## Network

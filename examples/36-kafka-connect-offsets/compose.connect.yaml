@@ -1,7 +1,7 @@
 # Kafka Connect for Appendix R. Kept out of the base stack on purpose: it is
 # only needed for this one appendix, and it is another JVM to keep warm.
 #
-#   podman-compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
+#   docker compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
 services:
   connect:
     image: docker.io/apache/kafka:4.3.1

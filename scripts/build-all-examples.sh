@@ -7,7 +7,7 @@
 # a few are a single project rooted at the example directory.
 #
 #   ./scripts/build-all-examples.sh                 # package, skip tests
-#   ./scripts/build-all-examples.sh --with-tests    # package and run tests
+#   ./scripts/build-all-examples.sh --with-tests    # verify: package and run every test
 #   ./scripts/build-all-examples.sh 04 12 loan      # only matching examples
 #
 # Exit status is non-zero if any project fails.
@@ -20,7 +20,7 @@ MVN_ARGS=(-B package -DskipTests)
 FILTERS=()
 for arg in "$@"; do
   case "$arg" in
-    --with-tests) MVN_ARGS=(-B package) ;;
+    --with-tests) MVN_ARGS=(-B verify) ;;
     *) FILTERS+=("$arg") ;;
   esac
 done
@@ -28,18 +28,12 @@ done
 LOG_DIR="${TMPDIR:-/tmp}/eip-build-logs"
 mkdir -p "$LOG_DIR"
 
-# This project's stack is Podman, but Testcontainers looks for a Docker socket
-# and will silently use Docker if one is present -- so the tests would run on a
-# different engine than everything else, with no warning. Point it at Podman
-# when the socket is there, unless the caller has already chosen an engine.
-#
-# Ryuk (the Testcontainers cleanup sidecar) is deliberately left enabled: it was
-# verified working against the rootless Podman socket on 2026-09-15. Disabling
-# it leaks containers whenever a run is interrupted.
-PODMAN_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/podman/podman.sock"
-if [ -z "${DOCKER_HOST:-}" ] && [ -S "$PODMAN_SOCK" ]; then
-  export DOCKER_HOST="unix://$PODMAN_SOCK"
-  echo "Testcontainers -> Podman ($PODMAN_SOCK)"
+# Testcontainers (and the Citrus compose actions) talk to Docker Engine through
+# /var/run/docker.sock on the default context -- the same engine the dev stack
+# runs on. Fail fast if it is not reachable rather than half-way through.
+if ! docker info >/dev/null 2>&1; then
+  echo "ERROR: cannot reach the Docker daemon (sudo systemctl enable --now docker; docker group membership)" >&2
+  exit 1
 fi
 
 matches_filter() {

@@ -15,7 +15,7 @@
 set -uo pipefail
 
 BS="localhost:9092"
-K="podman exec eip-kafka /opt/kafka/bin"
+K="docker exec eip-kafka /opt/kafka/bin"
 GROUP=""
 DUMP_PID=""
 LAG_WARN=1000
@@ -35,7 +35,7 @@ warn()  { printf '   \033[33m%s\033[0m\n' "$1"; }
 bad()   { printf '   \033[31m%s\033[0m\n' "$1"; }
 note()  { printf '   \033[2m%s\033[0m\n' "$1"; }
 
-if ! podman ps --format '{{.Names}}' 2>/dev/null | grep -q '^eip-kafka$'; then
+if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^eip-kafka$'; then
   bad "eip-kafka is not running. Start it with ./scripts/setup-stack.sh"
   exit 1
 fi
@@ -111,7 +111,7 @@ fi
 
 # ── 3. Broker logs ───────────────────────────────────────────────────────────
 step "3. Broker logs (errors and rebalances, last 500 lines)"
-LOGS=$(podman logs --tail 500 eip-kafka 2>&1)
+LOGS=$(docker logs --tail 500 eip-kafka 2>&1)
 ERRS=$(echo "$LOGS" | grep -cE '\bERROR\b')
 WARNS=$(echo "$LOGS" | grep -cE '\bWARN\b')
 REBAL=$(echo "$LOGS" | grep -ciE 'rebalanc')
@@ -155,7 +155,7 @@ done
 
 # ── 6. JMX metrics ───────────────────────────────────────────────────────────
 step "6. JMX metrics"
-if podman exec eip-kafka test -x /opt/kafka/bin/kafka-run-class.sh 2>/dev/null; then
+if docker exec eip-kafka test -x /opt/kafka/bin/kafka-run-class.sh 2>/dev/null; then
   note "JMX is not exposed by default in this stack. To enable it, add to the"
   note "kafka service in compose.yaml:"
   note "  - KAFKA_JMX_PORT=9999"
@@ -166,7 +166,7 @@ fi
 
 # ── 7. JVM diagnostics ───────────────────────────────────────────────────────
 step "7. JVM diagnostics"
-# Rootless podman runs container processes as host processes, so a naive pgrep
+# Container processes are visible as host processes, so a naive pgrep
 # for quarkus-run.jar also matches Apicurio inside its container. Anything
 # launched from /deployments is a container, not something you started.
 CAMEL_PIDS=$(pgrep -af 'quarkus-run.jar|-springboot-.*\.jar' 2>/dev/null \
@@ -179,7 +179,7 @@ else
   note "No Camel application JVMs found."
 fi
 note "The Kafka broker runs inside the container; for its JVM use:"
-note "  podman exec eip-kafka jcmd 1 Thread.print"
+note "  docker exec eip-kafka jcmd 1 Thread.print"
 
 step "Done"
 note "Most route problems are one of three things: consumer lag (too slow),"

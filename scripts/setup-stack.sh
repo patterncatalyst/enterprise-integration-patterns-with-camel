@@ -5,6 +5,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 INFRA_DIR="$PROJECT_ROOT/examples/_infra"
 
+# Docker Engine (docker-ce) with the Compose v2 plugin, on the default context.
+# The legacy docker-compose binary is not supported.
+command -v docker >/dev/null 2>&1 || { echo "ERROR: docker not found. Install Docker Engine (docker-ce) — see docs/00-prerequisites."; exit 1; }
+docker compose version >/dev/null 2>&1 || { echo "ERROR: the docker compose plugin is missing: sudo dnf install docker-compose-plugin"; exit 1; }
+docker info >/dev/null 2>&1 || { echo "ERROR: cannot reach the Docker daemon: sudo systemctl enable --now docker, and add yourself to the docker group"; exit 1; }
+ctx="$(docker context show 2>/dev/null || echo default)"
+[[ "$ctx" == "default" ]] || echo "WARNING: docker context is '$ctx', not 'default'; the stack starts wherever that context points."
+
 LGTM=false
 CLEAN=false
 for arg in "$@"; do
@@ -16,9 +24,9 @@ done
 
 if $CLEAN; then
   echo "==> Cleaning existing stack and volumes..."
-  podman-compose -p eip -f "$INFRA_DIR/compose.yaml" down -v 2>/dev/null || true
+  docker compose -p eip -f "$INFRA_DIR/compose.yaml" down -v 2>/dev/null || true
   for vol in eip-kafka-data eip-pulsar-data eip-redis-data eip-postgres-data; do
-    podman volume rm "$vol" 2>/dev/null || true
+    docker volume rm "$vol" 2>/dev/null || true
   done
   echo "    Volumes removed."
 fi
@@ -27,19 +35,19 @@ fi
 # If Pulsar is sitting in a crashed state, wipe its volume before restarting.
 #
 # This only catches the case where the container still exists. After a
-# `podman-compose down` the container is gone while the corrupt volume remains,
+# `docker compose down` the container is gone while the corrupt volume remains,
 # and the next start fails with "Bookie handle is not available". The recovery
 # after the health wait below handles that case.
-pulsar_status=$(podman inspect --format='{{.State.Status}}' eip-pulsar 2>/dev/null || echo "absent")
+pulsar_status=$(docker inspect --format='{{.State.Status}}' eip-pulsar 2>/dev/null || echo "absent")
 if [[ "$pulsar_status" == "exited" ]] || [[ "$pulsar_status" == "dead" ]]; then
   echo "==> Detected crashed Pulsar container — cleaning volume to prevent ledger corruption..."
-  podman rm eip-pulsar 2>/dev/null || true
-  podman volume rm eip-pulsar-data 2>/dev/null || true
+  docker rm eip-pulsar 2>/dev/null || true
+  docker volume rm eip-pulsar-data 2>/dev/null || true
   echo "    Pulsar volume cleaned."
 fi
 
 echo "==> Starting EIP base stack (Kafka, Pulsar, Redis, PostgreSQL, Apicurio)..."
-podman-compose -p eip -f "$INFRA_DIR/compose.yaml" up -d
+docker compose -p eip -f "$INFRA_DIR/compose.yaml" up -d
 
 echo "==> Waiting for base services to become healthy..."
 # wait_healthy <service> [timeout] [nonfatal]
@@ -50,16 +58,16 @@ wait_healthy() {
   local svc_timeout=${2:-120}
   local mode=${3:-fatal}
   printf "    %-20s " "$svc"
-  while ! podman inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null | grep -q healthy; do
+  while ! docker inspect --format='{{.State.Health.Status}}' "$svc" 2>/dev/null | grep -q healthy; do
     # A container that has exited will never become healthy; stop waiting.
     local state
-    state=$(podman inspect --format='{{.State.Status}}' "$svc" 2>/dev/null || echo absent)
+    state=$(docker inspect --format='{{.State.Status}}' "$svc" 2>/dev/null || echo absent)
     if [[ "$state" == "exited" ]] || [[ "$state" == "dead" ]]; then svc_timeout=0; fi
     if [[ $svc_timeout -le 0 ]]; then
       echo "FAILED"
       [[ "$mode" == "nonfatal" ]] && return 1
       echo "ERROR: $svc did not become healthy within the timeout"
-      podman logs --tail 15 "$svc" 2>&1 | sed 's/^/      /'
+      docker logs --tail 15 "$svc" 2>&1 | sed 's/^/      /'
       exit 1
     fi
     sleep 2
@@ -77,10 +85,10 @@ wait_ready() {
   local svc_timeout=${3:-120}
   printf "    %-20s " "$svc"
   while ! curl -sf -m 3 -o /dev/null "$url"; do
-    if ! podman inspect --format='{{.State.Status}}' "$svc" 2>/dev/null | grep -q running; then
+    if ! docker inspect --format='{{.State.Status}}' "$svc" 2>/dev/null | grep -q running; then
       echo "EXITED"
       echo "ERROR: $svc is not running. Logs:"
-      podman logs --tail 20 "$svc" 2>&1 | sed 's/^/      /'
+      docker logs --tail 20 "$svc" 2>&1 | sed 's/^/      /'
       exit 1
     fi
     sleep 2
@@ -88,7 +96,7 @@ wait_ready() {
     if [[ $svc_timeout -le 0 ]]; then
       echo "TIMEOUT"
       echo "ERROR: $svc did not become ready within the timeout"
-      podman logs --tail 20 "$svc" 2>&1 | sed 's/^/      /'
+      docker logs --tail 20 "$svc" 2>&1 | sed 's/^/      /'
       exit 1
     fi
   done
@@ -105,9 +113,9 @@ wait_healthy eip-apicurio 120
 if ! wait_healthy eip-pulsar 180 nonfatal; then
   echo "    Pulsar did not come up. This is almost always a corrupt BookKeeper"
   echo "    ledger from an unclean shutdown. Wiping its volume and retrying once."
-  podman rm -f eip-pulsar >/dev/null 2>&1 || true
-  podman volume rm eip-pulsar-data >/dev/null 2>&1 || true
-  podman-compose -p eip -f "$INFRA_DIR/compose.yaml" up -d pulsar >/dev/null 2>&1
+  docker rm -f eip-pulsar >/dev/null 2>&1 || true
+  docker volume rm eip-pulsar-data >/dev/null 2>&1 || true
+  docker compose -p eip -f "$INFRA_DIR/compose.yaml" up -d pulsar >/dev/null 2>&1
   wait_healthy eip-pulsar 180
 fi
 
@@ -125,7 +133,7 @@ echo "    flagd:        localhost:8013 (gRPC), http://localhost:8014/healthz"
 if $LGTM; then
   echo ""
   echo "==> Starting LGTM observability stack..."
-  podman-compose -p eip -f "$INFRA_DIR/compose.yaml" -f "$INFRA_DIR/compose.lgtm.yaml" up -d
+  docker compose -p eip -f "$INFRA_DIR/compose.yaml" -f "$INFRA_DIR/compose.lgtm.yaml" up -d
 
   echo "==> Waiting for LGTM services..."
   wait_ready eip-loki           http://localhost:3100/ready        120
