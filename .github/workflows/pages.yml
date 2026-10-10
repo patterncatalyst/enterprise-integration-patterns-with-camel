@@ -2,7 +2,7 @@ name: Build and deploy site
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   build:
+    name: site
     if: github.repository == 'patterncatalyst/enterprise-integration-patterns-with-camel'
     runs-on: ubuntu-latest
     steps:

@@ -1,16 +1,43 @@
 name: Build Examples
 
 on:
+  # Run once per change: on the PR, and on main after the merge. A push to a
+  # PR branch no longer starts a second, identical run.
   push:
-    paths:
-      - 'examples/**'
-      - '.github/workflows/examples.yml'
+    branches: [main]
   pull_request:
-    paths:
-      - 'examples/**'
+
 
 jobs:
+  # Decides whether the heavy jobs run. The workflow itself always runs, so the
+  # required summary job below always reports — a docs-only PR is not left
+  # waiting on a check that never starts.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.diff.outputs.run }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: diff
+        run: |
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+          if ! files="$(git diff --name-only "$base" "${{ github.sha }}" 2>/dev/null)"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"   # cannot diff: run everything
+          elif grep -qE '^(examples/|\.github/workflows/examples\.yml$)' <<<"$files"; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build:
+    needs: changes
+    if: needs.changes.outputs.run == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -91,3 +118,14 @@ jobs:
             exit 1
           fi
           echo "Built $built Maven project(s) for ${{ matrix.example }}"
+
+  # The one check branch protection requires: passes when every job above
+  # succeeded or was skipped by `changes`, fails otherwise.
+  examples-ok:
+    if: always()
+    needs: [changes, build]
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: jq -e 'to_entries | all(.value.result == "success" or .value.result == "skipped")' <<<"$NEEDS"
