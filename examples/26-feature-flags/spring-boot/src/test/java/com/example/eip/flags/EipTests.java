@@ -89,7 +89,11 @@ class EipTests implements EipTestSupport {
                     .times(10)
                     .actions(
                         createVariables()
-                                .variable("id", "citrus:randomNumber(4)"),
+                                // Fixed keys, not random ones: flagd's fractional split is a
+                                // deterministic hash of flag key + targetingKey (the order id).
+                                // For ids 1..10 at 90/10 exactly one (id 8) lands on "new";
+                                // ten random ids missed it about a third of the time.
+                                .variable("id", "${i}"),
                         send()
                             .endpoint("kafka:eip.orders.placed")
                             .message()
@@ -110,8 +114,8 @@ class EipTests implements EipTestSupport {
                 int algorithmLegacyCount = context.getVariable("algorithm-legacy-count", Integer.class);
                 int algorithmNewCount = context.getVariable("algorithm-new-count", Integer.class);
 
-                Assertions.assertEquals(10, algorithmLegacyCount + algorithmNewCount);
-                Assertions.assertTrue(algorithmNewCount > 0, "Algorithm new count must be greater than 0");
+                Assertions.assertEquals(9, algorithmLegacyCount, "ids 1..10 except 8 bucket to legacy");
+                Assertions.assertEquals(1, algorithmNewCount, "id 8 buckets to new");
             });
         }
     }
