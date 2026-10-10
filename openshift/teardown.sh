@@ -95,7 +95,14 @@ for ns in "${OPERATOR_NAMESPACES[@]}"; do
     fi
 done
 
+# A build run while the kube context pointed at `default` (before
+# build-images.sh set quarkus.openshift.namespace) leaves its BuildConfig,
+# builds and ImageStreams there; the project deletion above never sees them.
+oc delete bc/eip-k8s-deploy is/eip-k8s-deploy is/openjdk-25 -n default --ignore-not-found >/dev/null 2>&1
+oc delete builds -n default -l buildconfig=eip-k8s-deploy --ignore-not-found >/dev/null 2>&1
+
 leftover="$(
+    oc get bc,is -n default --no-headers -o name 2>/dev/null | grep -E '/(eip-k8s-deploy|openjdk-25)$'
     oc get subscriptions.operators.coreos.com -A --no-headers 2>/dev/null
     oc get csv -n openshift-operators --no-headers 2>/dev/null | grep -v -E '^packageserver'
     oc get ns --no-headers -o name | grep -v -E '^namespace/(openshift|kube-|default$|hostpath-provisioner$)'

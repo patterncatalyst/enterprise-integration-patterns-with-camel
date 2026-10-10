@@ -1,0 +1,6 @@
+POD                               READY   RESTARTS   SCC             UID
+eip-dual-role-0                   true    0          restricted-v2   1000660000
+eip-k8s-deploy-697544b89d-wpzbz   true    0          restricted-v2   1000660000
+lgtm-5ff4cdf464-xvrm6             true    0          anyuid          0
+redis-7945f97bd-86xsp             true    0          restricted-v2   1000660000
+namespace uid-range: 1000660000/10000

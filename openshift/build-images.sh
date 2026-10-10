@@ -35,7 +35,10 @@ step "Building ${#targets[@]} image(s) in-cluster: ${targets[*]}"
 # quarkus.container-image.tag alone it stays at the project version
 # (e.g. 1.0.0-SNAPSHOT). The image group is the project, so the
 # ImageStream lands in $NS. kubernetes.deploy=false: build and push only,
-# the Helm chart owns the Deployments.
+# the Helm chart owns the Deployments. quarkus.openshift.namespace picks the
+# project: on Quarkus 3.40 quarkus.kubernetes-client.namespace (and
+# KUBERNETES_NAMESPACE) are ignored and the build lands in the kube context's
+# namespace, which `crc start` resets to `default`.
 for svc in "${targets[@]}"; do
     dir="$(service_dir "$svc")" || fail "unknown service $svc (see service_dir in lib.sh)"
     ok "$svc <- ${dir#"$REPO_ROOT"/}"
@@ -45,7 +48,7 @@ for svc in "${targets[@]}"; do
         -Dquarkus.container-image.tag="$IMAGE_TAG" \
         -Dquarkus.openshift.version="$IMAGE_TAG" \
         -Dquarkus.openshift.base-jvm-image="$BASE_JVM_IMAGE" \
-        -Dquarkus.kubernetes-client.namespace="$NS" \
+        -Dquarkus.openshift.namespace="$NS" \
         -Dquarkus.kubernetes.deploy=false \
         || fail "Maven/S2I build of $svc failed (oc get builds -n $NS; oc logs build/<name> -n $NS)"
 done

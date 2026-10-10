@@ -1,0 +1,2 @@
+GET https://eip-k8s-deploy-eip.apps-crc.testing/q/health/ready -> 200
+GET https://grafana-eip.apps-crc.testing/api/health -> 200

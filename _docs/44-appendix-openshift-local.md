@@ -211,14 +211,14 @@ mvn -B -q -f examples/38-kubernetes-deploy/quarkus/pom.xml package -DskipTests -
     -Dquarkus.container-image.tag=v1 \
     -Dquarkus.openshift.version=v1 \
     -Dquarkus.openshift.base-jvm-image=registry.access.redhat.com/ubi10/openjdk-25:1.24-15 \
-    -Dquarkus.kubernetes-client.namespace=eip \
+    -Dquarkus.openshift.namespace=eip \
     -Dquarkus.kubernetes.deploy=false
 ```
 
 The extension creates a `BuildConfig` (Source strategy, binary input) and two
 `ImageStream`s, uploads the fast-jar from `target/quarkus-app`, and the cluster
 runs the builder image's S2I assemble script and pushes `eip-k8s-deploy:v1` to
-the internal registry. Four settings carry the weight:
+the internal registry. Five settings carry the weight:
 
 - **`quarkus-openshift`, not `quarkus-container-image-openshift` alone.** The
   `BuildConfig` comes from the OpenShift manifest generator. With only the
@@ -227,6 +227,11 @@ the internal registry. Four settings carry the weight:
 - **`quarkus.openshift.version` sets the output tag.** With only
   `quarkus.container-image.tag`, the ImageStream tag stays at the project
   version, `1.0.0-SNAPSHOT`.
+- **`quarkus.openshift.namespace` picks the project.** Without it the build
+  runs in the kube context's current namespace, and `crc start` resets that to
+  `default`: Maven succeeds, the log says `in namespace:default`, and `eip` has
+  no `eip-k8s-deploy:v1`. `quarkus.kubernetes-client.namespace` and the
+  `KUBERNETES_NAMESPACE` variable do not change this on Quarkus 3.40.
 - **`quarkus.kubernetes.deploy=false`.** Build and push only; the Helm chart
   owns the Deployment.
 - **The builder image.** The extension defaults to `ubi9/openjdk-25`; the

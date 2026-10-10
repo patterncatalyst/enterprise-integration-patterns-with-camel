@@ -1,0 +1,15 @@
+-- pods with the injected agent
+POD                               INIT
+eip-k8s-deploy-697544b89d-wdnfv   opentelemetry-auto-instrumentation-java
+eip-k8s-deploy-697544b89d-wpzbz   opentelemetry-auto-instrumentation-java
+eip-k8s-deploy-697544b89d-zcqg5   opentelemetry-auto-instrumentation-java
+
+-- recent traces (Tempo), after one order through the Route
+      2 eip-k8s-deploy: eip.orders.enriched publish
+      8 eip-k8s-deploy: GET
+      3 eip-k8s-deploy: GET /q/health/live
+      4 eip-k8s-deploy: GET /q/health/ready
+      1 eip-k8s-deploy: HELLO
+      2 eip-k8s-deploy: POST /api/orders
+
+Grafana /api/health through its Route: 200

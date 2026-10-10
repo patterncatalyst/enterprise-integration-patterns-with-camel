@@ -1,0 +1,52 @@
+{
+    "status": "UP",
+    "checks": [
+        {
+            "name": "Redis connection health check",
+            "status": "UP",
+            "data": {
+                "default": "PONG"
+            }
+        },
+        {
+            "name": "camel-routes",
+            "status": "UP"
+        },
+        {
+            "name": "security-policy",
+            "status": "UP",
+            "data": {
+                "security.status": "clean",
+                "security.violations.count": "0",
+                "check.kind": "READINESS"
+            }
+        },
+        {
+            "name": "context",
+            "status": "UP",
+            "data": {
+                "context.phase": "5",
+                "context.name": "camel-1",
+                "context.version": "4.22.1",
+                "context.status": "Started",
+                "check.kind": "ALL"
+            }
+        },
+        {
+            "name": "camel-consumers",
+            "status": "UP"
+        },
+        {
+            "name": "route-controller",
+            "status": "UP",
+            "data": {
+                "check.kind": "READINESS"
+            }
+        }
+    ]
+}
+POST https://eip-k8s-deploy-eip.apps-crc.testing/api/orders -> {"status":"accepted"}
+2026-10-10 00:58:09,978 INFO  [order-api] (executor-thread-1) Received order: {"orderId":"ORD-CRC-1791593889","customerId":"C-101","item":"Shipping Container","quantity":2}
+2026-10-10 00:58:10,117 INFO  [order-processor] (Camel (camel-1) thread #2 - KafkaConsumer[eip.orders.incoming]) Processing order: {"orderId":"ORD-CRC-1791593889","customerId":"C-101","item":"Shipping Container","quantity":2}
+2026-10-10 00:58:10,368 INFO  [order-processor] (Camel (camel-1) thread #5 - KafkaProducer[eip.orders.enriched]) Enriched order published: {"orderId":"ORD-CRC-1791593889","customerId":"C-101","item":"Shipping Container","quantity":2,"customerName":"Global Freight Ltd"}
+{"orderId":"ORD-CRC-1791593889","customerId":"C-101","item":"Shipping Container","quantity":2,"customerName":"Global Freight Ltd"}
