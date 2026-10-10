@@ -174,3 +174,49 @@ jobs:
           include-hidden-files: true
           path: |
             **/.citrus-jbang/*-output.txt
+
+  citrus-cli:
+    # Appendix W: the Citrus tests run through the Camel CLI's test plugin
+    # (`camel test run`), which the yaml-dsl matrix above does not exercise.
+    runs-on: ubuntu-latest
+    name: Citrus via camel test — 41-citrus-testing
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+      - name: Cache SDKMAN and JBang
+        id: cache-sdkman
+        uses: actions/cache@v4
+        with:
+          path: ~/.sdkman
+          key: ${{ runner.os }}-sdkman-jbang
+      - name: Install JBang
+        if: steps.cache-sdkman.outputs.cache-hit != 'true'
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          sdk install jbang
+      - name: Install the Camel CLI and its test plugin
+        run: |
+          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          jbang app install --name camel org.apache.camel:camel-launcher:4.22.1
+          echo "$HOME/.jbang/bin" >> "$GITHUB_PATH"
+          "$HOME/.jbang/bin/camel" plugin add test
+      - name: Run tests
+        working-directory: examples/41-citrus-testing
+        env:
+          CITRUS_CAMEL_JBANG_DUMP_INTEGRATION_OUTPUT: "true"
+        run: |
+          source "/home/runner/.sdkman/bin/sdkman-init.sh"
+          camel test run test/order-validation.citrus.it.yaml
+          camel test run test/order-http.citrus.it.yaml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: citrus-cli-dumps
+          include-hidden-files: true
+          path: |
+            **/.citrus-jbang/*-output.txt

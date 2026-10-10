@@ -1,0 +1,61 @@
+name: order-http-test
+description: Verify the HTTP order validation endpoint answers 200 for a valid order and 400 with the reason for an invalid one
+actions:
+  # No broker needed: the route answers synchronously from the CLI's embedded HTTP server.
+  - camel:
+      jbang:
+        run:
+          args:
+            - "--port"
+            - "8088"
+          integration:
+            name: "order-http"
+            file: "../order-http-route.yaml"
+  - camel:
+      jbang:
+        verify:
+          integration: "order-http"
+          logMessage: "Routes startup"
+
+  # --- Scenario 1: valid order ---
+  - http:
+      client: "http://localhost:8088"
+      sendRequest:
+        POST:
+          path: "/api/orders"
+          contentType: "application/json"
+          body:
+            data: '{"orderId":"ORD-010","customerId":"C-110","item":"Cargo Net","quantity":5}'
+  - http:
+      client: "http://localhost:8088"
+      receiveResponse:
+        response:
+          status: "200"
+          contentType: "application/json"
+          body:
+            data: '{"status":"accepted","orderId":"@notEmpty()@"}'
+        # Pull the accepted order id out of the response for later steps.
+        extract:
+          body:
+            - path: "$.orderId"
+              variable: "acceptedOrderId"
+  - echo:
+      message: "Accepted order ${acceptedOrderId}"
+
+  # --- Scenario 2: invalid order (missing item) ---
+  - http:
+      client: "http://localhost:8088"
+      sendRequest:
+        POST:
+          path: "/api/orders"
+          contentType: "application/json"
+          body:
+            data: '{"orderId":"ORD-011","customerId":"C-111","quantity":3}'
+  - http:
+      client: "http://localhost:8088"
+      receiveResponse:
+        response:
+          status: "400"
+          contentType: "application/json"
+          body:
+            data: '{"status":"rejected","orderId":"ORD-011","reason":"item must not be null"}'

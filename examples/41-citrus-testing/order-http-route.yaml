@@ -1,0 +1,69 @@
+# Order Validation over HTTP
+# A synchronous front door for the same checks order-validation-route.yaml
+# applies to Kafka messages: POST an order, get 200 (accepted) or 400
+# (rejected, with the reason) straight back.
+#
+# Run with the CLI's embedded HTTP server on 8088 (a flag, not a property):
+#   camel run order-http-route.yaml --port=8088
+
+- rest:
+    path: /api/orders
+    post:
+      - consumes: application/json
+        produces: application/json
+        to: "direct:validate-http-order"
+
+- route:
+    id: order-http-validation
+    from:
+      uri: direct:validate-http-order
+      steps:
+        - unmarshal:
+            json:
+              unmarshalType: java.util.Map
+        - choice:
+            when:
+              - simple: "${body[orderId]} == null"
+                steps:
+                  - setVariable:
+                      name: reason
+                      constant: "orderId must not be null"
+              - simple: "${body[customerId]} == null"
+                steps:
+                  - setVariable:
+                      name: reason
+                      constant: "customerId must not be null"
+              - simple: "${body[item]} == null"
+                steps:
+                  - setVariable:
+                      name: reason
+                      constant: "item must not be null"
+              - simple: "${body[quantity]} == null || ${body[quantity]} <= 0"
+                steps:
+                  - setVariable:
+                      name: reason
+                      constant: "quantity must be greater than zero"
+        - choice:
+            when:
+              - simple: "${variable.reason} != null"
+                steps:
+                  - log:
+                      message: "REJECTED over HTTP — order ${body[orderId]}: ${variable.reason}"
+                      loggingLevel: WARN
+                  - setHeader:
+                      name: CamelHttpResponseCode
+                      constant: 400
+                  - setBody:
+                      simple: '{"status":"rejected","orderId":"${body[orderId]}","reason":"${variable.reason}"}'
+            otherwise:
+              steps:
+                - log:
+                    message: "ACCEPTED over HTTP — order ${body[orderId]}"
+                - setHeader:
+                    name: CamelHttpResponseCode
+                    constant: 200
+                - setBody:
+                    simple: '{"status":"accepted","orderId":"${body[orderId]}"}'
+        - setHeader:
+            name: Content-Type
+            constant: application/json
