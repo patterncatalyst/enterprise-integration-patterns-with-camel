@@ -22,6 +22,13 @@ public class EipInfraSetup implements TestActionSupport {
                     waitFor()
                             .http()
                             .url("http://localhost:8080/admin/v2/brokers/health")
+                            .seconds(90),
+                    // Pulsar 5 standalone reports healthy before it has created
+                    // public/default; a test that starts in between fails with
+                    // "Namespace not found". Wait for the namespace itself.
+                    waitFor()
+                            .http()
+                            .url("http://localhost:8080/admin/v2/namespaces/public/default")
                             .seconds(90)
                 ).build();
     }
