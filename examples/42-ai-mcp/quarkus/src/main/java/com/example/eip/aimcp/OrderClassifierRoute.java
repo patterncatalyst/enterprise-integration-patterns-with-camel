@@ -17,7 +17,10 @@ public class OrderClassifierRoute extends RouteBuilder {
         from("direct:classify-order")
             .routeId("classify-order")
             .log("Classifying order: ${body}")
-            .setHeader("CamelLangChain4jChatPrompt", simple(
+            // CHAT_SINGLE_MESSAGE (the default operation) sends the message
+            // body to the model, so the instructions go in the body. There is
+            // no "prompt" header: a header here is never seen by the model.
+            .setBody(simple(
                 "You are an order classification assistant for a shipping company. "
                 + "Classify the following order and return a JSON object with these fields: "
                 + "category (one of: ELECTRONICS, PERISHABLE, HAZARDOUS, FRAGILE, STANDARD), "

@@ -14,15 +14,22 @@ AI-powered order classification and conversational assistant using Camel's LangC
 
 - Java 25+
 - Maven 3.9+
-- Ollama running locally with the `llama3.2` model
+- Ollama running locally with the `qwen2.5:3b` model (a model that calls tools; see the chapter)
 
 ## Setup
 
 Pull the model and start the Ollama server:
 
 ```bash
-ollama pull llama3.2
+ollama pull qwen2.5:3b
 ollama serve
+```
+
+Or, without installing Ollama, the pinned container on the same port:
+
+```bash
+docker run -d --name ollama -p 127.0.0.1:11434:11434 -v ollama:/root/.ollama ollama/ollama:0.40.2
+docker exec ollama ollama pull qwen2.5:3b
 ```
 
 ## Running

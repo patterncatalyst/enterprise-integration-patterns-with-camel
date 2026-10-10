@@ -29,7 +29,7 @@ public class AgentConfig {
     @Bean
     public ChatModel chatModel(
             @Value("${ollama.base-url:http://localhost:11434}") String baseUrl,
-            @Value("${ollama.model-name:llama3.2}") String modelName) {
+            @Value("${ollama.model-name:qwen2.5:3b}") String modelName) {
         return OllamaChatModel.builder()
             .baseUrl(baseUrl)
             .modelName(modelName)

@@ -40,13 +40,19 @@ ollama pull qwen2.5:3b
 ollama serve
 ```
 
+Fedora's packaged `ollama` trails upstream by many releases; to run the current release without installing anything, use the pinned container image on the same port:
+
+```bash
+docker run -d --name ollama -p 127.0.0.1:11434:11434 -v ollama:/root/.ollama ollama/ollama:0.40.2
+docker exec ollama ollama pull qwen2.5:3b
+```
+
 > **Pick a model that can call tools.** The examples default to `qwen2.5:3b`
 > because tool calling is the whole point of the `ai-tool` sections below, and
 > not every small model does it. `llama3.2` was the earlier default and is a
 > poor fit: it answers in a single round trip and never invokes the registered
 > tools, so `toolExecutions` comes back empty and the assistant makes up an
-> answer. Asked to "return only the JSON", it also tends to return a friendly
-> paragraph *about* the JSON. `qwen2.5:3b` is a 1.9 GB download and calls tools
+> answer. `qwen2.5:3b` is a 1.9 GB download and calls tools
 > reliably; `llama3.1:8b` and the hosted OpenAI and Azure models below work too.
 > The route definitions do not change between them.
 
@@ -64,15 +70,17 @@ The `chatId` is a logical name that identifies the chat operation -- it does not
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `chatOperation` | `CHAT_SINGLE_MESSAGE` | `CHAT_SINGLE_MESSAGE` for one-shot, `CHAT_SINGLE_MESSAGE_WITH_PROMPT` when using the prompt header |
+| `chatOperation` | `CHAT_SINGLE_MESSAGE` | `CHAT_SINGLE_MESSAGE` sends the message body as the prompt; `CHAT_SINGLE_MESSAGE_WITH_PROMPT` fills a template from the `CamelLangChain4jChatPromptTemplate` header with the variables in a `Map` body |
 
-The prompt is set via the `CamelLangChain4jChatPrompt` header. This header accepts Simple expressions, so you can inject exchange data directly into the prompt:
+With the default operation the prompt **is the message body**. Build it with a Simple expression, so exchange data goes straight into it:
 
 ```java
-.setHeader("CamelLangChain4jChatPrompt", simple(
+.setBody(simple(
     "Classify this order: ${body}"))
 .to("langchain4j-chat:classifier")
 ```
+
+There is no "prompt" header. A header named `CamelLangChain4jChatPrompt` is silently ignored: the model then receives only the original body (here, the bare order JSON) and answers it as small talk, which is easy to mistake for a weak model.
 
 The model's response replaces the exchange body as a plain string.
 
@@ -102,7 +110,10 @@ public class OrderClassifierRoute extends RouteBuilder {
         from("direct:classify-order")
             .routeId("classify-order")
             .log("Classifying order: ${body}")
-            .setHeader("CamelLangChain4jChatPrompt", simple(
+            // CHAT_SINGLE_MESSAGE (the default operation) sends the message
+            // body to the model, so the instructions go in the body. There is
+            // no "prompt" header: a header here is never seen by the model.
+            .setBody(simple(
                 "You are an order classification assistant for a shipping company. "
                 + "Classify the following order and return a JSON object with these fields: "
                 + "category (one of: ELECTRONICS, PERISHABLE, HAZARDOUS, FRAGILE, STANDARD), "
@@ -135,7 +146,10 @@ public class OrderClassifierRoute extends RouteBuilder {
         from("direct:classify-order")
             .routeId("classify-order")
             .log("Classifying order: ${body}")
-            .setHeader("CamelLangChain4jChatPrompt", simple(
+            // CHAT_SINGLE_MESSAGE (the default operation) sends the message
+            // body to the model, so the instructions go in the body. There is
+            // no "prompt" header: a header here is never seen by the model.
+            .setBody(simple(
                 "You are an order classification assistant for a shipping company. "
                 + "Classify the following order and return a JSON object with these fields: "
                 + "category (one of: ELECTRONICS, PERISHABLE, HAZARDOUS, FRAGILE, STANDARD), "
@@ -181,16 +195,17 @@ Ollama runs models locally with no API key. It is the default for this tutorial'
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 
 ```properties
-# Quarkus — application.properties
-quarkus.langchain4j.ollama.chat-model.model-id=llama3.2
+# Quarkus — application.properties (quarkus-langchain4j-ollama supplies the ChatModel bean)
+quarkus.langchain4j.ollama.chat-model.model-id=qwen2.5:3b
 quarkus.langchain4j.ollama.base-url=http://localhost:11434
-camel.component.langchain4j-chat.chat-model=quarkusChatModel
+quarkus.langchain4j.ollama.timeout=120s
 ```
 
 ```properties
-# Spring Boot — application.properties
-langchain4j.ollama.chat-model.model-name=llama3.2
-langchain4j.ollama.chat-model.base-url=http://localhost:11434
+# Spring Boot — application.properties, read by AgentConfig, which builds the
+# OllamaChatModel itself (the langchain4j Ollama starter does not support Spring Boot 4)
+ollama.model-name=qwen2.5:3b
+ollama.base-url=http://localhost:11434
 ```
 
 ### OpenAI
@@ -594,7 +609,7 @@ public class AgentConfig {
     @Bean
     public ChatModel chatModel(
             @Value("${ollama.base-url:http://localhost:11434}") String baseUrl,
-            @Value("${ollama.model-name:llama3.2}") String modelName) {
+            @Value("${ollama.model-name:qwen2.5:3b}") String modelName) {
         return OllamaChatModel.builder()
             .baseUrl(baseUrl)
             .modelName(modelName)
@@ -768,9 +783,8 @@ An agent can use both MCP tools and Camel route tools simultaneously. The MCP to
 
 ```java
 from("direct:smart-assistant")
-    .setHeader("CamelLangChain4jChatPrompt", simple(
-        "You have access to both shipping tools and filesystem tools. "
-        + "Answer the user's question: ${body}"))
+    .setHeader("CamelLangChain4jAgentSystemMessage", constant(
+        "You have access to both shipping tools and filesystem tools."))
     .to("langchain4j-agent:assistant?agent=#assistantAgent&tags=shipping,filesystem");
 ```
 
@@ -778,7 +792,7 @@ The agent sees all tools -- both Camel routes and MCP servers -- as a flat list 
 
 ## Conversation memory
 
-By default, each call to the `langchain4j-chat` producer is stateless -- the model has no memory of previous exchanges. For conversational use cases like the order assistant, you need `ChatMemory` to maintain context across turns.
+By default, each call to the `langchain4j-chat` producer is stateless -- the model has no memory of previous exchanges. Memory belongs to the agent: for conversational use cases like the order assistant, give the `langchain4j-agent` a `ChatMemory` to maintain context across turns.
 
 LangChain4j provides `MessageWindowChatMemory`, which stores the last N messages in a sliding window:
 
@@ -796,7 +810,7 @@ public class ChatMemoryConfig {
 }
 ```
 
-When a `ChatMemoryProvider` bean is present, the LangChain4j Chat component automatically uses it. Each unique `chatId` in the URI gets its own memory window, so the classifier and assistant maintain separate conversation histories.
+When the agent is created from an `agentConfiguration` that carries a `ChatMemoryProvider`, Camel builds an `AgentWithMemory`; without one it builds an `AgentWithoutMemory`. The memory window is chosen per call by the `CamelLangChain4jAgentMemoryId` header.
 
 ### Session-based memory
 
@@ -804,9 +818,8 @@ For multi-user applications, you can key memory by session ID using a Camel head
 
 ```java
 from("direct:assistant-chat")
-    .setHeader("CamelLangChain4jChatMemoryId",
+    .setHeader("CamelLangChain4jAgentMemoryId",
         header("X-Session-Id"))
-    .setHeader("CamelLangChain4jChatPrompt", simple("${body}"))
     .to("langchain4j-agent:assistant?agent=#assistantAgent&tags=shipping");
 ```
 
@@ -974,7 +987,6 @@ For simpler use cases, you can apply keyword-based input filtering directly in t
 from("direct:guarded-chat")
     .filter(simple("${body} not contains 'ignore all previous instructions'"))
     .filter(simple("${body} not contains 'system prompt'"))
-    .setHeader("CamelLangChain4jChatPrompt", simple("${body}"))
     .to("langchain4j-chat:guarded");
 ```
 
@@ -1044,7 +1056,7 @@ from("file:incoming/customs-forms?noop=true&include=.*\\.pdf")
     .routeId("customs-processing")
     .log("Processing customs form: ${header.CamelFileName}")
     .bean("pdfTextExtractor")
-    .setHeader("CamelLangChain4jChatPrompt", simple(
+    .setBody(simple(
         "Extract the following fields from this customs declaration form: "
         + "shipper name, consignee, commodity description, declared value, "
         + "country of origin, HS code. Return as JSON. Document: ${body}"))
@@ -1062,7 +1074,7 @@ Combine with Camel's AWS S3 or Azure Blob components to process files from cloud
 from("aws2-s3:shipping-documents?prefix=invoices/")
     .routeId("invoice-extraction")
     .bean("pdfTextExtractor")
-    .setHeader("CamelLangChain4jChatPrompt", simple(
+    .setBody(simple(
         "Extract line items, totals, and payment terms from this invoice: ${body}"))
     .to("langchain4j-chat:invoice-extractor")
     .to("direct:store-extracted-invoice");
@@ -1112,7 +1124,7 @@ quarkus.camel.mcp-server.tool-timeout=20000
 
 ```properties
 # Add the camel-mcp-server-starter.
-# Defaults to Spring AI's Web MVC MCP transport, which serves streamable HTTP.
+# Spring AI's Web MVC MCP transport serves SSE: GET /sse, then POST /mcp/message.
 camel.mcp-server.enabled=true
 camel.mcp-server.tags=shipping
 camel.mcp-server.tool-timeout=20000
@@ -1131,7 +1143,34 @@ camel.server.mcp-server-name=shipping-tools
 
 ### Transports
 
-With an HTTP transport the client discovers and invokes tools through the configured MCP endpoint, which is `/mcp` by default for Camel Main and JBang. Quarkus and Spring Boot each own their own endpoint configuration.
+With an HTTP transport the client discovers and invokes tools through the runtime's MCP endpoint. The two example applications publish different transports on port 8088:
+
+| Runtime | Transport | Endpoint |
+|---|---|---|
+| Quarkus (Quarkus MCP server) | Streamable HTTP; SSE also offered | `POST /mcp`; `/mcp/sse` |
+| Spring Boot (Spring AI Web MVC) | SSE | `GET /sse` returns the message endpoint, `POST /mcp/message?sessionId=...` |
+| Camel Main and JBang (Vert.x) | Streamable HTTP | `/mcp` |
+
+Point an MCP client at the one your runtime serves. Against the Quarkus application, plain `curl` is enough to see the tool from the outside — `initialize`, then `tools/call`, carrying the session id the first response returns:
+
+```bash
+curl -s -D headers.txt -X POST localhost:8088/mcp \
+  -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"curl","version":"1"}}}'
+SID=$(awk 'tolower($1)=="mcp-session-id:"{print $2}' headers.txt | tr -d '\r')
+curl -s -X POST localhost:8088/mcp -H "Mcp-Session-Id: $SID" \
+  -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+curl -s -X POST localhost:8088/mcp -H "Mcp-Session-Id: $SID" \
+  -H 'Content-Type: application/json' -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"order-status","arguments":{"orderId":"ORD-002"}}}'
+```
+
+```json
+{"jsonrpc":"2.0","id":2,"result":{"isError":false,"content":[{"text":"{\"orderId\":\"ORD-002\",\"status\":\"PROCESSING\",\"warehouse\":\"West Coast Hub\"}","type":"text"}], ...}}
+```
+
+The same `ai-tool` route answers, and logs `Tool call — looking up order: ORD-002`, exactly as when the in-process agent calls it.
 
 With stdio there is no HTTP endpoint at all: the client launches your application as a subprocess and speaks MCP over stdin and stdout. On Spring Boot that means swapping the Web MVC transport for Spring AI's plain MCP server starter, setting `spring.ai.mcp.server.stdio=true`, and disabling both the web application and console logging — anything written to stdout other than protocol traffic corrupts the stream.
 
@@ -1281,21 +1320,17 @@ curl -X POST http://localhost:8088/api/orders/classify \
 
 The classifier route:
 1. Receives the JSON body via REST
-2. Sets the `CamelLangChain4jChatPrompt` header with instructions and the order data
+2. Replaces the body with the instructions plus the order data (the prompt)
 3. Sends the prompt to the LLM via `langchain4j-chat:classifier`
 4. Returns the LLM's JSON classification
 
-Expected response:
+A response from `qwen2.5:3b`:
 
 ```json
-{
-  "category": "HAZARDOUS",
-  "priority": "HIGH",
-  "fulfillmentType": "STANDARD"
-}
+{"category":"HAZARDOUS","priority":"CRITICAL","fulfillmentType":"SAME_DAY"}
 ```
 
-The LLM correctly identifies lithium batteries as hazardous and assigns high priority because hazardous shipments require special handling.
+The model identifies lithium batteries as hazardous. The priority and fulfillment type vary between runs and models — the category is the stable part.
 
 ### Step 2: Ask the assistant about an order
 
@@ -1315,29 +1350,31 @@ The assistant route:
 5. The tool returns `{"orderId":"ORD-001","status":"SHIPPED","carrier":"FedEx","eta":"2026-07-20"}`
 6. The agent formulates a natural-language response
 
-Expected response:
+A response (worded differently each run):
 
 ```
-Order ORD-001 has been shipped via FedEx. The estimated delivery date is July 20, 2026.
+The status of order ORD-001 is SHIPPED. It's being transported by FedEx with an estimated arrival time of 2026-07-20.
 ```
+
+The application log shows the tool call that produced it: `Tool call — looking up order: ORD-001`.
 
 ### Step 3: Try different orders
 
 ```bash
 # Processing order
 curl -X POST http://localhost:8088/api/assistant/chat \
-  -H "Content-Type: application/json" \
-  -d '"Is ORD-002 ready to ship?"'
+  -H "Content-Type: text/plain" \
+  -d 'Is ORD-002 ready to ship?'
 
 # Delivered order
 curl -X POST http://localhost:8088/api/assistant/chat \
-  -H "Content-Type: application/json" \
-  -d '"Has order ORD-003 been delivered?"'
+  -H "Content-Type: text/plain" \
+  -d 'Has order ORD-003 been delivered?'
 
 # Unknown order
 curl -X POST http://localhost:8088/api/assistant/chat \
-  -H "Content-Type: application/json" \
-  -d '"Where is order ORD-999?"'
+  -H "Content-Type: text/plain" \
+  -d 'Where is order ORD-999?'
 ```
 
 ### Step 4: Classify different product types
@@ -1358,6 +1395,10 @@ curl -X POST http://localhost:8088/api/orders/classify \
   -H "Content-Type: application/json" \
   -d '{"item":"Cotton T-Shirts","quantity":500,"destination":"Los Angeles"}'
 ```
+
+The assistant endpoint takes `text/plain`; posting `application/json` gets `415 Unsupported Media Type`. The agent calls the tool for each order, answers ORD-002 as processing at the West Coast Hub and ORD-003 as delivered, and says ORD-999 cannot be found.
+
+The classifier sorts the salmon as `PERISHABLE`, the glasses as `FRAGILE` and the t-shirts as `STANDARD`. A 3B model does not always respect the allowed values, though: it has answered the t-shirts with `"priority":"STANDARD"`, which is not one of the four priorities. Validate the model's JSON before routing on it (an output guardrail, or a `choice` that sends unknown values to a review queue).
 
 Watch the application logs to see the tool calls and AI responses in real time. Each tool invocation is logged by the route, so you can trace the agent's decision-making process.
 
@@ -1392,4 +1433,4 @@ As AI agents become standard components in enterprise architectures, the integra
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): both runtimes run against a live Ollama 0.34.0 with `qwen2.5:3b` (2026-09-14). The classifier returns a model response, and the assistant genuinely invokes the `ai-tool` route: asking for order ORD-002 logs `Tool call — looking up order: ORD-002` and answers from the tool's data, with zero route errors on either runtime. The embedded MCP server starts and publishes the tagged tool; it was not exercised from an external MCP client.*
+*Verification status: <span class="status status--verified">verified</span> — both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against Ollama 0.40.2 with `qwen2.5:3b` on Docker Engine: the classifier returns JSON (lithium batteries `HAZARDOUS`, salmon `PERISHABLE`, glasses `FRAGILE`, t-shirts `STANDARD`); the assistant calls the `ai-tool` route for ORD-001, ORD-002, ORD-003 and ORD-999 (`Tool call — looking up order: …` for each) and answers from its data, with no route errors; and an external MCP client lists `order-status` and calls it — over streamable HTTP at `/mcp` on Quarkus and over SSE (`/sse`, `/mcp/message`) on Spring Boot — reaching the same route (2026-10-09). This run found and fixed the classifier: its instructions went in a header the chat component never reads.*
