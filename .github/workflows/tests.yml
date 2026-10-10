@@ -158,7 +158,10 @@ jobs:
           # jar has no Main-Class, so --main avoids JBang's chooser prompt.
           jbang --main main.CitrusJBang org.citrusframework:citrus-jbang:5.0.2 --version
           jbang app install --name camel org.apache.camel:camel-launcher:4.22.1
-          camel version
+          # jbang app install puts `camel` in ~/.jbang/bin, which a fresh
+          # runner (no SDKMAN cache hit) does not have on PATH.
+          echo "$HOME/.jbang/bin" >> "$GITHUB_PATH"
+          "$HOME/.jbang/bin/camel" version
       - name: Run tests
         env:
           CITRUS_CAMEL_JBANG_DUMP_INTEGRATION_OUTPUT: "true"
