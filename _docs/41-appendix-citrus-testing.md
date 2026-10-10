@@ -831,4 +831,4 @@ End-to-end smoke tests        —  5% of test suite  — run nightly or pre-rele
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): the order-validation route runs on Camel CLI 4.22.0 and correctly routes a valid order to `eip.orders.validated` and one missing `orderId` to `eip.orders.rejected` (2026-09-14). Citrus 5.0.1 itself is exercised by the 44 integration tests across the other examples.*
+*Verification status: <span class="status status--verified">verified</span> — with Camel CLI 4.22.1 and the `test` plugin on Docker Engine, both tests pass through `camel test run` — the Kafka test (its own broker, the valid order and three rejections with their `rejectionReason` header) and the HTTP test (200 and 400 answers, extracted order id) — and pass again in the project `camel export` generates once the four fixes above are applied (`mvn verify -DskipITs=false`) (2026-10-09).*

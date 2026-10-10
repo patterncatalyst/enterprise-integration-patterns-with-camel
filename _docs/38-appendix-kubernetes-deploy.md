@@ -573,4 +573,4 @@ Routes instead of NodePorts, see
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — the minikube path was rewritten on 2026-10-09 for Docker Engine (docker driver, containerd), Kubernetes v1.36.5, Strimzi 1.2.0 (`kafka.strimzi.io/v1`, Kafka 4.3.1) and a NodePort published on 127.0.0.1, and has not yet been run on a cluster. Offline checks pass: both runtimes build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1), both images build with `docker build`, and the Quarkus manifest generates with NodePort 30088. The run is `./scripts/setup-minikube-stack.sh` then `examples/38-kubernetes-deploy/deploy-minikube.sh quarkus` and `spring-boot`.*
+*Verification status: <span class="status status--verified">verified</span> — on a fresh minikube profile (Docker Engine, docker driver, containerd, Kubernetes v1.36.5, Strimzi Kafka Ready): both variants built with Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) deploy, report ready (`/q/health/ready`, `/actuator/health/readiness` → 200) and enrich a test order with `Global Freight Ltd` from Redis; scaled to three replicas, all three pods take partitions (2026-10-09).*

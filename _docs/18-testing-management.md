@@ -336,4 +336,4 @@ This completes Part 8 — System Management (8 patterns across 2 chapters) — a
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) on 2026-10-09; the 10 Citrus integration tests passed on Camel 4.22.0 (2026-09-14) and await a re-run on Docker Engine.*
+*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

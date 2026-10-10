@@ -451,4 +451,4 @@ Spring Boot is a perfectly valid choice for Camel. If your organization standard
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): `examples/19-dsl-comparison/` was run on all three runtimes against the compose stack on 2026-09-15. Each classifies `amount > 500` as `HIGH_VALUE` and the rest as `STANDARD`, with identical output, and the YAML file validates clean against the Camel YAML DSL schema.*
+*Verification status: <span class="status status--verified">verified</span> — all three variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: given orders on `eip.orders.placed`, Quarkus, Spring Boot and the YAML DSL route each classify `DSL-1` (amount 640) as `HIGH_VALUE` and `DSL-2` as `STANDARD`, with no errors (2026-10-09).*

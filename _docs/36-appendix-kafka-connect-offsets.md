@@ -244,4 +244,4 @@ When the Camel route has a bug and you need to reprocess, you reset the Camel co
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): `examples/36-kafka-connect-offsets/connect-offsets-demo.sh` was run against Kafka and Connect 4.3.1 in the compose stack on 2026-09-16. A FileStreamSourceConnector read 10 records and reported byte position 328; after `PATCH`ing the position to 0 and resuming, the topic held 20 records; `DELETE` returned it to no offsets. The Strimzi CRD path is not covered by the example.*
+*Verification status: <span class="status status--verified">verified</span> — `connect-offsets-demo.sh` runs to completion against Kafka Connect on the compose stack on Docker Engine: the PATCH rewind takes the topic from 10 to 20 records and DELETE leaves no offsets. The script now waits for Connect to answer before starting (2026-10-09).*

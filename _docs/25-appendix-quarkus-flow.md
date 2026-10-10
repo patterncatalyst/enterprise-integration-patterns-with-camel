@@ -205,5 +205,5 @@ public class InventoryChecker {
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) on 2026-10-09; the 3 Citrus integration tests passed on Camel 4.22.0 (2026-09-14) and await a re-run on Docker Engine.*
+*Verification status: <span class="status status--verified">verified</span> — built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 3 integration tests pass against live containers on Docker Engine (2026-10-09).*
 Example `25-quarkus-flow` compiles and runs against the compose stack.*

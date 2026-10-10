@@ -333,4 +333,4 @@ Next: producer-side patterns, transactional messaging, and durable subscribers.
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) on 2026-10-09. Of the 18 Citrus integration tests, 17 passed on Docker Engine; the Quarkus SQL polling test read the row status once and lost a race with the poller\'s update, and now polls for it. Re-run pending.*
+*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 18 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean, its 5 Citrus tests pass, and the SQL Polling Consumer picks up a `PLACED` row from the stack's `eipdb` and marks it `PROCESSING` (2026-10-09).*

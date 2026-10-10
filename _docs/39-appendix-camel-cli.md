@@ -984,4 +984,4 @@ The entire lifecycle — from a blank YAML file to a production Kubernetes deplo
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — awaiting a live re-run on Docker Engine with Camel 4.22.1 / Quarkus 3.40.1 / Spring Boot 4.1.1 (see `_plans/live-retest-inventory.md`). Previously, with Camel 4.22.0 (on the earlier container engine): the three routes run on Camel CLI 4.22.0 against the live stack: a POST to `/api/orders` is routed to Kafka, consumed by the enricher, and enriched from Redis with zero errors (2026-09-14).*
+*Verification status: <span class="status status--verified">verified</span> — the routes run on Camel CLI 4.22.1 against the stack on Docker Engine: `POST /api/orders` with `orderType: EXPRESS` returns 200 and the enricher publishes `ORD-9001` with customer `Acme Freight`, tier `GOLD`, from Redis (2026-10-09).*
