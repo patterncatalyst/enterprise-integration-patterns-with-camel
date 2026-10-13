@@ -38,7 +38,7 @@ mvn spring-boot:run
 | `camel-quarkus-junit5` | `CamelQuarkusTestSupport` base class, `getMockEndpoint()`, `template` field, automatic advice cleanup | Teams migrating from `CamelTestSupport` |
 | `camel-quarkus-mock` | `mock:` endpoint component resolution at Quarkus build time | Any test that uses `MockEndpoint` |
 
-The `camel-quarkus-mock` dependency is easy to forget. Without it, Quarkus cannot resolve `mock:` URIs at build time and the test fails with a component-not-found error:
+Without `camel-quarkus-mock`, Quarkus cannot resolve `mock:` URIs at build time and the test fails with a component-not-found error:
 
 ```xml
 <dependency>

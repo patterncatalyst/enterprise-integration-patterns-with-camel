@@ -95,7 +95,7 @@ Dead letter handling typically involves:
 
 ### How Kafka implements it
 
-Kafka itself doesn't have a built-in dead letter queue — it's a broker-level concept that consumer frameworks implement. In our stack:
+Kafka itself doesn't have a built-in dead letter queue. It's a broker-level concept that consumer frameworks implement. In our stack:
 
 - **Camel's error handler** manages retries and dead-lettering at the route level.
 - The convention is to name the DLC topic `<original-topic>.dlq` — so `eip.orders.placed` has a dead letter at `eip.orders.placed.dlq`.

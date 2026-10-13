@@ -238,7 +238,7 @@ from("direct:payment-gateway")
 
 ### Smart proxy and Quarkus profiles
 
-Quarkus profiles make the smart proxy configuration seamless:
+Quarkus profiles configure the smart proxy per environment:
 
 ```properties
 # application.properties — production by default
@@ -332,7 +332,7 @@ from("direct:adapter-metrics")
 - **Smart Proxy** routes to different backends based on environment — mock for development, sandbox for staging, production for live traffic.
 - **Channel Adapter Management** combines circuit breakers, dead letter channels, and monitoring to handle external system failures gracefully.
 
-This completes Part 8 — System Management (8 patterns across 2 chapters) — and the entire EIP pattern catalog. All 65 Enterprise Integration Patterns have been covered across Parts 1-8. Next: Part 9 — Deep-Dive Appendices, covering advanced topics like schema evolution, testing strategies, performance tuning, and production deployment.
+This completes Part 8, System Management (8 patterns across 2 chapters), and the entire EIP pattern catalog. All 65 Enterprise Integration Patterns have been covered across Parts 1-8. Part 9, Deep-Dive Appendices, covers advanced topics like schema evolution, testing strategies, performance tuning, and production deployment.
 
 ---
 

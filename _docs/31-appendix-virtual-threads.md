@@ -164,7 +164,7 @@ from("seda:order-queue?virtualThreadPerTask=true&concurrentConsumers=500")
     .to("kafka:eip.orders.processed");
 ```
 
-The queue absorbs bursts; the concurrency limit prevents downstream flooding. Together they create a robust pipeline that handles variable load without circuit breakers or manual throttling.
+The queue absorbs bursts; the concurrency limit prevents downstream flooding. Together they handle variable load without circuit breakers or manual throttling.
 
 ## Virtual threads and Kafka consumers
 
@@ -254,7 +254,7 @@ from("seda:enrich-order?virtualThreadPerTask=true&concurrentConsumers=100")
     .to("kafka:eip.orders.enriched");
 ```
 
-## When NOT to use virtual threads
+## When not to use virtual threads
 
 Virtual threads improve throughput for I/O-bound workloads. They provide no benefit — and can add overhead — for:
 

@@ -448,4 +448,4 @@ Next, we'll meet the shipping domain that drives every example in this tutorial 
 
 *Verification status: <span class="status status--verified">verified</span> — on Docker Engine with Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1): `./scripts/setup-stack.sh` and `--lgtm` bring every service to healthy, `redis-cli ping` answers `PONG`, `init-schemas.sql` creates all five domain schemas, and the OTel Collector health endpoint and Grafana both answer 200 (2026-10-09). The SDKMAN chain itself was last run on a clean `fedora:44` container on 2026-09-14.*
 
-*Not verified here: the SDKMAN install commands, which need a clean machine to test honestly.*
+*Not verified here: the SDKMAN install commands, which need a clean machine to test.*

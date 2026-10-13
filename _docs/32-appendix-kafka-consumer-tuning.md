@@ -178,7 +178,7 @@ from("kafka:eip.orders.placed"
 The code above is unchanged from earlier Camel versions, and it has always
 *looked* correct. The guarantee behind it is new.
 
-Before 4.22, `allowManualCommit=true` did not actually stop the framework
+Before 4.22, `allowManualCommit=true` did not stop the framework
 committing on your behalf. Camel auto-committed offsets for every processed
 record whether or not the route ever called `commit()` — which, as the upgrade
 guide puts it, "defeated the purpose of manual commit mode and could cause
@@ -189,7 +189,7 @@ From 4.22, offsets are committed only on an explicit `commit()` call. The
 at-least-once claim this appendix and [Chapter 5]({% link _docs/05-channel-reliability.md %}) make
 is true now in a way it was not before.
 
-Two consequences worth internalising:
+Two consequences:
 
 - If you are reading this against an older Camel, the pattern is not delivering
   the guarantee you think. Upgrade before relying on it.

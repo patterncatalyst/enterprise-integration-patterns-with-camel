@@ -357,7 +357,7 @@ as UID 0, so it runs under `anyuid` through its own ServiceAccount, with
 collector configuration is used as shipped, health check on port 13133
 included.
 
-Service Mesh, GitOps, Ollama and native builds are left out on purpose: no
+Service Mesh, GitOps, Ollama and native builds are out of scope here: no
 chapter of this tutorial teaches them, and each would add an operator to
 install, size and tear down for nothing the examples demonstrate.
 

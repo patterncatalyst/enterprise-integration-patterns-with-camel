@@ -255,7 +255,7 @@ from("kafka:loan.bank.request.bank-a?brokers=localhost:9092&groupId=bank-a")
     .to("kafka:loan.bank.reply?brokers=localhost:9092");
 ```
 
-Each bank has its own pricing algorithm, approval criteria, and conditions. The key point: they all publish to the same `loan.bank.reply` topic, keyed by request ID for aggregation.
+Each bank has its own pricing algorithm, approval criteria, and conditions, but they all publish to the same `loan.bank.reply` topic, keyed by request ID for aggregation.
 
 ## Step 5: Aggregator — Collect and select
 

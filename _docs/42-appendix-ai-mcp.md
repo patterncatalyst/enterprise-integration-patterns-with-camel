@@ -80,7 +80,7 @@ With the default operation the prompt **is the message body**. Build it with a S
 .to("langchain4j-chat:classifier")
 ```
 
-There is no "prompt" header. A header named `CamelLangChain4jChatPrompt` is silently ignored: the model then receives only the original body (here, the bare order JSON) and answers it as small talk, which is easy to mistake for a weak model.
+There is no "prompt" header. A header named `CamelLangChain4jChatPrompt` is silently ignored: the model then receives only the original body (here, the bare order JSON) and answers it as small talk, which can look like a weak model.
 
 The model's response replaces the exchange body as a plain string.
 
@@ -331,7 +331,7 @@ covers the related case where the model invents a tool that does not exist.
 **Round trips are now bounded.** `maxToolCallingRoundTrips` defaults to 10. It
 was previously unbounded, which meant a model that kept calling tools could loop
 until something else gave out. If you have a legitimately deep tool chain, raise
-it deliberately.
+it.
 
 **Each tool call gets its own exchange.** Tool invocations run on an independent
 exchange copy, and the arguments the model supplies are filtered against the
@@ -340,8 +340,8 @@ into your route by hallucinating an extra argument. This is why declaring typed
 parameters, as `OrderLookupToolRoute` does below, is worth the small effort:
 undeclared arguments are silently dropped.
 
-One more thing worth knowing if you write a custom agent rather than using
-Camel's built-in one: `Agent.chat()` now returns `Result<String>` instead of
+If you write a custom agent rather than using
+Camel's built-in one, `Agent.chat()` now returns `Result<String>` instead of
 `String`, and exposes token usage and finish reason as exchange headers, plus
 `CamelLangChain4jAgentSources` and `CamelLangChain4jAgentToolExecutions` when
 RAG or tools are in play. The examples here use the built-in
@@ -1139,7 +1139,7 @@ camel.server.mcp-tags=shipping
 camel.server.mcp-server-name=shipping-tools
 ```
 
-`tool-timeout` bounds a single tool call at 20 seconds by default. On expiry the MCP client receives an error result, but note that the underlying Camel route is not cancelled — it keeps running until it finishes on its own.
+`tool-timeout` bounds a single tool call at 20 seconds by default. On expiry the MCP client receives an error result, but the underlying Camel route is not cancelled — it keeps running until it finishes on its own.
 
 ### Transports
 

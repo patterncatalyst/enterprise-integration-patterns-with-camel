@@ -27,7 +27,7 @@ mvn spring-boot:run
 
 flagd runs as part of the base stack, so `./scripts/setup-stack.sh` is all the
 infrastructure you need. It watches the flag file, which means editing
-`flags.json` changes behaviour on the very next message — no rebuild, no
+`flags.json` changes behaviour on the next message — no rebuild, no
 restart, no redeploy. Run the example and try it; that property is the whole
 argument for feature flags and it is much more convincing seen than described.
 
@@ -163,7 +163,7 @@ flagd:
 establish its event stream against flagd v0.13.1. The failure is quiet in the
 worst way: evaluation over the Connect RPC still works if you curl it by hand,
 but the provider never reaches ready, so the SDK returns the *default* for
-every flag and your application looks like it is simply ignoring the flag file.
+every flag and your application looks like it is ignoring the flag file.
 flagd is distroless, so it has no in-container healthcheck — `setup-stack.sh`
 polls `http://localhost:8014/healthz` from the host instead.
 
@@ -185,7 +185,7 @@ polls `http://localhost:8014/healthz` from the host instead.
 On Quarkus you also need `camel-quarkus-bean`: the flag lookup is a bean-backed
 expression, and Quarkus resolves the bean language only when that extension is
 present. Without it the route fails at startup with `No language could be found
-for: bean`, which does not obviously point at the cause.
+for: bean`, which does not point at the cause.
 
 On Spring Boot, set `camel.main.run-controller=true`. Without a web starter
 there is nothing else holding the JVM open, and the application shuts down a

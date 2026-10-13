@@ -6,7 +6,7 @@ description: "Listing, altering, and resetting connector offsets via the Kafka C
 duration: "20 minutes"
 ---
 
-Kafka Connect tracks its position in source and sink data streams using **connector offsets** — metadata stored in an internal Kafka topic (`connect-offsets` by default) that tells each connector where it left off. When a connector restarts, it resumes from its last committed offset. Managing these offsets — listing, resetting, and altering them — is essential for reprocessing data, recovering from failures, and migrating connectors between clusters.
+Kafka Connect tracks its position in source and sink data streams using **connector offsets**: metadata stored in an internal Kafka topic (`connect-offsets` by default) that tells each connector where it left off. When a connector restarts, it resumes from its last committed offset. Managing these offsets — listing, resetting, and altering them — is essential for reprocessing data, recovering from failures, and migrating connectors between clusters.
 
 ## How connector offsets differ from consumer offsets
 

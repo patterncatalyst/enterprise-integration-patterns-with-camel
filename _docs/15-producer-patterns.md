@@ -296,7 +296,7 @@ from("kafka:eip.payments.required?brokers=localhost:9092&groupId=payment-activat
 
 ### Why it matters
 
-The service activator pattern keeps your business logic clean. `PaymentProcessor` is a testable CDI bean — you can unit-test it with a mock `PaymentGateway` without starting Camel or Kafka. The Camel route is pure wiring — it connects the Kafka topic to the bean and the bean's output to the next topic. If you later switch from Kafka to Pulsar, the bean doesn't change — only the route.
+The service activator pattern keeps your business logic clean. `PaymentProcessor` is a testable CDI bean: you can unit-test it with a mock `PaymentGateway` without starting Camel or Kafka. The Camel route is pure wiring. It connects the Kafka topic to the bean and the bean's output to the next topic. If you later switch from Kafka to Pulsar, the bean doesn't change; only the route does.
 
 ## Common pitfalls
 

@@ -53,7 +53,7 @@ An **Aggregator** collects related messages (by a correlation key) and combines 
 
 ### How Camel models it
 
-Camel's `aggregate()` EIP is one of the most powerful and configurable patterns in the framework:
+Camel's `aggregate()` EIP is one of the most configurable patterns in the framework:
 
 ```java
 // Aggregate order lifecycle events into a complete status

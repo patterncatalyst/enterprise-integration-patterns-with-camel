@@ -84,11 +84,11 @@ camel run MyRoute.java --observe   # health, metrics, dev console, Camel tracing
 Metrics get scraped, traces and logs get exported, and none of it needs a
 property file.
 
-Two things to be clear about. It is a **different stack** — Prometheus,
+It is a **different stack** — Prometheus,
 VictoriaTraces, VictoriaLogs and Perses, not Loki, Tempo, Mimir and Grafana —
-so dashboards and queries are not portable between the two. And it is aimed at
-the dev loop, not at the thing you ship. Use it while you are working out what
-your routes do; use the rest of this appendix for what runs in production.
+so dashboards and queries are not portable between the two. It is aimed at
+the dev loop, not at what you ship. Use it while you are working out what
+your routes do; the production sections below cover what you deploy.
 
 If you want auto-instrumentation of the libraries around Camel — JDBC, HTTP
 clients, Kafka clients, gRPC — there is also `--open-telemetry-agent`, which
@@ -195,8 +195,8 @@ management.otlp.metrics.export.aggregation-temporality=cumulative
 ### Getting all three signals
 
 A Camel application wired only with the OpenTelemetry extension exports traces
-and nothing else. The other two signals fail quietly, and it is worth
-understanding why, because the failure looks like success:
+and nothing else. The other two signals fail quietly, and the failure
+looks like success:
 
 - **Metrics.** Camel registers its route meters through Micrometer. The usual
   Micrometer setup is a Prometheus registry, which *exposes* meters at
@@ -348,7 +348,7 @@ the other.
 **Counters appear only once they have counted.** The Prometheus endpoint lists
 every registered meter immediately, including zero-valued ones. The OTLP bridge
 exports only what has recorded a value, so `camel_exchanges_failed_total` will
-not exist in Mimir until something actually fails. Write alerting rules that
+not exist in Mimir until something fails. Write alerting rules that
 tolerate the series being absent.
 
 Custom business metrics:

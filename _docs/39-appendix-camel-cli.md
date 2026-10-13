@@ -494,8 +494,7 @@ This is the fastest path from zero to a working prototype. Write a route, run `c
 
 ### The observability set
 
-One of the available sets is worth calling out, because it replaces a lot of
-manual wiring. Camel 4.22 bundles an observability stack — Prometheus,
+One set replaces a lot of manual wiring. Camel 4.22 bundles an observability stack — Prometheus,
 VictoriaTraces, VictoriaLogs and Perses:
 
 ```bash
@@ -601,7 +600,7 @@ The shell is useful for interactive exploration during development. Rather than 
 
 ## Exporting to production runtimes
 
-This is the most powerful feature of the CLI: taking a set of YAML route files that you prototyped with `camel run` and generating a complete, production-ready Maven project.
+Export takes a set of YAML route files that you prototyped with `camel run` and generates a complete, production-ready Maven project.
 
 ### Export to Quarkus
 

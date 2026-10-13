@@ -118,7 +118,7 @@ The happy path is clean, but failures reveal where integration patterns earn the
 - **Duplicate event delivery** → Any service may receive the same event twice → **Idempotent Receiver** (Part 7) ensures at-most-once processing.
 - **Service down** → Events queue in Kafka until the service recovers → **Guaranteed Delivery** (Part 3) ensures nothing is lost.
 
-These failure paths aren't edge cases — they're where most of the integration complexity lives, and where the patterns in this tutorial provide their greatest value.
+These failure paths are where most of the integration complexity lives, and where the patterns in this tutorial provide their greatest value.
 
 ## Events and schemas
 

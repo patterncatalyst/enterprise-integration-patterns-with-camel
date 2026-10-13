@@ -271,7 +271,7 @@ You can also filter by log level. The TUI supports adjusting the log level in re
 
 ### Log buffer
 
-The TUI maintains a scrollable buffer of recent log entries. Use the arrow keys or `Page Up`/`Page Down` to scroll through history. The buffer size is bounded, so very old entries are eventually evicted, but it retains enough history for practical debugging.
+The TUI maintains a scrollable buffer of recent log entries. Use the arrow keys or `Page Up`/`Page Down` to scroll through history. The buffer size is bounded, so old entries are eventually evicted, but it retains enough history for practical debugging.
 
 ## Activity tab
 
@@ -361,7 +361,7 @@ The Diagram tab supports several interaction modes:
 
 ## Inspect tab
 
-The Inspect tab is the most powerful debugging tool in the TUI. It provides a step-by-step view of how a single exchange was processed — every processor it visited, what changed at each step, and how long each step took.
+The Inspect tab provides a step-by-step view of how a single exchange was processed — every processor it visited, what changed at each step, and how long each step took.
 
 ### Selecting an exchange
 

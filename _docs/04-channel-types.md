@@ -185,7 +185,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=analytics-service")
     .to("direct:record-analytics");
 ```
 
-Notice that adding the analytics subscriber required zero changes to the publisher or the existing subscribers. This is the power of publish-subscribe: subscribers are additive. In a monolithic architecture, adding analytics would mean modifying order-service to call a new endpoint. In an event-driven architecture, it's a new consumer group.
+Adding the analytics subscriber required zero changes to the publisher or the existing subscribers. This is the power of publish-subscribe: subscribers are additive. In a monolithic architecture, adding analytics would mean modifying order-service to call a new endpoint. In an event-driven architecture, it's a new consumer group.
 
 ## Pattern: Datatype Channel
 

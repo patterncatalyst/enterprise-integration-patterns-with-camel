@@ -51,7 +51,7 @@ This chapter covers six patterns that address these questions. Together with the
 
 When order-service publishes an `OrderPlaced` event, it doesn't expect a response. That's the beauty of events. But during checkout, order-service needs to call inventory-service synchronously to check if items are in stock *before* accepting the order. The response matters — the order shouldn't proceed without confirmation.
 
-HTTP makes this trivial: send a request, get a response. But what if inventory-service is a Kafka-based microservice? You want to leverage the same messaging infrastructure for request-reply without switching to HTTP.
+HTTP makes this trivial: send a request, get a response. But what if inventory-service is a Kafka-based microservice? You want to use the same messaging infrastructure for request-reply without switching to HTTP.
 
 ### The solution
 
@@ -121,7 +121,7 @@ This shows `InOut` vs `InOnly` for each route — a quick way to verify that req
 
 ### When to avoid request-reply over messaging
 
-Request-reply over Kafka is powerful but adds complexity compared to a simple HTTP call. Use it when:
+Request-reply over Kafka adds complexity compared to an HTTP call. Use it when:
 - You want both sides on the same messaging infrastructure (no separate HTTP endpoint to deploy/monitor).
 - You need Kafka's durability guarantees (the request survives a consumer restart).
 - You're already in a Kafka-centric architecture and want consistency.

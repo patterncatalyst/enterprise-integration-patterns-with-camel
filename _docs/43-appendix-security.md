@@ -60,8 +60,8 @@ you can probably delete it.
 lowercases by default and blocks `Camel`- and `camel`-prefixed headers in both
 directions. More quietly, header constants across more than thirty components
 were renamed to the `Camel*` convention *specifically so that this filter
-catches them* — which is a good example of a fix that looks like churn in a
-changelog and is actually the whole point.
+catches them* — a fix that looks like churn in a changelog but is the whole
+point.
 
 This matters for [Chapter 8]({% link _docs/08-message-metadata.md %}). Headers
 are how EIP carries metadata, and the boundary between "metadata my system set"
@@ -124,9 +124,9 @@ a transport — which is a perfectly normal thing to do, and something
 [Chapter 8]({% link _docs/08-message-metadata.md %}) shows — you need to say so
 explicitly with a `HeaderFilterStrategy` that permits it. The default will
 otherwise silently drop it, and "the correlation ID disappears when it crosses
-JMS" is a genuinely annoying afternoon.
+JMS" is an annoying afternoon.
 
-## What to actually do
+## What to do
 
 If you are upgrading an existing application:
 
@@ -136,10 +136,10 @@ If you are upgrading an existing application:
 - Re-test HTTP endpoints under the `prod` profile before deploying, since
   misconfigured auth now fails startup
 
-If you are writing something new, the honest summary is that the defaults are
+If you are writing something new, the defaults are
 now good enough that the three decisions above are most of your remaining
-security surface at the framework level. That is a meaningful change from two
-releases ago, and it is worth knowing which side of it you are on.
+security surface at the framework level — a meaningful change from two
+releases ago.
 
 ---
 

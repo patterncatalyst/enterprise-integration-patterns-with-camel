@@ -302,7 +302,7 @@ oscillating with every sample.
 This does not replace a metrics pipeline — nothing here is stored, so there is
 no history and no alerting. But "what is the p95 on this route right now" is a
 question you can now answer on a running process without standing up Prometheus
-first, and that is often the question you actually have.
+first, and that is often the question you have.
 
 Two other consoles arrived alongside: a **SQL trace** console capturing the SQL
 your routes execute, and a **heap histogram** panel.

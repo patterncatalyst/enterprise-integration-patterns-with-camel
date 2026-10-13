@@ -112,7 +112,7 @@ Camel's 400+ components are all channel adapters. That's the entire point of the
 
 ### The problem
 
-Your shipping domain runs on Kafka, but a partner organization's order management system runs on Apache Pulsar. Their `partner.orders.placed` Pulsar topic needs to flow into your `eip.orders.placed` Kafka topic — seamlessly, reliably, and without the partner needing to know about your infrastructure.
+Your shipping domain runs on Kafka, but a partner organization's order management system runs on Apache Pulsar. Their `partner.orders.placed` Pulsar topic needs to flow into your `eip.orders.placed` Kafka topic reliably, without the partner needing to know about your infrastructure.
 
 Or internally: some pattern examples in this tutorial use Pulsar for specific features (shared subscriptions, per-message TTL). Messages need to flow between Kafka and Pulsar topics without manual intervention.
 
@@ -175,7 +175,7 @@ In our shipping domain, the message bus is the combination of:
 5. **Camel on a common runtime** — the programming model, providing a consistent way to define routes. This tutorial uses Quarkus and Spring Boot; what matters for the bus is that the routing model is the same on both.
 6. **Shared configuration** — Connection strings, serializer classes, consumer group naming conventions, all defined once rather than repeated per service.
 
-**What the examples in this tutorial actually do**, which is worth stating plainly because a bus is only as real as its conventions:
+**What the examples in this tutorial do:**
 
 - The pattern chapters follow `eip.<domain>.<event>` throughout. The two case studies do not — [Loan Broker]({{ '/docs/28-appendix-loan-broker/' | relative_url }}) uses `loan.*` and [Bond Trading]({{ '/docs/29-appendix-bond-trading/' | relative_url }}) uses `bond.*`, because each models a separate business domain rather than the shipping one.
 - Serialization is **JSON**, via `camel-jackson`, in every example. Avro with Apicurio-backed serializers is the stronger production choice — it gives you schema enforcement and compatibility checking rather than hoping producers and consumers agree — but JSON keeps the routes readable on the page, which matters more in a tutorial.

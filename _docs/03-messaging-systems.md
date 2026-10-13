@@ -97,7 +97,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
     .log("Priority: ${header.orderPriority}");
 ```
 
-Notice how Kafka metadata (key, partition, offset, topic, timestamp) arrives as Camel headers prefixed with `kafka.`. Every Camel component populates component-specific headers — the `file` component sets `CamelFileName`, the `http` component sets `CamelHttpResponseCode`, and so on. These headers are the mechanism by which transport-layer metadata flows into route logic.
+Kafka metadata (key, partition, offset, topic, timestamp) arrives as Camel headers prefixed with `kafka.`. Every Camel component populates component-specific headers — the `file` component sets `CamelFileName`, the `http` component sets `CamelHttpResponseCode`, and so on. These headers are the mechanism by which transport-layer metadata flows into route logic.
 
 ## Pattern 3: Pipes and Filters
 
@@ -371,7 +371,7 @@ Watch the Camel logs to see the message flow through the pipeline — each `log(
 - **Message Translator** — a filter that converts the message's format without changing its meaning.
 - **Message Endpoint** — the Camel component that connects application code to a channel.
 
-These six building blocks are the vocabulary for the rest of this tutorial. Next, we dive into the first building block in depth — **Messaging Channels** — exploring point-to-point, publish-subscribe, dead letter channels, guaranteed delivery, and more.
+These six building blocks are the vocabulary for the chapters that follow. Next, the first building block in depth — **Messaging Channels** — covering point-to-point, publish-subscribe, dead letter channels, guaranteed delivery, and more.
 
 ---
 

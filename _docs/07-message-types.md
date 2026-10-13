@@ -28,7 +28,7 @@ cd examples/07-message-types/yaml-dsl
 camel run *
 ```
 
-So far, we've treated messages as generic packets of data. But messages carry intent — they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types — command, document, and event — fundamentally shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
+So far, we've treated messages as generic packets of data. But messages carry intent — they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types — command, document, and event — shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
 
 {% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1 — The three message types and their channel/consumer affinities." %}
 
@@ -218,11 +218,11 @@ The event envelope includes metadata that helps consumers process and debug:
 
 ### Hybrid patterns
 
-Real systems often mix types. Our shipping domain is mostly events, but the checkout flow uses a command-style RPI call to get a shipping estimate (Part 1). The nightly accounting export is a document flow. The key is to choose deliberately, not by accident.
+Real systems often mix types. Our shipping domain is mostly events, but the checkout flow uses a command-style RPI call to get a shipping estimate (Part 1). The nightly accounting export is a document flow. The key is to choose the right type for each flow, not fall into one by accident.
 
 ## Common pitfalls
 
-**Commands disguised as events.** If `OrderPlaced` is only consumed by inventory-service, and inventory-service is the *only* thing that should react, you've built a command with event naming. This isn't necessarily wrong — but be honest about the coupling. If you later add a second consumer and it causes problems, the event naming misled you.
+**Commands disguised as events.** If `OrderPlaced` is only consumed by inventory-service, and inventory-service is the *only* thing that should react, you've built a command with event naming. This isn't necessarily wrong, but the coupling is real. If you later add a second consumer and it causes problems, the event naming misled you.
 
 **Events with command semantics.** If inventory-service emits `InventoryReserved` and payment-service treats it as "I must now charge the customer" — that's fine, that's choreography. But if payment-service would break if it *didn't* process the event, you've created an implicit command. Make sure the dependency is understood and documented.
 

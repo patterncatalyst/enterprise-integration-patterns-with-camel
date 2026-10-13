@@ -51,7 +51,7 @@ The message content determines the route. The routing logic needs to be clean, m
 
 A **Content-Based Router** inspects the message body or headers and routes the message to the appropriate channel based on the content. It's a message-level `if-else` or `switch` statement — but it separates the routing decision from the processing logic.
 
-Camel implements this with the `choice()` EIP, which is arguably the most-used pattern in any Camel application.
+Camel implements this with the `choice()` EIP, one of the most-used patterns in any Camel application.
 
 ### How Camel models it
 
@@ -371,7 +371,7 @@ points on identical input. An absolute count does not have that problem.
 > applies to an `onException(...).handled(true)` covering the split body.
 >
 > So choose. Either let items fail and let the threshold do its job, or handle
-> them per-item and give up the batch-level abort. If you genuinely want both,
+> them per-item and give up the batch-level abort. If you want both,
 > the handler has to rethrow after diverting the item.
 
 ### Processing items in chunks
@@ -413,7 +413,7 @@ across runs, letting you record a business value instead, such as
 `${body[line_number]}`.
 
 These carry real operational weight and a matching amount of setup; treat them
-as the answer when "just reprocess it" is genuinely unacceptable, not as a
+as the answer when "just reprocess it" is unacceptable, not as a
 default.
 
 ### Split headers

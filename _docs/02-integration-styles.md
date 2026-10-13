@@ -6,9 +6,9 @@ description: "The four fundamental ways applications share data — file transfe
 duration: "45 minutes"
 ---
 
-Before we dive into messaging patterns, we need to understand *why messaging exists at all*. Gregor Hohpe and Bobby Woolf open the EIP book with a deceptively simple question: how do you get two applications to share data? There are exactly four fundamental approaches — four **integration styles** — and each one trades off differently along the axes of coupling, timeliness, reliability, and complexity. Understanding these trade-offs is essential, because every decision you make in the rest of this tutorial builds on the choice of messaging as the primary integration style.
+Before we dive into messaging patterns, we need to understand *why messaging exists at all*. Gregor Hohpe and Bobby Woolf open the EIP book with a deceptively simple question: how do you get two applications to share data? There are exactly four fundamental approaches — four **integration styles** — and each one trades off differently along the axes of coupling, timeliness, reliability, and complexity. These trade-offs matter, because the rest of this tutorial builds on the choice of messaging as the primary integration style.
 
-This chapter walks through all four styles, shows how each one would solve a problem from our shipping domain, implements each in Apache Camel, and explains when you'd choose one over another. By the end, you'll understand not just *what* messaging is, but *why* it's the right default for loosely coupled systems.
+This chapter walks through all four styles, shows how each one would solve a problem from our shipping domain, implements each in Apache Camel, and explains when you'd choose one over another.
 
 {% include excalidraw.html file="02-integration-styles" alt="Diagram showing the four integration styles side by side — File Transfer, Shared Database, RPI, and Messaging" caption="Figure 2.1 — The Four Integration Styles" %}
 
@@ -373,7 +373,7 @@ In practice, most systems — including our shipping domain — use more than on
 - **File Transfer** bridges external systems: nightly order exports to accounting, weekly inventory imports from suppliers.
 - **Shared Database** appears in legacy corners: a reporting dashboard that reads across service schemas (with a read replica to avoid locking production).
 
-The goal isn't to use only messaging — it's to choose the right style for each interaction, and to know the trade-offs well enough to make that choice deliberately.
+The goal is not to use only messaging. Choose the right style for each interaction, and know the trade-offs well enough to make that choice knowingly, not by accident.
 
 ## Common pitfalls
 
