@@ -10,7 +10,7 @@ actions:
             - "8088"
           integration:
             name: "order-http"
-            file: "../order-http-route.yaml"
+            file: "../order-http-route.camel.yaml"
   - camel:
       jbang:
         verify:

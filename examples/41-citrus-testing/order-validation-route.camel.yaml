@@ -3,7 +3,7 @@
 #
 # Valid orders are enriched with a validatedAt header and published to
 # eip.orders.validated. Invalid orders are tagged with a rejectionReason
-# header and published to eip.orders.rejected.
+# header, a status "rejected" and a reason field, then published to eip.orders.rejected.
 
 - route:
     id: order-validation
@@ -23,6 +23,8 @@
                   - log:
                       message: "REJECTED — missing orderId: ${body}"
                       loggingLevel: WARN
+                  - setBody:
+                      groovy: "body + [status: 'rejected', reason: 'orderId must not be null']"
                   - marshal:
                       json: {}
                   - to:
@@ -35,6 +37,8 @@
                   - log:
                       message: "REJECTED — missing customerId for order ${body[orderId]}: ${body}"
                       loggingLevel: WARN
+                  - setBody:
+                      groovy: "body + [status: 'rejected', reason: 'customerId must not be null']"
                   - marshal:
                       json: {}
                   - to:
@@ -47,6 +51,8 @@
                   - log:
                       message: "REJECTED — missing item for order ${body[orderId]}: ${body}"
                       loggingLevel: WARN
+                  - setBody:
+                      groovy: "body + [status: 'rejected', reason: 'item must not be null']"
                   - marshal:
                       json: {}
                   - to:
@@ -59,6 +65,8 @@
                   - log:
                       message: "REJECTED — invalid quantity for order ${body[orderId]}: ${body}"
                       loggingLevel: WARN
+                  - setBody:
+                      groovy: "body + [status: 'rejected', reason: 'quantity must be greater than zero']"
                   - marshal:
                       json: {}
                   - to:
@@ -70,6 +78,8 @@
                     simple: "${date:now:yyyy-MM-dd'T'HH:mm:ss.SSSZ}"
                 - log:
                     message: "VALIDATED — order ${body[orderId]} for customer ${body[customerId]}"
+                - setBody:
+                    groovy: "body + [status: 'validated']"
                 - marshal:
                     json: {}
                 - to:

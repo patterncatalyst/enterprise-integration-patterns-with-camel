@@ -28,7 +28,7 @@ camel plugin add test
 ## Running tests
 
 ```bash
-# Run the Kafka integration test (starts its own Kafka on a random port)
+# Run the Kafka integration test (starts Kafka on the default fixed port)
 camel test run test/order-validation.citrus.it.yaml
 
 # Run the HTTP endpoint test (no broker; the route answers on port 8088)
@@ -42,13 +42,13 @@ The test plugin adds the Citrus modules each test needs (`citrus-kafka`,
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `order-validation-route.yaml` | Camel route that validates incoming orders from Kafka |
-| `order-http-route.yaml` | Camel route that validates orders POSTed to `/api/orders` and answers 200 or 400 |
+| File                                   | Purpose |
+|----------------------------------------|---------|
+| `order-validation-route.camel.yaml`    | Camel route that validates incoming orders from Kafka |
+| `order-http-route.camel.yaml`          | Camel route that validates orders POSTed to `/api/orders` and answers 200 or 400 |
 | `test/order-validation.citrus.it.yaml` | Citrus test — starts Kafka (`camel infra`), runs the route, verifies routing and the `rejectionReason` header |
-| `test/order-http.citrus.it.yaml` | Citrus test — runs the HTTP route, verifies the 200 and 400 responses |
-| `application.properties` | Kafka and REST configuration for running the routes by hand against the compose stack |
+| `test/order-http.citrus.it.yaml`       | Citrus test — runs the HTTP route, verifies the 200 and 400 responses |
+| `application.properties`               | Kafka and REST configuration for running the routes by hand against the compose stack |
 
 ---
 

@@ -1,10 +1,10 @@
 # Order Validation over HTTP
-# A synchronous front door for the same checks order-validation-route.yaml
+# A synchronous front door for the same checks order-validation-route.camel.yaml
 # applies to Kafka messages: POST an order, get 200 (accepted) or 400
 # (rejected, with the reason) straight back.
 #
 # Run with the CLI's embedded HTTP server on 8088 (a flag, not a property):
-#   camel run order-http-route.yaml --port=8088
+#   camel run order-http-route.camel.yaml --port=8088
 
 - rest:
     path: /api/orders

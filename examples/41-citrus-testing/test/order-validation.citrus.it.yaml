@@ -1,22 +1,17 @@
 name: order-validation-test
 description: Verify the order validation route sends valid orders to eip.orders.validated and invalid ones to eip.orders.rejected
 actions:
-  # Kafka from Camel's own test infrastructure (the same service `camel infra run kafka` starts),
-  # on a random port. Citrus exposes its address as CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS.
   - camel:
       infra:
         run:
           service: "kafka"
+          fixedPort: true
   - camel:
       jbang:
         run:
           integration:
             name: "order-validation"
-            file: "../order-validation-route.yaml"
-            systemProperties:
-              properties:
-                - name: "camel.component.kafka.brokers"
-                  value: "${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+            file: "../order-validation-route.camel.yaml"
   - camel:
       jbang:
         verify:
@@ -25,61 +20,60 @@ actions:
 
   # --- Scenario 1: valid order ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
-          data: '{"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}'
+          data: |
+            {"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}
   - receive:
-      endpoint: "kafka:eip.orders.validated?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-validated"
+      endpoint: "kafka:eip.orders.validated?consumerGroup=citrus-validated"
       timeout: 20000
       message:
         body:
-          data: '{"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}'
+          data: |
+            {"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2,"status":"validated"}
 
   # --- Scenario 2: missing customerId ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
-          data: '{"orderId":"ORD-002","item":"Pallet Jack","quantity":1}'
+          data: |
+            {"orderId":"ORD-002","item":"Pallet Jack","quantity":1}
   - receive:
-      endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+      endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
       timeout: 20000
       message:
-        headers:
-          - name: "rejectionReason"
-            value: "customerId must not be null"
         body:
-          data: '{"orderId":"ORD-002","item":"Pallet Jack","quantity":1}'
+          data: |
+            {"orderId":"ORD-002","item":"Pallet Jack","quantity":1,"status":"rejected","reason":"customerId must not be null"}
 
   # --- Scenario 3: zero quantity ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
-          data: '{"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0}'
+          data: |
+            {"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0}
   - receive:
-      endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+      endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
       timeout: 20000
       message:
-        headers:
-          - name: "rejectionReason"
-            value: "quantity must be greater than zero"
         body:
-          data: '{"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0}'
+          data: |
+            {"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0,"status":"rejected","reason":"quantity must be greater than zero"}
 
   # --- Scenario 4: missing item ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
-          data: '{"orderId":"ORD-004","customerId":"C-103","quantity":5}'
+          data: |
+            {"orderId":"ORD-004","customerId":"C-103","quantity":5}
   - receive:
-      endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+      endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
       timeout: 20000
       message:
-        headers:
-          - name: "rejectionReason"
-            value: "item must not be null"
         body:
-          data: '{"orderId":"ORD-004","customerId":"C-103","quantity":5}'
+          data: |
+            {"orderId":"ORD-004","customerId":"C-103","quantity":5,"status":"rejected","reason":"item must not be null"}

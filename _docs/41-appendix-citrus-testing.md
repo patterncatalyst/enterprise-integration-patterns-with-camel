@@ -94,8 +94,7 @@ docker ps
 
 ### Stop the development stack first
 
-This appendix's Kafka test starts its broker on a random port, so it runs
-fine next to the development stack; only its HTTP test needs port 8088 free.
+This appendix's Kafka test starts its broker with `fixedPort: true`, so it uses the default Kafka port 9092 — the same port the development stack binds. Stop the development stack before running the tests. The HTTP test also needs port 8088 free.
 The Maven examples in the other chapters are different. Each one's tests bring up their own infrastructure from
 `src/test/resources/_infra/compose.yaml`, on the same fixed host ports the
 development stack uses — 9092 for Kafka, 6379 for Redis, 5432 for PostgreSQL,
@@ -146,7 +145,7 @@ regardless and needs no equivalent setting.
 
 A Citrus test follows a four-step pattern that mirrors the Arrange-Act-Assert structure familiar from unit testing:
 
-1. **Start infrastructure** — a `camel: infra: run:` action starts a service (Kafka, PostgreSQL, Redis, ...) from Camel's own test infrastructure, the same containers `camel infra run` starts by hand, on a random port. It stops again when the test ends.
+1. **Start infrastructure** — a `camel: infra: run:` action starts a service (Kafka, PostgreSQL, Redis, ...) from Camel's own test infrastructure, the same containers `camel infra run` starts by hand. By default the port is random; set `fixedPort: true` to use the service's default port instead. The service stops again when the test ends.
 
 2. **Launch the integration** — a `camel: jbang: run:` action runs the route under test through the Camel CLI, pointed at that infrastructure; `camel: jbang: verify:` waits until it has started.
 
@@ -165,18 +164,15 @@ actions:
       infra:
         run:
           service: "kafka"
+          fixedPort: true
 
-  # Step 2: the route under test, pointed at that Kafka (Arrange)
+  # Step 2: the route under test (Arrange)
   - camel:
       jbang:
         run:
           integration:
             name: "order-validation"
-            file: "../order-validation-route.yaml"
-            systemProperties:
-              properties:
-                - name: "camel.component.kafka.brokers"
-                  value: "${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+            file: "../order-validation-route.camel.yaml"
   - camel:
       jbang:
         verify:
@@ -185,14 +181,14 @@ actions:
 
   # Step 3: send a test message (Act)
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
           data: '{"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}'
 
   # Step 4: verify the outcome (Assert)
   - receive:
-      endpoint: "kafka:eip.orders.validated?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-validated"
+      endpoint: "kafka:eip.orders.validated?consumerGroup=citrus-validated"
       timeout: 20000
       message:
         body:
@@ -208,10 +204,10 @@ The `send` action publishes a message to the endpoint. The `receive` action wait
 The `camel test init` command generates a skeleton test file for an existing route:
 
 ```bash
-camel test init order-validation-route.yaml
+camel test init order-validation-route.camel.yaml
 ```
 
-This writes a starter test, `test/order-validation-route.yaml` (an `echo` action and a `message` variable), and a `test/citrus-application.properties` that pins the Camel version Citrus runs the route on. It does not read the route's endpoints: you write the actions yourself. Rename the file to `*.citrus.it.yaml` before running it, or Citrus will not pick it up.
+This writes a starter test, `test/order-validation-route.camel.yaml` (an `echo` action and a `message` variable), and a `test/citrus-application.properties` that pins the Camel version Citrus runs the route on. It does not read the route's endpoints: you write the actions yourself. Rename the file to `*.citrus.it.yaml` before running it, or Citrus will not pick it up.
 
 ### YAML test anatomy
 
@@ -231,7 +227,7 @@ Citrus supports several action types for different testing scenarios:
 
 ```yaml
 - send:
-    endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+    endpoint: "kafka:eip.orders.incoming"
     message:
       headers:
         - name: "orderId"
@@ -244,7 +240,7 @@ Citrus supports several action types for different testing scenarios:
 
 ```yaml
 - receive:
-    endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+    endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
     timeout: 20000
     message:
       headers:
@@ -295,7 +291,7 @@ By default, Citrus performs an exact match on the message body. For JSON bodies,
 
 ```yaml
 - receive:
-    endpoint: "kafka:eip.orders.validated?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-validated"
+    endpoint: "kafka:eip.orders.validated?consumerGroup=citrus-validated"
     timeout: 20000
     message:
       body:
@@ -340,13 +336,14 @@ This starts a Kafka container and prints the connection properties. The containe
 
 ### Infrastructure in tests
 
-A test asks for its infrastructure with the `camel: infra: run:` action. It is the same catalogue `camel infra list` shows, started on a random port so it never collides with the development stack, and stopped when the test ends:
+A test asks for its infrastructure with the `camel: infra: run:` action. It is the same catalogue `camel infra list` shows, stopped when the test ends. Set `fixedPort: true` to use the service's default port (e.g. 9092 for Kafka); omit it and Citrus picks a random port so it never collides with the development stack:
 
 ```yaml
 - camel:
     infra:
       run:
         service: "kafka"
+        fixedPort: true
 ```
 
 Nothing is inferred from the route: a test whose route consumes from `kafka:` still has to start Kafka itself.
@@ -357,28 +354,13 @@ When the service is up, Citrus exposes its connection properties as test variabl
 
 ```
 Starting Camel infra service 'kafka' ...
-Exposing service property CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS='localhost:32993'
+Exposing service property CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS='localhost:9092'
 Successfully started Camel infra service 'kafka'
 ```
 
-For Kafka the useful one is `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` (`CITRUS_CAMEL_INFRA_KAFKA_BROKERS` carries the same address). Use it twice: in the test's own Kafka endpoints (`?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}`), and as a system property on the route the test runs:
+For Kafka the property is `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` (`CITRUS_CAMEL_INFRA_KAFKA_BROKERS` carries the same address). With `fixedPort: true` the broker listens on the default port 9092, so the route's own `application.properties` already points at the right address — no system property override is needed. The test's send and receive actions can use bare topic endpoints (`kafka:eip.orders.incoming`) without a `?server=` parameter.
 
-```yaml
-- camel:
-    jbang:
-      run:
-        integration:
-          name: "order-validation"
-          file: "../order-validation-route.yaml"
-          systemProperties:
-            properties:
-              - name: "camel.component.kafka.brokers"
-                value: "${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
-```
-
-The route file never changes: `application.properties` points it at the development stack's `localhost:9092`, and the system property points it at the test's broker.
-
-These variables exist only once the infra action has run. Reference them in actions, not in the test's top-level `variables:` block — that block is resolved before the first action, and fails with `Unknown variable 'CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS'`.
+When using a random port (no `fixedPort`), these variables become essential: pass `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` as a system property on the route and as `?server=` on the test's own Kafka endpoints. The variables exist only once the infra action has run — reference them in actions, not in the test's top-level `variables:` block.
 
 ## Testing with Kafka
 
@@ -386,7 +368,7 @@ The core use case for Citrus in a Camel integration project is testing message-d
 
 ### The route under test
 
-The order validation route in `order-validation-route.yaml` consumes from `kafka:eip.orders.incoming`, validates the order payload, and routes to one of two output topics:
+The order validation route in `order-validation-route.camel.yaml` consumes from `kafka:eip.orders.incoming`, validates the order payload, and routes to one of two output topics:
 
 - **Valid orders** — enriched with a `validatedAt` header and published to `kafka:eip.orders.validated`
 - **Invalid orders** — tagged with a `rejectionReason` header and published to `kafka:eip.orders.rejected`
@@ -401,22 +383,17 @@ The test file `test/order-validation.citrus.it.yaml` starts Kafka, runs the rout
 name: order-validation-test
 description: Verify the order validation route sends valid orders to eip.orders.validated and invalid ones to eip.orders.rejected
 actions:
-  # Kafka from Camel's own test infrastructure (the same service `camel infra run kafka` starts),
-  # on a random port. Citrus exposes its address as CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS.
   - camel:
       infra:
         run:
           service: "kafka"
+          fixedPort: true
   - camel:
       jbang:
         run:
           integration:
             name: "order-validation"
-            file: "../order-validation-route.yaml"
-            systemProperties:
-              properties:
-                - name: "camel.component.kafka.brokers"
-                  value: "${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+            file: "../order-validation-route.camel.yaml"
   - camel:
       jbang:
         verify:
@@ -425,12 +402,12 @@ actions:
 
   # --- Scenario 1: valid order ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
           data: '{"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}'
   - receive:
-      endpoint: "kafka:eip.orders.validated?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-validated"
+      endpoint: "kafka:eip.orders.validated?consumerGroup=citrus-validated"
       timeout: 20000
       message:
         body:
@@ -438,12 +415,12 @@ actions:
 
   # --- Scenario 2: missing customerId ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
           data: '{"orderId":"ORD-002","item":"Pallet Jack","quantity":1}'
   - receive:
-      endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+      endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
       timeout: 20000
       message:
         headers:
@@ -454,12 +431,12 @@ actions:
 
   # --- Scenario 3: zero quantity ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
           data: '{"orderId":"ORD-003","customerId":"C-102","item":"Cargo Net","quantity":0}'
   - receive:
-      endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+      endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
       timeout: 20000
       message:
         headers:
@@ -470,12 +447,12 @@ actions:
 
   # --- Scenario 4: missing item ---
   - send:
-      endpoint: "kafka:eip.orders.incoming?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}"
+      endpoint: "kafka:eip.orders.incoming"
       message:
         body:
           data: '{"orderId":"ORD-004","customerId":"C-103","quantity":5}'
   - receive:
-      endpoint: "kafka:eip.orders.rejected?server=${CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS}&consumerGroup=citrus-rejected"
+      endpoint: "kafka:eip.orders.rejected?consumerGroup=citrus-rejected"
       timeout: 20000
       message:
         headers:
@@ -496,8 +473,8 @@ camel test run test/order-validation.citrus.it.yaml
 
 Citrus runs the actions in order:
 
-1. Starts Kafka from Camel's test infrastructure on a random port and exposes `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS`
-2. Runs `order-validation-route.yaml` through the Camel CLI with `camel.component.kafka.brokers` set to that address, and waits for `Routes startup`
+1. Starts Kafka from Camel's test infrastructure on the default fixed port (9092)
+2. Runs `order-validation-route.camel.yaml` through the Camel CLI — the route's default broker address (`localhost:9092`) matches the fixed port, so no system property override is needed — and waits for `Routes startup`
 3. Sends each order and verifies the topic, body and header it arrives with
 4. Stops the route and the broker, and reports the result
 
@@ -506,7 +483,7 @@ The output of a passing run (timestamps trimmed):
 ```
 ➤ TEST START: order-validation-test (org.citrusframework.base)
 Starting Camel infra service 'kafka' ...
-Exposing service property CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS='localhost:32993'
+Exposing service property CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS='localhost:9092'
 Successfully started Camel infra service 'kafka'
 ✔ camel:run-infra
 ✔ camel:cli:run
@@ -532,7 +509,7 @@ A failing action is marked `✘` and the run ends `✘ TEST FAILED`, followed by
 Common failure causes:
 
 - **No route running** — the test has no `camel: jbang: run:` action, or `verify` timed out because the route failed to start; the route's own output is in `.citrus-jbang/i-<name>-output.txt` when `citrus.camel.jbang.dump.integration.output=true`
-- **Route on the wrong broker** — the `camel.component.kafka.brokers` system property is missing, so the route talks to `localhost:9092` instead of the test's Kafka
+- **Route on the wrong broker** — if using a random port (no `fixedPort`), the `camel.component.kafka.brokers` system property must point the route at the test's Kafka; without it the route defaults to `localhost:9092`
 - **Topic name mismatch** — the test endpoint URI must match the route's topic exactly
 - **Serialization mismatch** — the route may produce a different JSON structure than expected (e.g., additional fields from enrichment)
 - **Timeout too short** — increase the `timeout` value if the route involves slow processors
@@ -550,7 +527,7 @@ Citrus also supports testing REST endpoints exposed by Camel routes. The HTTP te
 
 ### HTTP test walkthrough
 
-The route under test is `order-http-route.yaml`: a REST endpoint, `POST /api/orders`, that applies the same four checks as the Kafka route and answers straight away — `200` with `{"status":"accepted",...}`, or `400` with the reason. It needs no broker, so the test starts only the route, on the CLI's embedded HTTP server (`--port 8088`; the port is a flag, not a property).
+The route under test is `order-http-route.camel.yaml`: a REST endpoint, `POST /api/orders`, that applies the same four checks as the Kafka route and answers straight away — `200` with `{"status":"accepted",...}`, or `400` with the reason. It needs no broker, so the test starts only the route, on the CLI's embedded HTTP server (`--port 8088`; the port is a flag, not a property).
 
 The test file `test/order-http.citrus.it.yaml`:
 
@@ -567,7 +544,7 @@ actions:
             - "8088"
           integration:
             name: "order-http"
-            file: "../order-http-route.yaml"
+            file: "../order-http-route.camel.yaml"
   - camel:
       jbang:
         verify:
@@ -679,7 +656,7 @@ Name every route the tests run; the export only copies the files you give it:
 cd examples/41-citrus-testing
 camel export --runtime=quarkus --gav=com.example:order-validation:1.0 \
   --directory=target/exported-project \
-  order-validation-route.yaml order-http-route.yaml
+  order-validation-route.camel.yaml order-http-route.camel.yaml
 ```
 
 ### Exported project structure
@@ -692,8 +669,8 @@ target/exported-project/
       resources/
         application.properties
         camel/
-          order-http-route.yaml
-          order-validation-route.yaml
+          order-http-route.camel.yaml
+          order-validation-route.camel.yaml
     test/
       java/com/example/ordervalidation/
         OrderHttpCitrusIT.java
@@ -703,7 +680,7 @@ target/exported-project/
         order-validation.citrus.it.yaml
 ```
 
-Each YAML test gets a JUnit Jupiter class that runs it, and the tests' route paths are rewritten to the classpath (`camel/order-http-route.yaml`):
+Each YAML test gets a JUnit Jupiter class that runs it, and the tests' route paths are rewritten to the classpath (`camel/order-http-route.camel.yaml`):
 
 ```java
 @CitrusSupport
@@ -761,7 +738,7 @@ For an exported project, the step is `mvn verify -DskipITs=false`.
 
 ### Parallel test execution
 
-Each Kafka test starts its own broker on a random port, so Kafka tests can run side by side. The HTTP test cannot: it binds the route to the fixed port 8088, and two copies would collide. Keep tests that bind fixed ports in sequence.
+Both tests bind fixed ports (Kafka on 9092, HTTP on 8088), so they cannot run in parallel with other tests that use the same ports. Keep tests that bind fixed ports in sequence. To allow parallel execution, remove `fixedPort: true` from the infra action — Citrus then picks a random port that never collides.
 
 ### Test reports
 
@@ -816,7 +793,7 @@ End-to-end smoke tests        —  5% of test suite  — run nightly or pre-rele
 
 - **Citrus tests integrations against real infrastructure** — no mocks, no stubs. When a Citrus test passes, the route works with real Kafka, real HTTP endpoints, and real serialization.
 - **The Camel CLI test plugin makes YAML-native testing practical** — write routes in YAML, write tests in YAML, run `camel test run`. No Maven project needed for development-time testing.
-- **The test declares its infrastructure** — `camel: infra: run:` starts Kafka (or another service) on a random port, Citrus exposes its address as `CITRUS_CAMEL_INFRA_*` variables, and a system property on `camel: jbang: run:` points the unchanged route at it.
+- **The test declares its infrastructure** — `camel: infra: run:` starts Kafka (or another service), Citrus exposes its address as `CITRUS_CAMEL_INFRA_*` variables, and a system property on `camel: jbang: run:` points the unchanged route at it. Use `fixedPort: true` for a predictable port or omit it for a random one.
 - **`camel export` generates CI-ready Maven projects** — the same tests run locally with `camel test run` and in CI with `mvn verify`.
 - **Citrus complements Camel-native testing, not replaces it** — use Camel-native tests for fast route logic verification, Citrus tests for end-to-end integration confidence.
 
