@@ -71,7 +71,7 @@ mvn quarkus:dev
 
 | Example | Description | Appendix |
 |---------|-------------|----------|
-| [loan-broker](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/loan-broker) | Scatter-Gather — fan out to banks, aggregate best offer (13 EIP patterns) | Appendix J |
+| [loan-broker](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/loan-broker) | Scatter-Gather: fan out to banks, aggregate best offer (13 EIP patterns) | Appendix J |
 | [bond-trading](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/bond-trading) | Market data normalization, desk filtering, trade execution (16 EIP patterns) | Appendix K |
 
 ## Infrastructure
