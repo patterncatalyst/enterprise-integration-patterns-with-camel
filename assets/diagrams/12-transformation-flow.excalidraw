@@ -1025,13 +1025,13 @@
    "updated": 1,
    "link": null,
    "locked": false,
-   "text": "Pipes and Filters \u2014 each step transforms the message",
+   "text": "Pipes and Filters: each step transforms the message",
    "fontSize": 11,
    "fontFamily": 1,
    "textAlign": "left",
    "verticalAlign": "top",
    "containerId": null,
-   "originalText": "Pipes and Filters \u2014 each step transforms the message",
+   "originalText": "Pipes and Filters: each step transforms the message",
    "lineHeight": 1.25,
    "baseline": 11
   }

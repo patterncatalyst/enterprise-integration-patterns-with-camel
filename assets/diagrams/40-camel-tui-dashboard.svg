@@ -26,12 +26,12 @@
 <text x="717.5" y="59.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">More</text>
 <rect x="30" y="80" width="400" height="90" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="230.0" y="115.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Running Integrations</text>
-<text x="230.0" y="132.5" font-size="11.5" fill="#555555" text-anchor="middle">order-router (pid 12345) — started</text>
-<text x="230.0" y="147.5" font-size="11.5" fill="#555555" text-anchor="middle">order-enricher (pid 12346) — started</text>
+<text x="230.0" y="132.5" font-size="11.5" fill="#555555" text-anchor="middle">order-router (pid 12345): started</text>
+<text x="230.0" y="147.5" font-size="11.5" fill="#555555" text-anchor="middle">order-enricher (pid 12346): started</text>
 <rect x="450" y="80" width="400" height="90" rx="9" fill="#ffffff" stroke="#111111" stroke-width="2"/>
 <text x="650.0" y="115.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Infrastructure Services</text>
-<text x="650.0" y="132.5" font-size="11.5" fill="#555555" text-anchor="middle">kafka — running (localhost:9092)</text>
-<text x="650.0" y="147.5" font-size="11.5" fill="#555555" text-anchor="middle">redis — running (localhost:6379)</text>
+<text x="650.0" y="132.5" font-size="11.5" fill="#555555" text-anchor="middle">kafka: running (localhost:9092)</text>
+<text x="650.0" y="147.5" font-size="11.5" fill="#555555" text-anchor="middle">redis: running (localhost:6379)</text>
 <rect x="30" y="185" width="820" height="80" rx="9" fill="#fff8ef" stroke="#e8870c" stroke-width="2"/>
 <text x="440.0" y="215.5" font-size="13.5" font-weight="700" fill="#111111" text-anchor="middle">Activity Feed</text>
 <text x="440.0" y="232.5" font-size="11.5" fill="#555555" text-anchor="middle">ORD-001 → validate-order → route-by-type → kafka:eip.orders.express  (12ms)</text>
