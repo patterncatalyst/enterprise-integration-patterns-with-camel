@@ -2,7 +2,7 @@
 title: "Testing and Management"
 order: 18
 part: system-management
-description: "Test Message, Detour, Smart Proxy, and Channel Adapter management — patterns that keep a running integration system testable and manageable."
+description: "Test Message, Detour, Smart Proxy, and Channel Adapter management: patterns that keep a running integration system testable and manageable."
 duration: "35 minutes"
 ---
 
@@ -22,26 +22,26 @@ cd examples/18-testing-management/spring-boot
 mvn spring-boot:run
 ```
 
-The previous chapter covered observability — knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
+The previous chapter covered observability: knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
 
-{% include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1 — Test Message injection and Detour toggle" %}
+{% include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1: Test Message injection and Detour toggle" %}
 
 ## Pattern: Test Message
 
 ### The problem
 
-How do you know the order processing pipeline is working right now? The monitoring dashboard shows messages flowing, but are they being processed correctly? A subtle bug might silently corrupt data — the pipeline looks healthy from the outside while producing wrong results.
+How do you know the order processing pipeline is working right now? The monitoring dashboard shows messages flowing, but are they being processed correctly? A subtle bug might silently corrupt data: the pipeline looks healthy from the outside while producing wrong results.
 
-You need to send a known message through the system and verify that the output matches what you expect — a synthetic health check for the entire pipeline.
+You need to send a known message through the system and verify that the output matches what you expect: a synthetic health check for the entire pipeline.
 
 ### The solution
 
 A **Test Message** is a message with known content that's injected into the system periodically. The sender knows what the output should be; a verifier at the end of the pipeline checks the actual output against the expected result. If they don't match, the system is misbehaving.
 
 Test messages are:
-- **Synthetic** — Not real business data. They carry a flag (like `test: true`) so they can be filtered out of business processing.
-- **Periodic** — Sent on a schedule (every 5 minutes, every hour) to continuously verify system health.
-- **End-to-end** — They traverse the full pipeline, not just individual routes.
+- **Synthetic**: Not real business data. They carry a flag (like `test: true`) so they can be filtered out of business processing.
+- **Periodic**: Sent on a schedule (every 5 minutes, every hour) to continuously verify system health.
+- **End-to-end**: They traverse the full pipeline, not just individual routes.
 
 ### How Camel models it
 
@@ -103,7 +103,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=inventory-service")
 
 ### Test messages vs. Camel test framework
 
-Test messages are *runtime* health checks — they verify the system works in production. The Camel test framework (`camel-test`, `camel-quarkus-junit5`) verifies the system works in development:
+Test messages are *runtime* health checks; they verify the system works in production. The Camel test framework (`camel-test`, `camel-quarkus-junit5`) verifies the system works in development:
 
 ```java
 @QuarkusTest
@@ -139,11 +139,11 @@ Use both: the test framework in CI/CD, test messages in production.
 
 ### The problem
 
-A bug in the enrichment step is corrupting customer emails. You need to bypass the enrichment step for all messages while you investigate — without deploying new code. Once the fix is ready, you re-enable enrichment.
+A bug in the enrichment step is corrupting customer emails. You need to bypass the enrichment step for all messages while you investigate, without deploying new code. Once the fix is ready, you re-enable enrichment.
 
 ### The solution
 
-A **Detour** is a conditional bypass in a route. When enabled, messages skip one or more processing steps. When disabled, messages flow through normally. It's a runtime toggle — typically controlled by a feature flag, a configuration property, or a control bus command.
+A **Detour** is a conditional bypass in a route. When enabled, messages skip one or more processing steps. When disabled, messages flow through normally. It's a runtime toggle, typically controlled by a feature flag, a configuration property, or a control bus command.
 
 ### How Camel models it
 
@@ -181,7 +181,7 @@ In a Kubernetes environment, update the ConfigMap and restart the pod (or use a 
 
 ### Detour vs. stopping a route
 
-You could achieve a similar effect by stopping the enrichment route via the control bus. But a detour is more surgical — it skips a specific *step* within a route, not the entire route. Messages continue flowing; they just take a different path.
+You could achieve a similar effect by stopping the enrichment route via the control bus. But a detour is more surgical; it skips a specific *step* within a route, not the entire route. Messages continue flowing; they just take a different path.
 
 ## Pattern: Smart Proxy
 
@@ -257,16 +257,16 @@ When you run `camel run` with JBang (which starts in dev mode by default), the m
 
 ### The problem
 
-The shipping domain has channel adapters connecting to external systems: carrier APIs (FedEx, UPS, DHL), the partner order system, the accounting CSV drop, the legacy CRM SOAP service. Each adapter might fail independently — the FedEx API might be down while UPS is fine. You need to manage these adapters: monitor their health, retry on failure, and gracefully degrade when external systems are unavailable.
+The shipping domain has channel adapters connecting to external systems: carrier APIs (FedEx, UPS, DHL), the partner order system, the accounting CSV drop, the legacy CRM SOAP service. Each adapter might fail independently: the FedEx API might be down while UPS is fine. You need to manage these adapters: monitor their health, retry on failure, and gracefully degrade when external systems are unavailable.
 
 ### The solution
 
 Managing channel adapters is about combining several patterns we've already covered:
 
-1. **Circuit Breaker** (Part 1) — Protect against cascading failures when an external system is down.
-2. **Dead Letter Channel** (Part 3) — Route messages that fail after retries to a dead letter topic.
-3. **Control Bus** (this chapter) — Start/stop individual adapters.
-4. **Wire Tap** (this chapter) — Monitor adapter health metrics.
+1. **Circuit Breaker** (Part 1): Protect against cascading failures when an external system is down.
+2. **Dead Letter Channel** (Part 3): Route messages that fail after retries to a dead letter topic.
+3. **Control Bus** (this chapter): Start/stop individual adapters.
+4. **Wire Tap** (this chapter): Monitor adapter health metrics.
 
 ### How Camel models it
 
@@ -318,22 +318,22 @@ from("direct:adapter-metrics")
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 10: "System Management"
-- [enterpriseintegrationpatterns.com — Test Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/TestMessage.html)
-- [enterpriseintegrationpatterns.com — Detour](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Detour.html)
-- [enterpriseintegrationpatterns.com — Smart Proxy](https://www.enterpriseintegrationpatterns.com/patterns/messaging/SmartProxy.html)
-- [Apache Camel — Testing](https://camel.apache.org/manual/testing.html)
-- [Apache Camel — Circuit Breaker](https://camel.apache.org/components/4.22.x/eips/circuitBreaker-eip.html)
-- [Quarkus — Configuration Reference](https://quarkus.io/guides/config-reference)
+- [enterpriseintegrationpatterns.com: Test Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/TestMessage.html)
+- [enterpriseintegrationpatterns.com: Detour](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Detour.html)
+- [enterpriseintegrationpatterns.com: Smart Proxy](https://www.enterpriseintegrationpatterns.com/patterns/messaging/SmartProxy.html)
+- [Apache Camel: Testing](https://camel.apache.org/manual/testing.html)
+- [Apache Camel: Circuit Breaker](https://camel.apache.org/components/4.22.x/eips/circuitBreaker-eip.html)
+- [Quarkus: Configuration Reference](https://quarkus.io/guides/config-reference)
 
 ## What you learned
 
-- **Test Message** injects synthetic known-result messages to continuously verify system health — filter them out of business processing with a header flag.
-- **Detour** conditionally bypasses processing steps at runtime — controlled by configuration properties or feature flags for zero-downtime debugging.
-- **Smart Proxy** routes to different backends based on environment — mock for development, sandbox for staging, production for live traffic.
+- **Test Message** injects synthetic known-result messages to continuously verify system health: filter them out of business processing with a header flag.
+- **Detour** conditionally bypasses processing steps at runtime: controlled by configuration properties or feature flags for zero-downtime debugging.
+- **Smart Proxy** routes to different backends based on environment: mock for development, sandbox for staging, production for live traffic.
 - **Channel Adapter Management** combines circuit breakers, dead letter channels, and monitoring to handle external system failures gracefully.
 
 This completes Part 8, System Management (8 patterns across 2 chapters), and the entire EIP pattern catalog. All 65 Enterprise Integration Patterns have been covered across Parts 1-8. Part 9, Deep-Dive Appendices, covers advanced topics like schema evolution, testing strategies, performance tuning, and production deployment.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

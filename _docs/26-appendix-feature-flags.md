@@ -2,7 +2,7 @@
 title: "Appendix H: Feature Flags"
 order: 26
 part: appendices
-description: "Flagd + OpenFeature with Camel routes — gradual rollouts, A/B testing, and runtime route control."
+description: "Flagd + OpenFeature with Camel routes: gradual rollouts, A/B testing, and runtime route control."
 duration: "15 minutes"
 ---
 
@@ -27,7 +27,7 @@ mvn spring-boot:run
 
 flagd runs as part of the base stack, so `./scripts/setup-stack.sh` is all the
 infrastructure you need. It watches the flag file, which means editing
-`flags.json` changes behaviour on the next message — no rebuild, no
+`flags.json` changes behaviour on the next message: no rebuild, no
 restart, no redeploy. Run the example and try it; that property is the whole
 argument for feature flags and it is much more convincing seen than described.
 
@@ -37,7 +37,7 @@ argument for feature flags and it is much more convincing seen than described.
 
 ### Architecture
 
-{% include excalidraw.html file="26-feature-flags" alt="flagd architecture" caption="Figure Q.1 — flagd evaluation with OpenFeature SDK" %}
+{% include excalidraw.html file="26-feature-flags" alt="flagd architecture" caption="Figure Q.1: flagd evaluation with OpenFeature SDK" %}
 
 ### Flag definitions
 
@@ -164,7 +164,7 @@ establish its event stream against flagd v0.13.1. The failure is quiet in the
 worst way: evaluation over the Connect RPC still works if you curl it by hand,
 but the provider never reaches ready, so the SDK returns the *default* for
 every flag and your application looks like it is ignoring the flag file.
-flagd is distroless, so it has no in-container healthcheck — `setup-stack.sh`
+flagd is distroless, so it has no in-container healthcheck; `setup-stack.sh`
 polls `http://localhost:8014/healthz` from the host instead.
 
 ## Dependencies
@@ -189,9 +189,9 @@ for: bean`, which does not point at the cause.
 
 On Spring Boot, set `camel.main.run-controller=true`. Without a web starter
 there is nothing else holding the JVM open, and the application shuts down a
-few seconds after the routes start. Note the property name — `camel.main.`, not
+few seconds after the routes start. Note the property name: `camel.main.`, not
 `camel.springboot.`; the latter is silently ignored.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against flagd v0.17.0 on Docker Engine, the fractional A/B split now asserted exactly (order ids 1–10 split 9 legacy / 1 new); both runtimes also run against the compose stack, the detour enriching while `enrichment-enabled` is on (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against flagd v0.17.0 on Docker Engine, the fractional A/B split now asserted exactly (order ids 1–10 split 9 legacy / 1 new); both runtimes also run against the compose stack, the detour enriching while `enrichment-enabled` is on (2026-10-09).*

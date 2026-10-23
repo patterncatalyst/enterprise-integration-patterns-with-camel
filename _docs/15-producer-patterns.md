@@ -2,7 +2,7 @@
 title: "Producer and Transactional Patterns"
 order: 15
 part: messaging-endpoints
-description: "Durable Subscriber, Idempotent Receiver, Transactional Client, and Service Activator — patterns for reliable message production and exactly-once processing."
+description: "Durable Subscriber, Idempotent Receiver, Transactional Client, and Service Activator: patterns for reliable message production and exactly-once processing."
 duration: "40 minutes"
 ---
 
@@ -30,17 +30,17 @@ camel run *
 
 The previous chapter covered how consumers receive messages. This chapter covers the other side: how producers send messages durably, how consumers guarantee exactly-once processing, how transactions span messaging and database operations, and how messaging integrates with service-oriented application code.
 
-{% include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1 — The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." %}
+{% include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1: The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." %}
 
 ## Pattern: Durable Subscriber
 
 ### The problem
 
-Notification-service subscribes to `OrderPlaced` events. But notification-service goes down for maintenance every Sunday at 2 AM. Orders placed during the maintenance window — when the subscriber is offline — would be missed. When notification-service restarts, it should receive all the events it missed, not just future ones.
+Notification-service subscribes to `OrderPlaced` events. But notification-service goes down for maintenance every Sunday at 2 AM. Orders placed during the maintenance window (when the subscriber is offline) would be missed. When notification-service restarts, it should receive all the events it missed, not just future ones.
 
 ### The solution
 
-A **Durable Subscriber** maintains its subscription state even when disconnected. The messaging system tracks which messages the subscriber has consumed (via offsets or cursors), and when the subscriber reconnects, it resumes from where it left off — no messages lost.
+A **Durable Subscriber** maintains its subscription state even when disconnected. The messaging system tracks which messages the subscriber has consumed (via offsets or cursors), and when the subscriber reconnects, it resumes from where it left off: no messages lost.
 
 In Kafka, every consumer group is a durable subscriber by default. Kafka stores the consumer group's offset for each partition. When the consumer restarts, it reads from the last committed offset.
 
@@ -84,11 +84,11 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
 | Auto-commit | At-most-once | If processing fails after offset commit, the message is lost |
 | Manual commit after processing | At-least-once | If the consumer crashes after processing but before commit, the message is reprocessed |
 
-For our shipping domain, at-least-once with manual commit is the safe default. The cost of a duplicate notification is low (an extra email). The cost of a missed notification is high (customer never knows their order shipped). The next pattern — Idempotent Receiver — handles the duplicates.
+For our shipping domain, at-least-once with manual commit is the safe default. The cost of a duplicate notification is low (an extra email). The cost of a missed notification is high (customer never knows their order shipped). The next pattern, Idempotent Receiver, handles the duplicates.
 
 The at-least-once row of that table holds from Camel 4.22 onward. Before it,
 `allowManualCommit=true` did not suppress the framework's own commits, so the
-"manual" mode could still lose a message in the gap it was meant to close —
+"manual" mode could still lose a message in the gap it was meant to close;
 see [Appendix N]({% link _docs/32-appendix-kafka-consumer-tuning.md %}).
 
 ### Pulsar durable subscriptions
@@ -163,13 +163,13 @@ from("kafka:eip.shipping.scheduled?brokers=localhost:9092&groupId=shipping-servi
 | `JdbcMessageIdRepository` | Persistent | Moderate | Production (when Redis unavailable) |
 | `InfinispanIdempotentRepository` | Persistent, clustered | Fast | High-availability clusters |
 
-For our shipping domain, Redis is already in the stack — so `RedisIdempotentRepository` is the natural choice for production. The idempotent key is `event_id` from the event envelope (Chapter 07 / 12).
+For our shipping domain, Redis is already in the stack, so `RedisIdempotentRepository` is the natural choice for production. The idempotent key is `event_id` from the event envelope (Chapter 07 / 12).
 
 The runnable Redis example in [Appendix G]({{ '/docs/22-appendix-redis/' | relative_url }}) does the deduplication by hand against Redis rather than through `RedisIdempotentRepository`, so the mechanics are visible on the page. Reach for the repository in real code: it handles the eviction, expiry and concurrent-claim edge cases that a hand-rolled check quietly skips.
 
 ### Why `event_id` matters
 
-This is why we put `event_id` in the event envelope from the beginning. Without a unique per-message ID, you'd have to use a combination of fields (`order_id` + `event_type` + timestamp) for deduplication — which is fragile. A UUID per event makes idempotent consumption straightforward.
+This is why we put `event_id` in the event envelope from the beginning. Without a unique per-message ID, you'd have to use a combination of fields (`order_id` + `event_type` + timestamp) for deduplication, which is fragile. A UUID per event makes idempotent consumption straightforward.
 
 ## Pattern: Transactional Client
 
@@ -179,9 +179,9 @@ When payment-service processes a payment, it needs to:
 1. Insert a payment record into PostgreSQL.
 2. Publish a `PaymentProcessed` event to Kafka.
 
-If the database insert succeeds but the Kafka publish fails, the payment is recorded but no event is emitted — downstream services never know the payment was processed. If the Kafka publish succeeds but the database insert fails (crash between the two), an event announces a payment that never happened.
+If the database insert succeeds but the Kafka publish fails, the payment is recorded but no event is emitted: downstream services never know the payment was processed. If the Kafka publish succeeds but the database insert fails (crash between the two), an event announces a payment that never happened.
 
-You need both operations to succeed or both to fail — a transaction that spans the database and the message broker.
+You need both operations to succeed or both to fail: a transaction that spans the database and the message broker.
 
 ### The solution
 
@@ -191,7 +191,7 @@ True distributed transactions (XA/2PC) across a database and a message broker ar
 
 ### How Camel models it
 
-**The Outbox Pattern — database-first, publish-after:**
+**The Outbox Pattern, database-first, publish-after:**
 
 ```java
 // Step 1: Write both the payment record and the outbox event in one DB transaction
@@ -237,9 +237,9 @@ from("sql:SELECT * FROM payments.outbox WHERE published = false "
 
 ### The outbox pattern guarantees
 
-1. **Atomicity** — The payment record and the outbox event are written in the same database transaction. Either both exist or neither does.
-2. **Eventual consistency** — The outbox publisher polls the table and publishes to Kafka. If the publisher crashes, it retries on restart — events are published at-least-once.
-3. **Ordering** — Events are published in `created_at` order, preserving the temporal ordering of business operations.
+1. **Atomicity**: The payment record and the outbox event are written in the same database transaction. Either both exist or neither does.
+2. **Eventual consistency**: The outbox publisher polls the table and publishes to Kafka. If the publisher crashes, it retries on restart; events are published at-least-once.
+3. **Ordering**: Events are published in `created_at` order, preserving the temporal ordering of business operations.
 
 Combined with the Idempotent Receiver on the consumer side, the outbox pattern gives you effectively-once processing across the database-to-Kafka boundary.
 
@@ -247,11 +247,11 @@ Combined with the Idempotent Receiver on the consumer side, the outbox pattern g
 
 ### The problem
 
-You have a CDI bean (`PaymentProcessor`) that contains your payment processing business logic. You want to connect it to the messaging system — call it when a message arrives and publish the result — without coupling the bean to Camel or Kafka.
+You have a CDI bean (`PaymentProcessor`) that contains your payment processing business logic. You want to connect it to the messaging system (call it when a message arrives and publish the result) without coupling the bean to Camel or Kafka.
 
 ### The solution
 
-A **Service Activator** connects a message channel to application code. It receives a message, invokes the appropriate business logic, and optionally sends the result to an output channel. The service (your CDI bean) remains unaware of the messaging infrastructure — the activator handles the translation.
+A **Service Activator** connects a message channel to application code. It receives a message, invokes the appropriate business logic, and optionally sends the result to an output channel. The service (your CDI bean) remains unaware of the messaging infrastructure: the activator handles the translation.
 
 ### How Camel models it
 
@@ -302,7 +302,7 @@ The service activator pattern keeps your business logic clean. `PaymentProcessor
 
 **Auto-commit with slow processing.** If auto-commit fires every 5 seconds but your processing takes 10 seconds, the offset is committed before processing finishes. A crash loses the unfinished message. Use manual commit for anything that takes more than a few hundred milliseconds.
 
-**Idempotent repositories without TTL.** If the idempotent repository grows forever, it eventually uses all available memory or disk. Set a TTL (time-to-live) on entries — for our shipping domain, 7 days is enough (orders older than 7 days won't be replayed).
+**Idempotent repositories without TTL.** If the idempotent repository grows forever, it eventually uses all available memory or disk. Set a TTL (time-to-live) on entries: for our shipping domain, 7 days is enough (orders older than 7 days won't be replayed).
 
 **Outbox tables without cleanup.** Published outbox events should be deleted or archived periodically. A background job that deletes `published = true AND created_at < NOW() - INTERVAL '7 days'` keeps the table manageable.
 
@@ -311,22 +311,22 @@ The service activator pattern keeps your business logic clean. `PaymentProcessor
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 9: "Messaging Endpoints"
-- [enterpriseintegrationpatterns.com — Durable Subscriber](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DurableSubscription.html)
-- [enterpriseintegrationpatterns.com — Idempotent Receiver](https://www.enterpriseintegrationpatterns.com/patterns/messaging/IdempotentReceiver.html)
-- [enterpriseintegrationpatterns.com — Transactional Client](https://www.enterpriseintegrationpatterns.com/patterns/messaging/TransactionalClient.html)
-- [enterpriseintegrationpatterns.com — Service Activator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingAdapter.html)
-- [Apache Camel — Idempotent Consumer EIP](https://camel.apache.org/components/4.22.x/eips/idempotentConsumer-eip.html)
-- [Apache Camel — Transactional Client](https://camel.apache.org/components/4.22.x/eips/transactional-client.html)
+- [enterpriseintegrationpatterns.com: Durable Subscriber](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DurableSubscription.html)
+- [enterpriseintegrationpatterns.com: Idempotent Receiver](https://www.enterpriseintegrationpatterns.com/patterns/messaging/IdempotentReceiver.html)
+- [enterpriseintegrationpatterns.com: Transactional Client](https://www.enterpriseintegrationpatterns.com/patterns/messaging/TransactionalClient.html)
+- [enterpriseintegrationpatterns.com: Service Activator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingAdapter.html)
+- [Apache Camel: Idempotent Consumer EIP](https://camel.apache.org/components/4.22.x/eips/idempotentConsumer-eip.html)
+- [Apache Camel: Transactional Client](https://camel.apache.org/components/4.22.x/eips/transactional-client.html)
 
 ## What you learned
 
-- **Durable Subscriber** persists subscription state so no messages are lost during downtime — Kafka consumer groups are durable by default.
-- **Idempotent Receiver** deduplicates messages using a persistent ID store — essential for at-least-once delivery with side-effect-free processing.
-- **Transactional Client** ensures atomicity across database and messaging operations — the outbox pattern is the practical solution when XA isn't available.
-- **Service Activator** connects plain business logic (CDI beans) to the messaging infrastructure — keeping business code free of messaging concerns.
+- **Durable Subscriber** persists subscription state so no messages are lost during downtime: Kafka consumer groups are durable by default.
+- **Idempotent Receiver** deduplicates messages using a persistent ID store: essential for at-least-once delivery with side-effect-free processing.
+- **Transactional Client** ensures atomicity across database and messaging operations: the outbox pattern is the practical solution when XA isn't available.
+- **Service Activator** connects plain business logic (CDI beans) to the messaging infrastructure, keeping business code free of messaging concerns.
 
-Next: endpoint lifecycle and management — Messaging Gateway, Channel Purger, and Selective Consumer.
+Next: endpoint lifecycle and management: Messaging Gateway, Channel Purger, and Selective Consumer.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean and their Citrus test passes (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean and their Citrus test passes (2026-10-09).*

@@ -6,7 +6,7 @@ description: "Collecting broker logs, consumer group state, topic metadata, JMX 
 duration: "20 minutes"
 ---
 
-When a Kafka-backed integration route stalls — consumer lag climbs, messages disappear, or throughput drops — you need a systematic approach to collecting diagnostic data. This appendix covers the tools and commands for gathering the information you need to diagnose Kafka issues, from the local compose stack through production Kubernetes deployments.
+When a Kafka-backed integration route stalls (consumer lag climbs, messages disappear, or throughput drops), you need a systematic approach to collecting diagnostic data. This appendix covers the tools and commands for gathering the information you need to diagnose Kafka issues, from the local compose stack through production Kubernetes deployments.
 
 ## Diagnostic data categories
 
@@ -39,12 +39,12 @@ docker logs eip-kafka 2>&1 | grep -i "error\|exception\|warn"
 
 | Log pattern | Indicates |
 |-------------|-----------|
-| `LEADER_NOT_AVAILABLE` | Partition leader election in progress — transient during startup |
+| `LEADER_NOT_AVAILABLE` | Partition leader election in progress: transient during startup |
 | `NOT_ENOUGH_REPLICAS` | Too few in-sync replicas for `acks=all` writes |
-| `REBALANCE` / `JoinGroup` | Consumer group rebalancing — check frequency and duration |
-| `RequestTimedOut` | Broker unable to handle requests within timeout — check load |
-| `OutOfMemoryError` | JVM heap exhaustion — increase broker memory or reduce load |
-| `CorruptRecordException` | Data corruption — investigate disk health |
+| `REBALANCE` / `JoinGroup` | Consumer group rebalancing: check frequency and duration |
+| `RequestTimedOut` | Broker unable to handle requests within timeout: check load |
+| `OutOfMemoryError` | JVM heap exhaustion: increase broker memory or reduce load |
+| `CorruptRecordException` | Data corruption: investigate disk health |
 
 ### Adjusting broker log level
 
@@ -105,7 +105,7 @@ docker exec eip-kafka /opt/kafka/bin/kafka-log-dirs.sh \
   --describe --topic-list eip.orders.placed
 ```
 
-This shows the size of each partition's log segments on disk — essential for capacity planning and identifying topics that are growing faster than expected.
+This shows the size of each partition's log segments on disk: essential for capacity planning and identifying topics that are growing faster than expected.
 
 ## Consumer group diagnostics
 
@@ -138,7 +138,7 @@ inventory-service eip.orders.placed  2          1103            1200            
 **What each column means**:
 - **CURRENT-OFFSET**: last committed offset for this (group, partition)
 - **LOG-END-OFFSET**: latest message offset in the partition
-- **LAG**: `LOG-END-OFFSET - CURRENT-OFFSET` — messages not yet committed
+- **LAG**: `LOG-END-OFFSET - CURRENT-OFFSET` (messages not yet committed)
 - **CONSUMER-ID**: which consumer instance owns this partition
 - **HOST**: consumer's IP address
 
@@ -146,10 +146,10 @@ inventory-service eip.orders.placed  2          1103            1200            
 
 | Observation | Likely cause |
 |-------------|-------------|
-| High lag, consumer assigned | Consumer is slow — check processing time, downstream dependencies |
-| High lag, no consumer assigned | Consumer crashed or was evicted — check consumer logs |
-| All partitions assigned to one consumer | Other consumers failed to join — check connectivity, group coordinator |
-| Lag growing steadily | Production rate exceeds consumption rate — add consumers or optimize processing |
+| High lag, consumer assigned | Consumer is slow: check processing time, downstream dependencies |
+| High lag, no consumer assigned | Consumer crashed or was evicted: check consumer logs |
+| All partitions assigned to one consumer | Other consumers failed to join: check connectivity, group coordinator |
+| Lag growing steadily | Production rate exceeds consumption rate: add consumers or optimize processing |
 | Lag spikes then recovers | Burst traffic or brief consumer pause (GC, rebalance) |
 
 ### Check consumer group state
@@ -199,11 +199,11 @@ Kafka exposes hundreds of metrics via JMX. For integration route debugging, focu
 
 | Metric | What it tells you |
 |--------|-------------------|
-| `kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec` | Ingestion rate — is the broker keeping up? |
+| `kafka.server:type=BrokerTopicMetrics,name=MessagesInPerSec` | Ingestion rate: is the broker keeping up? |
 | `kafka.server:type=BrokerTopicMetrics,name=BytesInPerSec` | Byte-level ingestion rate |
-| `kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions` | Replicas falling behind — disk or network issue |
-| `kafka.server:type=ReplicaManager,name=IsrShrinksPerSec` | ISR shrink rate — replicas going out of sync |
-| `kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce` | Produce request latency — broker overload indicator |
+| `kafka.server:type=ReplicaManager,name=UnderReplicatedPartitions` | Replicas falling behind: disk or network issue |
+| `kafka.server:type=ReplicaManager,name=IsrShrinksPerSec` | ISR shrink rate: replicas going out of sync |
+| `kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Produce` | Produce request latency: broker overload indicator |
 | `kafka.network:type=RequestMetrics,name=TotalTimeMs,request=Fetch` | Fetch request latency |
 
 ### Client-side metrics (Camel/Kafka producer)
@@ -229,7 +229,7 @@ ports:
   - "9999:9999"
 ```
 
-Our Kafka UI at `http://localhost:8090` surfaces many of these metrics in a friendlier format — check the broker and topic dashboards first before diving into raw JMX.
+Our Kafka UI at `http://localhost:8090` surfaces many of these metrics in a friendlier format: check the broker and topic dashboards first before diving into raw JMX.
 
 ## JVM diagnostics
 
@@ -243,8 +243,8 @@ docker exec eip-kafka bash -c 'jcmd 1 Thread.print'
 ```
 
 Look for:
-- Threads stuck in `BLOCKED` state — contention on a lock
-- Many threads in `WAITING` on the same monitor — resource starvation
+- Threads stuck in `BLOCKED` state: contention on a lock
+- Many threads in `WAITING` on the same monitor: resource starvation
 - `GC` threads consuming excessive CPU
 
 ### Heap dump
@@ -281,16 +281,16 @@ you, in order, against the local stack:
 
 When something goes wrong, work through this checklist:
 
-1. **Check consumer group lag** — is the consumer falling behind? (`kafka-consumer-groups.sh --describe`)
-2. **Check consumer group state** — is the group stable or rebalancing? (`--state`)
-3. **Check broker logs** — any errors, warnings, or rebalance entries? (`docker logs`)
-4. **Check topic metadata** — are all partitions healthy with leaders and ISR? (`kafka-topics.sh --describe`)
-5. **Check Camel route logs** — is the route processing messages or stuck?
-6. **Check JMX metrics** — request latency, under-replicated partitions, buffer usage
-7. **Thread dump** — if the JVM appears hung, capture thread state
+1. **Check consumer group lag**: is the consumer falling behind? (`kafka-consumer-groups.sh --describe`)
+2. **Check consumer group state**: is the group stable or rebalancing? (`--state`)
+3. **Check broker logs**: any errors, warnings, or rebalance entries? (`docker logs`)
+4. **Check topic metadata**: are all partitions healthy with leaders and ISR? (`kafka-topics.sh --describe`)
+5. **Check Camel route logs**: is the route processing messages or stuck?
+6. **Check JMX metrics**: request latency, under-replicated partitions, buffer usage
+7. **Thread dump**: if the JVM appears hung, capture thread state
 
 Most Kafka issues in integration routes fall into three categories: **consumer lag** (consumer too slow), **rebalance storms** (consumers joining/leaving frequently), and **producer failures** (broker unavailable, buffer exhaustion). The diagnostic workflow above covers all three.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `kafka-diagnostics.sh` runs all seven steps against the compose stack on Docker Engine with `09-routing-fundamentals` consuming: consumer groups `Stable`, no under-replicated partitions (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: `kafka-diagnostics.sh` runs all seven steps against the compose stack on Docker Engine with `09-routing-fundamentals` consuming: consumer groups `Stable`, no under-replicated partitions (2026-10-09).*

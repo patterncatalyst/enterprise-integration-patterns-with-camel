@@ -6,7 +6,7 @@ description: "Fetch sizes, poll intervals, offset commits, session timeouts, and
 duration: "20 minutes"
 ---
 
-Appendix B introduced Kafka's core concepts — partitions, consumer groups, offsets, and exactly-once semantics. This appendix focuses on the consumer side: the configuration properties that control throughput, latency, data safety, and rebalance behavior. Every property is shown in the context of Camel's Kafka component, with guidance for the shipping domain's workload profiles.
+Appendix B introduced Kafka's core concepts: partitions, consumer groups, offsets, and exactly-once semantics. This appendix focuses on the consumer side: the configuration properties that control throughput, latency, data safety, and rebalance behavior. Every property is shown in the context of Camel's Kafka component, with guidance for the shipping domain's workload profiles.
 
 The code is in `examples/32-kafka-consumer-tuning/`.
 
@@ -28,9 +28,9 @@ mvn spring-boot:run
 
 A Kafka consumer cycles through three operations: **fetch** (pull batches from the broker), **poll** (deliver records to application code), and **commit** (acknowledge processed offsets). Each operation has configuration knobs that trade off throughput against latency and safety.
 
-{% include excalidraw.html file="32-consumer-lifecycle" alt="Kafka consumer lifecycle showing fetch, poll, and commit operations between broker and consumer" caption="Figure N.1 — The consumer lifecycle: fetch batches from the broker, poll and process records, then commit offsets. Each step has configuration knobs that trade throughput against latency and safety." %}
+{% include excalidraw.html file="32-consumer-lifecycle" alt="Kafka consumer lifecycle showing fetch, poll, and commit operations between broker and consumer" caption="Figure N.1: The consumer lifecycle: fetch batches from the broker, poll and process records, then commit offsets. Each step has configuration knobs that trade throughput against latency and safety." %}
 
-## Throughput tuning — fetch thresholds
+## Throughput tuning: fetch thresholds
 
 Two properties control how much data the broker accumulates before responding to a fetch request:
 
@@ -40,9 +40,9 @@ The minimum number of bytes the broker should have available before responding. 
 
 | Value | Behavior |
 |-------|----------|
-| `1` (default) | Respond immediately with whatever is available — lowest latency |
-| `16384` (16 KB) | Wait for a small batch — fewer requests, lower CPU overhead |
-| `1048576` (1 MB) | Wait for a large batch — highest throughput, higher latency |
+| `1` (default) | Respond immediately with whatever is available, lowest latency |
+| `16384` (16 KB) | Wait for a small batch, fewer requests, lower CPU overhead |
+| `1048576` (1 MB) | Wait for a large batch, highest throughput, higher latency |
 
 For the shipping domain's order pipeline (moderate volume, low-latency requirements): leave at the default `1`. For the nightly batch export (high volume, latency-tolerant): increase to `16384` or higher.
 
@@ -82,7 +82,7 @@ For our 3-partition, single-broker dev stack: `min(1 × 50MB, 3 × 1MB) = 3 MB`.
 
 `max.partition.fetch.bytes` must be larger than the topic's `max.message.bytes` setting, or the consumer will fail to fetch large messages.
 
-## Poll tuning — processing cadence
+## Poll tuning: processing cadence
 
 ### max.poll.records
 
@@ -136,7 +136,7 @@ from("kafka:eip.orders.placed"
 
 With `enable.auto.commit=true` (the default), the consumer commits offsets every `auto.commit.interval.ms` (default 5 seconds). This creates two risk windows:
 
-**Data loss**: consumer commits offset 100, then crashes before processing records 95–100. On restart, the consumer resumes from 101 — records 95–100 are lost.
+**Data loss**: consumer commits offset 100, then crashes before processing records 95–100. On restart, the consumer resumes from 101: records 95–100 are lost.
 
 **Data duplication**: consumer processes records 95–100, then crashes before the next auto-commit. On restart, the consumer resumes from the last committed offset (94) and reprocesses 95–100.
 
@@ -148,7 +148,7 @@ camel.component.kafka.configuration.auto-commit-interval-ms=1000
 
 ### Manual commit
 
-For the shipping domain — where losing an order or processing a payment twice are both unacceptable — manual commit with at-least-once semantics plus idempotent receivers is the standard pattern:
+For the shipping domain, where losing an order or processing a payment twice are both unacceptable, manual commit with at-least-once semantics plus idempotent receivers is the standard pattern:
 
 {% raw %}
 ```java
@@ -173,14 +173,14 @@ from("kafka:eip.orders.placed"
 
 **Best practice**: use `commitAsync` by default for lower latency, but switch to `commitSync` before shutdown or rebalance to guarantee the final commit. Camel's `allowManualCommit=true` uses synchronous commit, which is the safer default.
 
-#### This only genuinely worked from Camel 4.22
+#### This guarantee only holds from Camel 4.22
 
 The code above is unchanged from earlier Camel versions, and it has always
 *looked* correct. The guarantee behind it is new.
 
 Before 4.22, `allowManualCommit=true` did not stop the framework
 committing on your behalf. Camel auto-committed offsets for every processed
-record whether or not the route ever called `commit()` — which, as the upgrade
+record whether or not the route ever called `commit()`, which, as the upgrade
 guide puts it, "defeated the purpose of manual commit mode and could cause
 message loss." A route that crashed after `processPayment` but before
 `commit()` could still have had its offset committed, and the order was gone.
@@ -204,7 +204,7 @@ Two consequences:
 Related, same release. When Camel auto-generates a `groupId` because you did
 not set one, all `consumersCount` threads now share it. Previously each thread
 got its own UUID, joined the group alone, and independently consumed *every*
-partition — so `consumersCount=3` meant processing each message three times.
+partition, so `consumersCount=3` meant processing each message three times.
 
 Every Kafka consumer in this tutorial sets an explicit `groupId`, so nothing
 here was affected. Set one in your own routes too; the default is not a name
@@ -218,9 +218,9 @@ When consuming from topics that are written transactionally (see Appendix B's EO
 camel.component.kafka.configuration.isolation-level=read_committed
 ```
 
-With `read_committed`, the consumer only sees records from completed transactions. With `read_uncommitted` (the default), all records are visible — including those from transactions that may be rolled back.
+With `read_committed`, the consumer only sees records from completed transactions. With `read_uncommitted` (the default), all records are visible, including those from transactions that may be rolled back.
 
-## Failure recovery — session and heartbeat
+## Failure recovery: session and heartbeat
 
 ### session.timeout.ms
 
@@ -234,7 +234,7 @@ Lower values detect failures faster but risk false positives during GC pauses or
 
 ### heartbeat.interval.ms
 
-How often the consumer sends heartbeats to the group coordinator. Default: 3000 (3 seconds). Must be less than `session.timeout.ms` — the standard recommendation is one-third of the session timeout:
+How often the consumer sends heartbeats to the group coordinator. Default: 3000 (3 seconds). Must be less than `session.timeout.ms`; the standard recommendation is one-third of the session timeout:
 
 ```properties
 camel.component.kafka.configuration.heartbeat-interval-ms=3000
@@ -250,9 +250,9 @@ What happens when a consumer starts with no committed offset (new group) or when
 
 | Value | Behavior |
 |-------|----------|
-| `latest` (default) | Start from the most recent message — skip history |
-| `earliest` | Start from the oldest available message — replay everything |
-| `none` | Throw an exception — fail fast if no offset exists |
+| `latest` (default) | Start from the most recent message, skip history |
+| `earliest` | Start from the oldest available message, replay everything |
+| `none` | Throw an exception, fail fast if no offset exists |
 
 ```properties
 camel.component.kafka.configuration.auto-offset-reset=earliest
@@ -306,4 +306,4 @@ This reduces rebalance impact from "all consumers paused" to "only affected part
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine and process messages with no errors (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine and process messages with no errors (2026-10-09).*

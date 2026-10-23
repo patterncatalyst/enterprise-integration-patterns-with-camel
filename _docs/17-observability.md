@@ -2,7 +2,7 @@
 title: "Observability"
 order: 17
 part: system-management
-description: "Control Bus, Message Store, Message History, and Wire Tap (for monitoring) — patterns that make a running integration system observable."
+description: "Control Bus, Message Store, Message History, and Wire Tap (for monitoring): patterns that make a running integration system observable."
 duration: "40 minutes"
 ---
 
@@ -30,7 +30,7 @@ camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 
 A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
 
-{% include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1 — The Control Bus manages routes at runtime and exports metrics to observability tools." %}
+{% include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1: The Control Bus manages routes at runtime and exports metrics to observability tools." %}
 
 System Management patterns address operational concerns: monitoring, debugging, testing, and managing a running integration system. This chapter covers four observability patterns. The next chapter covers management and testing patterns.
 
@@ -40,7 +40,7 @@ System Management patterns address operational concerns: monitoring, debugging, 
 
 You have 15 Camel routes running across 5 services. During a deployment, you need to pause the order-intake route while the database migration runs, then resume it. During a flash sale, you want to increase the consumer thread count on the inventory route. At 3 AM, you want to check whether all routes are healthy.
 
-These are operational tasks — not business logic changes, but runtime configuration and control of the messaging system.
+These are operational tasks, not business logic changes, but runtime configuration and control of the messaging system.
 
 ### The solution
 
@@ -50,7 +50,7 @@ A **Control Bus** provides a mechanism to monitor and manage the integration sys
 
 Camel provides a comprehensive Control Bus through multiple mechanisms:
 
-**1. The `controlbus` component — manage routes from within Camel:**
+**1. The `controlbus` component: manage routes from within Camel:**
 
 ```java
 // Control Bus: manage routes via messaging
@@ -80,7 +80,7 @@ from("direct:route-status")
     .toD("controlbus:route?routeId=${header.routeId}&action=status");
 ```
 
-**2. JBang and `camel` CLI — the developer's control bus:**
+**2. JBang and `camel` CLI: the developer's control bus:**
 
 During development, `camel` CLI commands are the control bus:
 
@@ -105,11 +105,11 @@ camel trace content-based-router
 ```
 
 These commands connect to the running Camel context via a local management API. In production, the same capabilities are available through:
-- **JMX** — Camel exposes MBeans for every route, component, and processor.
-- **REST management API** — Quarkus exposes health and metrics endpoints.
-- **Micrometer** — Route-level metrics exported to Prometheus.
+- **JMX**: Camel exposes MBeans for every route, component, and processor.
+- **REST management API**: Quarkus exposes health and metrics endpoints.
+- **Micrometer**: Route-level metrics exported to Prometheus.
 
-**3. Quarkus health checks — Kubernetes-native control bus:**
+**3. Quarkus health checks: Kubernetes-native control bus:**
 
 Camel Quarkus automatically registers health checks for every route:
 
@@ -149,11 +149,11 @@ Kubernetes uses these for liveness and readiness probes:
 
 ### The problem
 
-When debugging a production issue — "order 42 was placed but never shipped" — you need to see every message that mentioned order 42: the `OrderPlaced` event, the `InventoryReserved` confirmation, the `PaymentProcessed` result, and the conspicuously absent `ShipmentScheduled` event. You need a searchable log of all messages that have flowed through the system.
+When debugging a production issue ("order 42 was placed but never shipped"), you need to see every message that mentioned order 42: the `OrderPlaced` event, the `InventoryReserved` confirmation, the `PaymentProcessed` result, and the conspicuously absent `ShipmentScheduled` event. You need a searchable log of all messages that have flowed through the system.
 
 ### The solution
 
-A **Message Store** captures and persists messages as they flow through the system. It serves as an audit trail, a debugging tool, and (if needed) a replay source. The store captures the message at one or more points in the route — typically at ingress and egress points.
+A **Message Store** captures and persists messages as they flow through the system. It serves as an audit trail, a debugging tool, and (if needed) a replay source. The store captures the message at one or more points in the route, typically at ingress and egress points.
 
 ### How Camel models it
 
@@ -191,13 +191,13 @@ from("direct:store-message")
 
 ### Kafka as a message store
 
-Kafka itself is a message store — it retains all messages for the configured retention period (default 7 days). You can replay any consumer group by resetting its offset. For many use cases, Kafka's built-in retention replaces the need for a separate message store.
+Kafka itself is a message store: it retains all messages for the configured retention period (default 7 days). You can replay any consumer group by resetting its offset. For many use cases, Kafka's built-in retention replaces the need for a separate message store.
 
 But a dedicated message store adds:
-- **Cross-topic search** — Query all messages for order 42 across all topics.
-- **Long-term retention** — Keep messages beyond Kafka's retention period.
-- **Structured queries** — SQL queries, time-range searches, header-based filtering.
-- **PII-redacted copies** — Store messages with sensitive fields stripped.
+- **Cross-topic search**: Query all messages for order 42 across all topics.
+- **Long-term retention**: Keep messages beyond Kafka's retention period.
+- **Structured queries**: SQL queries, time-range searches, header-based filtering.
+- **PII-redacted copies**: Store messages with sensitive fields stripped.
 
 ## Pattern: Message History
 
@@ -207,7 +207,7 @@ Order 42's `ShipmentScheduled` event is missing. You know it entered the routing
 
 ### The solution
 
-A **Message History** records the sequence of processing steps a message has passed through. Each step appends an entry to the history — like a flight itinerary or a shipping tracking number. When you inspect the message at any point, you can see exactly where it's been.
+A **Message History** records the sequence of processing steps a message has passed through. Each step appends an entry to the history, like a flight itinerary or a shipping tracking number. When you inspect the message at any point, you can see exactly where it's been.
 
 ### How Camel models it
 
@@ -244,12 +244,12 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=history-demo")
 
 ### Message history and distributed tracing
 
-For a single Camel application, the built-in message history is sufficient. But in a microservices architecture, the message passes through *multiple* applications — order-service → inventory-service → payment-service → shipping-service. The per-application history doesn't span services.
+For a single Camel application, the built-in message history is sufficient. But in a microservices architecture, the message passes through *multiple* applications: order-service → inventory-service → payment-service → shipping-service. The per-application history doesn't span services.
 
 **OpenTelemetry** provides cross-service message history. Camel Quarkus integrates with OpenTelemetry to propagate trace IDs across Kafka messages:
 
 ```properties
-# application.properties — enable OpenTelemetry tracing
+# application.properties: enable OpenTelemetry tracing
 quarkus.otel.exporter.otlp.endpoint=http://localhost:4317
 quarkus.otel.service.name=order-service
 
@@ -262,9 +262,9 @@ camel.component.kafka.additional-properties.interceptor.classes=\
 With OpenTelemetry configured and the LGTM stack running (Part 0), you can:
 1. Search Grafana/Tempo for a trace ID.
 2. See the complete path: HTTP request → order-service → Kafka → inventory-service → Kafka → payment-service → Kafka → shipping-service.
-3. See timing for each span — how long each service took, where bottlenecks are.
+3. See timing for each span: how long each service took, where bottlenecks are.
 
-This is the distributed Message History — and it's one of the most valuable debugging tools in a microservices architecture.
+This is the distributed Message History, and one of the most valuable debugging tools in a microservices architecture.
 
 ### `camel trace` as a live message history
 
@@ -299,7 +299,7 @@ The same release switched the `Throughput` JMX attribute to an EWMA with a
 one-minute decay window, so it converges on a readable figure instead of
 oscillating with every sample.
 
-This does not replace a metrics pipeline — nothing here is stored, so there is
+This does not replace a metrics pipeline: nothing here is stored, so there is
 no history and no alerting. But "what is the p95 on this route right now" is a
 question you can now answer on a running process without standing up Prometheus
 first, and that is often the question you have.
@@ -311,11 +311,11 @@ your routes execute, and a **heap histogram** panel.
 
 ### The problem
 
-You want to collect metrics on every order that flows through the system: order volume per hour, average processing time, error rate by route, top destinations by country. But you don't want to modify the business routes — metrics collection is a cross-cutting concern.
+You want to collect metrics on every order that flows through the system: order volume per hour, average processing time, error rate by route, top destinations by country. But you don't want to modify the business routes; metrics collection is a cross-cutting concern.
 
 ### The solution
 
-We covered the **Wire Tap** in Chapter 11 as a routing pattern. Here, we use it as a system management pattern — tapping into the message flow to collect metrics and feed monitoring dashboards without affecting the business routes.
+We covered the **Wire Tap** in Chapter 11 as a routing pattern. Here, we use it as a system management pattern, tapping into the message flow to collect metrics and feed monitoring dashboards without affecting the business routes.
 
 ### How Camel models it
 
@@ -324,7 +324,7 @@ We covered the **Wire Tap** in Chapter 11 as a routing pattern. Here, we use it 
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=order-processing")
     .routeId("metrics-wire-tap")
     .unmarshal().json(Map.class)
-    // Tap for metrics — async, non-blocking
+    // Tap for metrics: async, non-blocking
     .wireTap("direct:collect-metrics")
     // Main processing continues
     .to("direct:process-order");
@@ -360,9 +360,9 @@ Wire taps feed the metrics pillar. OpenTelemetry feeds traces. Structured loggin
 
 ## Common pitfalls
 
-**Control bus without authentication.** A `kafka:eip.system.control` topic that accepts route stop/start commands from anyone is a denial-of-service vulnerability. Authenticate and authorize control bus messages — or restrict control to JMX/REST endpoints behind a service mesh.
+**Control bus without authentication.** A `kafka:eip.system.control` topic that accepts route stop/start commands from anyone is a denial-of-service vulnerability. Authenticate and authorize control bus messages, or restrict control to JMX/REST endpoints behind a service mesh.
 
-**Message store with PII.** A message store that captures everything — including customer emails, credit card numbers, and addresses — is a data governance nightmare. Apply content filters before storing, or use a separate PII-safe schema.
+**Message store with PII.** A message store that captures everything, including customer emails, credit card numbers, and addresses, is a data governance nightmare. Apply content filters before storing, or use a separate PII-safe schema.
 
 **Message history in high-throughput routes.** Camel's message history adds overhead per step (object allocation, timestamp capture). For routes processing millions of messages per second, disable it (`camel.context.message-history=false`) and rely on sampled tracing instead.
 
@@ -371,23 +371,23 @@ Wire taps feed the metrics pillar. OpenTelemetry feeds traces. Structured loggin
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 10: "System Management"
-- [enterpriseintegrationpatterns.com — Control Bus](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ControlBus.html)
-- [enterpriseintegrationpatterns.com — Message Store](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageStore.html)
-- [enterpriseintegrationpatterns.com — Message History](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageHistory.html)
-- [enterpriseintegrationpatterns.com — Wire Tap](https://www.enterpriseintegrationpatterns.com/patterns/messaging/WireTap.html)
-- [Apache Camel — Control Bus Component](https://camel.apache.org/components/4.22.x/controlbus-component.html)
-- [Apache Camel — Message History](https://camel.apache.org/components/4.22.x/eips/message-history.html)
-- [Apache Camel — OpenTelemetry](https://camel.apache.org/components/4.22.x/others/opentelemetry.html)
+- [enterpriseintegrationpatterns.com: Control Bus](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ControlBus.html)
+- [enterpriseintegrationpatterns.com: Message Store](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageStore.html)
+- [enterpriseintegrationpatterns.com: Message History](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageHistory.html)
+- [enterpriseintegrationpatterns.com: Wire Tap](https://www.enterpriseintegrationpatterns.com/patterns/messaging/WireTap.html)
+- [Apache Camel: Control Bus Component](https://camel.apache.org/components/4.22.x/controlbus-component.html)
+- [Apache Camel: Message History](https://camel.apache.org/components/4.22.x/eips/message-history.html)
+- [Apache Camel: OpenTelemetry](https://camel.apache.org/components/4.22.x/others/opentelemetry.html)
 
 ## What you learned
 
-- **Control Bus** provides runtime management of routes and components — use `camel` CLI for development, JMX/REST for production, and Quarkus health checks for Kubernetes.
-- **Message Store** captures messages for auditing, debugging, and replay — use wire taps to store asynchronously, and consider Kafka's built-in retention as a basic store.
-- **Message History** records the path a message takes through the system — built into Camel, extended across services by OpenTelemetry distributed tracing.
-- **Wire Tap (for monitoring)** feeds metrics without affecting business routes — use Micrometer counters with low-cardinality tags for Prometheus-compatible dashboards.
+- **Control Bus** provides runtime management of routes and components: use `camel` CLI for development, JMX/REST for production, and Quarkus health checks for Kubernetes.
+- **Message Store** captures messages for auditing, debugging, and replay: use wire taps to store asynchronously, and consider Kafka's built-in retention as a basic store.
+- **Message History** records the path a message takes through the system: built into Camel, extended across services by OpenTelemetry distributed tracing.
+- **Wire Tap (for monitoring)** feeds metrics without affecting business routes: use Micrometer counters with low-cardinality tags for Prometheus-compatible dashboards.
 
-Next: testing and management patterns — Test Message, Detour, Smart Proxy, and Channel Adapter management.
+Next: testing and management patterns, including Test Message, Detour, Smart Proxy, and Channel Adapter management.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run with `camel run * --port=8082`, the Control Bus answers `GET /control/status/control-bus-status` with 200, and their Citrus test passes (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run with `camel run * --port=8082`, the Control Bus answers `GET /control/status/control-bus-status` with 200, and their Citrus test passes (2026-10-09).*

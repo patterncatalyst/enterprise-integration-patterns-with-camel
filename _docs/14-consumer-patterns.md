@@ -2,7 +2,7 @@
 title: "Consumer Patterns"
 order: 14
 part: messaging-endpoints
-description: "Polling Consumer, Event-Driven Consumer, Competing Consumers, and Message Dispatcher — patterns that determine how application code receives messages."
+description: "Polling Consumer, Event-Driven Consumer, Competing Consumers, and Message Dispatcher: patterns that determine how application code receives messages."
 duration: "40 minutes"
 ---
 
@@ -28,9 +28,9 @@ cd examples/14-consumer-patterns/yaml-dsl
 camel run *
 ```
 
-So far, we've treated the connection between a Camel route and a messaging system as a simple `from()` statement. But the *way* a consumer connects to a channel — polling vs. event-driven, single vs. competing, direct delivery vs. dispatched — fundamentally affects throughput, latency, resource usage, and scalability. These are the Messaging Endpoint patterns, and they sit at the boundary between the messaging system and your application code.
+So far, we've treated the connection between a Camel route and a messaging system as a simple `from()` statement. But the *way* a consumer connects to a channel (polling vs. event-driven, single vs. competing, direct delivery vs. dispatched) fundamentally affects throughput, latency, resource usage, and scalability. These are the Messaging Endpoint patterns, and they sit at the boundary between the messaging system and your application code.
 
-{% include excalidraw.html file="14-consumer-patterns" alt="Competing Consumers and Event-Driven Consumer" caption="Figure 14.1 — Competing Consumers scale horizontally; Event-Driven Consumers react to message arrival." %}
+{% include excalidraw.html file="14-consumer-patterns" alt="Competing Consumers and Event-Driven Consumer" caption="Figure 14.1: Competing Consumers scale horizontally; Event-Driven Consumers react to message arrival." %}
 
 This chapter covers four consumer-side patterns. The next two chapters cover producer-side patterns, transactional messaging, and system-level endpoint management.
 
@@ -38,13 +38,13 @@ This chapter covers four consumer-side patterns. The next two chapters cover pro
 
 ### The problem
 
-A file-based integration drops CSV order files into a directory. The files appear at unpredictable intervals — sometimes every second, sometimes hours apart. The application needs to check for new files periodically and process them when they arrive.
+A file-based integration drops CSV order files into a directory. The files appear at unpredictable intervals: sometimes every second, sometimes hours apart. The application needs to check for new files periodically and process them when they arrive.
 
-Similarly, a database table receives new rows from a legacy system. There's no event notification — the only way to detect new rows is to poll the table.
+Similarly, a database table receives new rows from a legacy system. There's no event notification: the only way to detect new rows is to poll the table.
 
 ### The solution
 
-A **Polling Consumer** actively checks a channel for new messages at regular intervals. It initiates the receive operation — the messaging system doesn't push messages to it. This is the "pull" model.
+A **Polling Consumer** actively checks a channel for new messages at regular intervals. It initiates the receive operation: the messaging system doesn't push messages to it. This is the "pull" model.
 
 Polling consumers are appropriate when:
 - The source doesn't support push (files, database tables, FTP servers).
@@ -101,7 +101,7 @@ from("quartz:orders/nightly-export?cron=0+0+2+*+*+?")
 | `maxMessagesPerPoll` | Maximum messages to process per poll cycle | 0 (unlimited) |
 | `greedy` | Poll again immediately if messages were found (don't wait for delay) | false |
 | `sendEmptyMessageWhenIdle` | Send an empty exchange if no messages found | false |
-| `scheduledExecutorService` | Custom thread pool for the polling scheduler | — |
+| `scheduledExecutorService` | Custom thread pool for the polling scheduler | N/A |
 
 ### JBang prototyping with polling consumers
 
@@ -136,7 +136,7 @@ camel top
 
 ### The problem
 
-Kafka consumers don't poll for individual messages — the Kafka client library manages fetching and delivers messages to the consumer's processing method via callbacks. The consumer doesn't need to ask "is there a new message?" — it's notified when one arrives.
+Kafka consumers don't poll for individual messages: the Kafka client library manages fetching and delivers messages to the consumer's processing method via callbacks. The consumer never asks whether a new message exists; it's notified when one arrives.
 
 This is fundamentally different from polling: the consumer is reactive, not proactive. It consumes less CPU (no empty polls) and has lower latency (no delay between message availability and processing).
 
@@ -178,7 +178,7 @@ from("platform-http:/api/orders?httpMethodRestrict=POST")
 
 ### Polling vs. event-driven in Kafka
 
-Kafka's consumer API is technically a polling API (`consumer.poll()`), but the Camel Kafka component abstracts this into an event-driven interface: your route logic runs when `poll()` returns records. So from the Camel programmer's perspective, the Kafka consumer is event-driven — you don't manage the poll loop.
+Kafka's consumer API is technically a polling API (`consumer.poll()`), but the Camel Kafka component abstracts this into an event-driven interface: your route logic runs when `poll()` returns records. So from the Camel programmer's perspective, the Kafka consumer is event-driven: you don't manage the poll loop.
 
 The `consumersCount` parameter controls how many threads consume from the topic. Each thread runs an independent Kafka consumer within the same consumer group. More consumers = more partitions consumed in parallel = higher throughput.
 
@@ -186,7 +186,7 @@ The `consumersCount` parameter controls how many threads consume from the topic.
 
 ### The problem
 
-Inventory-service processes orders at a rate of 100/second, but during flash sales, orders arrive at 10,000/second. A single consumer instance can't keep up. You need to scale horizontally — run multiple instances of inventory-service and distribute the workload across them.
+Inventory-service processes orders at a rate of 100/second, but during flash sales, orders arrive at 10,000/second. A single consumer instance can't keep up. You need to scale horizontally: run multiple instances of inventory-service and distribute the workload across them.
 
 ### The solution
 
@@ -213,11 +213,11 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
 
 You can scale competing consumers at two levels:
 
-1. **Within a single application** — Increase `consumersCount` to add more consumer threads. Each thread is assigned partitions by Kafka's group coordinator. Maximum useful value = partition count of the topic.
+1. **Within a single application**: Increase `consumersCount` to add more consumer threads. Each thread is assigned partitions by Kafka's group coordinator. Maximum useful value = partition count of the topic.
 
-2. **Across multiple application instances** — Deploy multiple copies of the service (via Kubernetes replicas, extra containers, etc.). Each instance joins the same consumer group and is assigned a subset of partitions.
+2. **Across multiple application instances**: Deploy multiple copies of the service (via Kubernetes replicas, extra containers, etc.). Each instance joins the same consumer group and is assigned a subset of partitions.
 
-{% include excalidraw.html file="14-consumer-scaling" alt="Two application instances each with two consumer threads, distributing 12 Kafka partitions evenly — 3 partitions per thread" caption="Figure 14.1 — Competing consumer scaling: 2 instances × 2 threads = 4 consumers, each assigned 3 of 12 partitions." %}
+{% include excalidraw.html file="14-consumer-scaling" alt="Two application instances each with two consumer threads, distributing 12 Kafka partitions evenly: 3 partitions per thread" caption="Figure 14.1: Competing consumer scaling: 2 instances × 2 threads = 4 consumers, each assigned 3 of 12 partitions." %}
 
 Adding a third instance, still at two threads each, would trigger a rebalance and redistribute to 2 partitions per thread (12 partitions ÷ 6 threads). The figure uses two threads per instance to keep the arithmetic legible; the route above sets `consumersCount=3`, which would give 9 threads across three instances and leave 3 of them idle against a 12-partition topic only once you reach four instances.
 
@@ -233,7 +233,7 @@ A single Kafka consumer receives events from `eip.orders.status-updates`, but di
 
 ### The solution
 
-A **Message Dispatcher** receives messages from a channel and distributes them to specific handlers based on the message type. It centralizes the dispatch logic in one place — a single consumer route that fans out to type-specific handler routes.
+A **Message Dispatcher** receives messages from a channel and distributes them to specific handlers based on the message type. It centralizes the dispatch logic in one place: a single consumer route that fans out to type-specific handler routes.
 
 ### How Camel models it
 
@@ -273,18 +273,18 @@ In our shipping domain, we use datatype channels (`eip.orders.placed`, `eip.inve
 
 ### Safety with `toD()`
 
-The `toD()` (dynamic to) resolves the endpoint URI at runtime from the message body or headers. This is powerful but risky: the message decides where the message goes. A value like `../../exec:rm` does not just pick the wrong handler — it picks a wrong *component*. Guard it in two layers.
+The `toD()` (dynamic to) resolves the endpoint URI at runtime from the message body or headers. This is risky: the message decides where the message goes. A value like `../../exec:rm` does not just pick the wrong handler; it picks a wrong *component*. Guard it in two layers.
 
-**Layer one — constrain the scheme.** Camel 4.22 added `allowedSchemes` to `toD` (and to `enrich`, and to the Dynamic Router's endpoint). It is a comma-separated allow-list of component schemes the resolved URI may use; anything else is rejected before an endpoint is created:
+**Layer one: constrain the scheme.** Camel 4.22 added `allowedSchemes` to `toD` (and to `enrich`, and to the Dynamic Router's endpoint). It is a comma-separated allow-list of component schemes the resolved URI may use; anything else is rejected before an endpoint is created:
 
 ```java
 .toD().allowedSchemes("direct")
     .uri("direct:handle-${body[event_type]}");
 ```
 
-That single option closes the whole class of attack where a crafted value redirects the exchange into `exec:`, `http:` or `file:`. Set it on every `toD` whose URI derives from message content — the cost is one line and there is no reason not to.
+That single option closes the whole class of attack where a crafted value redirects the exchange into `exec:`, `http:` or `file:`. Set it on every `toD` whose URI derives from message content: the cost is one line and there is no reason not to.
 
-**Layer two — constrain the value.** `allowedSchemes` restricts the *scheme*, not the rest of the URI. With the list above, `direct:handle-anything-at-all` still passes. So you still need to know that the computed endpoint is one you meant to expose:
+**Layer two: constrain the value.** `allowedSchemes` restricts the *scheme*, not the rest of the URI. With the list above, `direct:handle-anything-at-all` still passes. So you still need to know that the computed endpoint is one you meant to expose:
 
 ```java
 .process(exchange -> {
@@ -300,13 +300,13 @@ That single option closes the whole class of attack where a crafted value redire
 
 The value check also does double duty against a plainer failure discussed under [common pitfalls](#common-pitfalls): an unrecognised event type resolves to an endpoint that does not exist, and Camel throws `NoSuchEndpointException`.
 
-Note the fluent form. `toD()` with no argument returns a builder, so `uri(...)` comes last — and inside a `choice()` you close the branch with `.endChoice()`, since the builder does not return the `ChoiceDefinition` on its own.
+Note the fluent form. `toD()` with no argument returns a builder, so `uri(...)` comes last; inside a `choice()` you close the branch with `.endChoice()`, since the builder does not return the `ChoiceDefinition` on its own.
 
 ## Common pitfalls
 
 **Polling too aggressively.** A 100ms poll interval on an empty database table wastes CPU and database connections. Use longer intervals with `greedy=true` to poll rapidly only when messages are available.
 
-**Too many competing consumers.** More consumers than partitions means wasted resources — idle threads consume memory and connections. Match `consumersCount` × instance count to your partition count.
+**Too many competing consumers.** More consumers than partitions means wasted resources: idle threads consume memory and connections. Match `consumersCount` × instance count to your partition count.
 
 **Event-driven consumers without backpressure.** If the consumer processes slower than messages arrive, the internal buffer grows unbounded. Use `maxPollRecords` to limit batch size and let the Kafka client pause fetching until the current batch is processed.
 
@@ -315,22 +315,22 @@ Note the fluent form. `toD()` with no argument returns a builder, so `uri(...)` 
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 9: "Messaging Endpoints"
-- [enterpriseintegrationpatterns.com — Polling Consumer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/PollingConsumer.html)
-- [enterpriseintegrationpatterns.com — Event-Driven Consumer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/EventDrivenConsumer.html)
-- [enterpriseintegrationpatterns.com — Competing Consumers](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CompetingConsumers.html)
-- [enterpriseintegrationpatterns.com — Message Dispatcher](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageDispatcher.html)
-- [Apache Camel — Polling Consumer](https://camel.apache.org/components/4.22.x/eips/polling-consumer.html)
-- [Apache Camel — Kafka Component](https://camel.apache.org/components/4.22.x/kafka-component.html)
+- [enterpriseintegrationpatterns.com: Polling Consumer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/PollingConsumer.html)
+- [enterpriseintegrationpatterns.com: Event-Driven Consumer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/EventDrivenConsumer.html)
+- [enterpriseintegrationpatterns.com: Competing Consumers](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CompetingConsumers.html)
+- [enterpriseintegrationpatterns.com: Message Dispatcher](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageDispatcher.html)
+- [Apache Camel: Polling Consumer](https://camel.apache.org/components/4.22.x/eips/polling-consumer.html)
+- [Apache Camel: Kafka Component](https://camel.apache.org/components/4.22.x/kafka-component.html)
 
 ## What you learned
 
-- **Polling Consumer** actively checks for messages at intervals — use for sources that don't support push (files, databases, FTP).
-- **Event-Driven Consumer** is notified when messages arrive — lower latency, less CPU, the default for Kafka/Pulsar/JMS.
-- **Competing Consumers** scale throughput by running multiple consumers on the same channel — scale within a process (`consumersCount`) and across instances (Kubernetes replicas).
-- **Message Dispatcher** centralizes type-based routing from a single consumer to multiple handlers — use `toD()` for dynamic dispatch, but validate inputs.
+- **Polling Consumer** actively checks for messages at intervals: use for sources that don't support push (files, databases, FTP).
+- **Event-Driven Consumer** is notified when messages arrive: lower latency, less CPU, the default for Kafka/Pulsar/JMS.
+- **Competing Consumers** scale throughput by running multiple consumers on the same channel: scale within a process (`consumersCount`) and across instances (Kubernetes replicas).
+- **Message Dispatcher** centralizes type-based routing from a single consumer to multiple handlers; use `toD()` for dynamic dispatch, but validate inputs.
 
 Next: producer-side patterns, transactional messaging, and durable subscribers.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 18 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean, its 5 Citrus tests pass, and the SQL Polling Consumer picks up a `PLACED` row from the stack's `eipdb` and marks it `PROCESSING` (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>; both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 18 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean, its 5 Citrus tests pass, and the SQL Polling Consumer picks up a `PLACED` row from the stack's `eipdb` and marks it `PROCESSING` (2026-10-09).*

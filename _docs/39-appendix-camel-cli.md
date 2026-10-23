@@ -2,13 +2,13 @@
 title: "Appendix U: Camel CLI Deep Dive"
 order: 39
 part: appendices
-description: "A comprehensive guide to the Camel CLI — prototyping routes with camel run, tracing exchanges, debugging, managing infrastructure, and exporting to production runtimes."
+description: "A comprehensive guide to the Camel CLI: prototyping routes with camel run, tracing exchanges, debugging, managing infrastructure, and exporting to production runtimes."
 duration: "35 minutes"
 ---
 
-Every YAML DSL example in this tutorial uses a single command to run: `camel run *.yaml`. That command is the entry point to the Camel CLI — a tool that serves two distinct roles. First, it is a **prototyping runtime**: write a YAML route file, run it, and you have a live integration in seconds with no Maven project, no pom.xml, no build step. Second, it is a **management tool**: inspect running Camel applications, trace live exchanges, check health, and monitor Kafka consumer lag — regardless of whether the application was started from the CLI or deployed as a Quarkus or Spring Boot service.
+Every YAML DSL example in this tutorial uses a single command to run: `camel run *.yaml`. That command is the entry point to the Camel CLI: a tool that serves two distinct roles. First, it is a **prototyping runtime**: write a YAML route file, run it, and you have a live integration in seconds with no Maven project, no pom.xml, no build step. Second, it is a **management tool**: inspect running Camel applications, trace live exchanges, check health, and monitor Kafka consumer lag, regardless of whether the application was started from the CLI or deployed as a Quarkus or Spring Boot service.
 
-This appendix covers both roles in depth. By the end you will know how to prototype a route, debug it interactively, and export it into a production-ready Maven project — the complete lifecycle from idea to deployment.
+This appendix covers both roles in depth. By the end you will know how to prototype a route, debug it interactively, and export it into a production-ready Maven project: the complete lifecycle from idea to deployment.
 
 Camel 4.22 promoted the CLI, the TUI and the embedded MCP Server from Preview to **Stable**, so the commands below are no longer subject to the looser compatibility rules that apply to preview features.
 
@@ -18,9 +18,9 @@ The code is in `examples/39-camel-cli/`.
 camel run *.yaml --port=8088
 ```
 
-The `--port` flag matters: the embedded HTTP server defaults to 8080, which the Pulsar admin console in the local stack already holds. It is a CLI flag rather than a property — setting `camel.server.port` in `application.properties` has no effect.
+The `--port` flag matters: the embedded HTTP server defaults to 8080, which the Pulsar admin console in the local stack already holds. It is a CLI flag rather than a property: setting `camel.server.port` in `application.properties` has no effect.
 
-{% include excalidraw.html file="39-camel-cli-workflow" alt="Camel CLI prototype-to-production workflow" caption="Figure U.1 — The Camel CLI lifecycle: prototype with camel run, inspect with camel trace, export to a production Maven project." %}
+{% include excalidraw.html file="39-camel-cli-workflow" alt="Camel CLI prototype-to-production workflow" caption="Figure U.1: The Camel CLI lifecycle: prototype with camel run, inspect with camel trace, export to a production Maven project." %}
 
 ## Installation
 
@@ -54,7 +54,7 @@ so the version floats. The `camel@apache/camel` JBang catalog alias runs the
 CLI source from GitHub at `HEAD`, adds the Apache snapshot repository, and
 makes JBang ask you to trust the source.
 
-The CLI ships as a single launcher jar that JBang runs. When you run `camel run`, it resolves Camel dependencies, downloads them once, caches them locally, and starts the Camel runtime — no Maven, Gradle, or IDE required.
+The CLI ships as a single launcher jar that JBang runs. When you run `camel run`, it resolves Camel dependencies, downloads them once, caches them locally, and starts the Camel runtime: no Maven, Gradle, or IDE required.
 
 ### Upgrading
 
@@ -70,7 +70,7 @@ to the newest release; with a pinned JBang install, re-install instead so the
 version stays an explicit choice.
 
 Do not confuse `camel self-update` with `camel update`, covered later in this
-appendix — that one runs OpenRewrite recipes against *your project's* source to
+appendix: that one runs OpenRewrite recipes against *your project's* source to
 migrate it across Camel versions. One upgrades the tool; the other upgrades your
 code.
 
@@ -85,7 +85,7 @@ camel doctor
 ```
 
 This is the first thing to run when `camel version` disagrees with what you
-think you installed — usually a JBang-installed CLI and a web-installed one
+think you installed: usually a JBang-installed CLI and a web-installed one
 both on `PATH`.
 
 ## Running routes
@@ -105,7 +105,7 @@ camel run --dev *.yaml
 
 ### How dependency resolution works
 
-When the CLI parses your route file, it detects which Camel components you reference — `kafka:`, `spring-redis:`, `rest:`, `json` marshalling — and resolves the corresponding Maven artifacts automatically. You never declare dependencies in a pom.xml. The CLI's dependency resolver handles:
+When the CLI parses your route file, it detects which Camel components you reference (`kafka:`, `spring-redis:`, `rest:`, `json` marshalling) and resolves the corresponding Maven artifacts automatically. You never declare dependencies in a pom.xml. The CLI's dependency resolver handles:
 
 | Component reference | Resolved artifact |
 |---------------------|-------------------|
@@ -118,11 +118,11 @@ This is the key advantage for prototyping. Add a `to: "slack:#alerts"` step to y
 
 ### The example routes
 
-The example directory contains three routes: a content-based router and an enricher — two patterns covered in Chapters 9 and 10 — wired together through Kafka, plus a one-shot route that seeds the customer records the enricher looks up.
+The example directory contains three routes: a content-based router and an enricher (two patterns covered in Chapters 9 and 10) wired together through Kafka, plus a one-shot route that seeds the customer records the enricher looks up.
 
 The seeding goes through the same `spring-redis` component as the lookup. Writing those values with `redis-cli` instead would store plain strings, while `spring-redis` reads through its default JDK serializer, and the lookup would come back as something the `jsonpath` step cannot parse.
 
-**order-router.yaml** — A REST API that accepts POST requests on `/api/orders` and routes each order to a Kafka topic based on the `orderType` header:
+**order-router.yaml**: A REST API that accepts POST requests on `/api/orders` and routes each order to a Kafka topic based on the `orderType` header:
 
 {% raw %}
 ```yaml
@@ -180,7 +180,7 @@ The seeding goes through the same `spring-redis` component as the lookup. Writin
 ```
 {% endraw %}
 
-**order-enricher.yaml** — Consumes express orders from Kafka, looks up customer data in Redis, and publishes the enriched order downstream:
+**order-enricher.yaml**: Consumes express orders from Kafka, looks up customer data in Redis, and publishes the enriched order downstream:
 
 {% raw %}
 ```yaml
@@ -252,7 +252,7 @@ camel.rest.binding-mode=json
 
 ### Dev mode
 
-The `--dev` flag enables live reload. When you save a change to any route file or `application.properties`, the CLI detects the modification, stops the running routes, reloads the files, and restarts — all within a second or two:
+The `--dev` flag enables live reload. When you save a change to any route file or `application.properties`, the CLI detects the modification, stops the running routes, reloads the files, and restarts, all within a second or two:
 
 ```bash
 camel run --dev *.yaml
@@ -295,8 +295,8 @@ When running in dev mode, the CLI starts a developer console on port 8080. Open 
 | Section | What it shows |
 |---------|---------------|
 | **Routes** | All loaded routes with their status (Started, Stopped), uptime, and exchange counters |
-| **Endpoints** | Every endpoint URI in use — Kafka topics, REST paths, Redis connections — with message counts |
-| **Health** | Readiness and liveness checks — Kafka broker connectivity, Redis connection pool status |
+| **Endpoints** | Every endpoint URI in use (Kafka topics, REST paths, Redis connections) with message counts |
+| **Health** | Readiness and liveness checks: Kafka broker connectivity, Redis connection pool status |
 | **Statistics** | Per-route performance: total exchanges, failed exchanges, mean processing time, last processing time |
 | **Properties** | Resolved configuration properties and their sources |
 
@@ -327,7 +327,7 @@ Output is a live-updating table:
  1234  order-enricher  order-enricher  toKafkaEnriched      12ms     ✔       {"orderId":"ORD-9001","customerNa...
 ```
 
-Each row is a processing step. The ELAPSED column shows how long that step took, making it easy to spot slow processors — a Kafka produce that takes 200ms, a Redis lookup timing out, or a marshalling step that is unexpectedly expensive.
+Each row is a processing step. The ELAPSED column shows how long that step took, making it easy to spot slow processors: a Kafka produce that takes 200ms, a Redis lookup timing out, or a marshalling step that is unexpectedly expensive.
 
 #### Filtering traces
 
@@ -375,11 +375,11 @@ camel debug> step
 camel debug> continue
 ```
 
-Debugging is particularly useful when a content-based router is not matching the branch you expect — you can inspect the exact header values and body content at the decision point.
+Debugging is particularly useful when a content-based router is not matching the branch you expect: you can inspect the exact header values and body content at the decision point.
 
 ## Inspecting running integrations
 
-The CLI includes a set of `camel get` and `camel ps` commands for inspecting running Camel applications. These commands work against any Camel application that has the `camel-management` component enabled — not just CLI-launched routes. This means you can use them to inspect Quarkus and Spring Boot applications too.
+The CLI includes a set of `camel get` and `camel ps` commands for inspecting running Camel applications. These commands work against any Camel application that has the `camel-management` component enabled, not just CLI-launched routes. This means you can use them to inspect Quarkus and Spring Boot applications too.
 
 ### Listing running integrations
 
@@ -421,7 +421,7 @@ camel get health
  1234  redis                UP      Connected to localhost:6379
 ```
 
-Health checks are the CLI's equivalent of the `/q/health` endpoint in Quarkus. They verify that every external dependency — Kafka brokers, Redis, databases — is reachable.
+Health checks are the CLI's equivalent of the `/q/health` endpoint in Quarkus. They verify that every external dependency (Kafka brokers, Redis, databases) is reachable.
 
 ### Kafka consumer lag
 
@@ -482,7 +482,7 @@ camel infra list
 camel infra run kafka
 ```
 
-The CLI pulls the container image (if not cached), starts it, and configures the Camel Kafka component to connect to it automatically. No `application.properties` change needed — the CLI injects the broker address.
+The CLI pulls the container image (if not cached), starts it, and configures the Camel Kafka component to connect to it automatically. No `application.properties` change needed: the CLI injects the broker address.
 
 You can start multiple services:
 
@@ -490,12 +490,12 @@ You can start multiple services:
 camel infra run kafka redis
 ```
 
-This is the fastest path from zero to a working prototype. Write a route, run `camel infra run kafka`, and `camel run --dev *.yaml` — three commands to a live integration with real infrastructure.
+This is the fastest path from zero to a working prototype. Write a route, run `camel infra run kafka`, and `camel run --dev *.yaml`: three commands to a live integration with real infrastructure.
 
 ### The observability set
 
-One set replaces a lot of manual wiring. Camel 4.22 bundles an observability stack — Prometheus,
-VictoriaTraces, VictoriaLogs and Perses:
+One set replaces a lot of manual wiring. Camel 4.22 bundles an observability stack (Prometheus,
+VictoriaTraces, VictoriaLogs and Perses):
 
 ```bash
 camel infra run observability
@@ -508,12 +508,12 @@ Spans tab. Together the two commands need no configuration: metrics are scraped
 and traces and logs exported without a property file.
 
 Note this is a *different* stack from the LGTM overlay in [Appendix
-I]({% link _docs/27-appendix-observability.md %}) — different components,
+I]({% link _docs/27-appendix-observability.md %}): different components,
 different query languages, nothing portable between them. This one is for the
 dev loop.
 
 For auto-instrumentation of the libraries around Camel rather than Camel
-itself — JDBC, HTTP clients, Kafka clients, gRPC — attach the OpenTelemetry
+itself (JDBC, HTTP clients, Kafka clients, gRPC), attach the OpenTelemetry
 Java Agent instead:
 
 ```bash
@@ -549,7 +549,7 @@ That is the setting that makes JFR useful for the profiling work described in
 
 ### How it relates to the compose stack
 
-The `camel infra` containers are ephemeral — data is lost when you stop them. For persistent development environments, use the compose stack (`./scripts/setup-stack.sh`) described in Chapter 0. The CLI containers are best for quick experiments and throwaway prototypes.
+The `camel infra` containers are ephemeral: data is lost when you stop them. For persistent development environments, use the compose stack (`./scripts/setup-stack.sh`) described in Chapter 0. The CLI containers are best for quick experiments and throwaway prototypes.
 
 ## Interactive shell
 
@@ -594,7 +594,7 @@ Within the shell, you can prefix any `get` command with `--watch` to refresh the
 camel> get routes --watch
 ```
 
-This turns the terminal into a live dashboard — route statistics update every two seconds. Press `Ctrl+C` to stop watching.
+This turns the terminal into a live dashboard: route statistics update every two seconds. Press `Ctrl+C` to stop watching.
 
 The shell is useful for interactive exploration during development. Rather than switching between terminal tabs to run `camel trace`, `camel get routes`, and `camel run`, you stay in one session and iterate.
 
@@ -629,7 +629,7 @@ order-router-quarkus/
 The generated `pom.xml` includes:
 
 - Quarkus BOM at the correct version
-- `camel-quarkus-kafka`, `camel-quarkus-spring-redis`, `camel-quarkus-rest`, `camel-quarkus-jackson` — every component detected from your route files
+- `camel-quarkus-kafka`, `camel-quarkus-spring-redis`, `camel-quarkus-rest`, `camel-quarkus-jackson`: every component detected from your route files
 - `camel-quarkus-yaml-dsl` for YAML route loading
 - The Quarkus Maven plugin with `quarkus:dev` and native build profiles
 
@@ -670,7 +670,7 @@ mvn spring-boot:run
 | **Native compilation** | Not supported | Quarkus: `mvn package -Dnative` |
 | **Health checks** | CLI built-in | Quarkus SmallRye Health / Spring Boot Actuator |
 
-The route logic does not change. The YAML files are byte-for-byte identical. What changes is the runtime plumbing — dependency management, health endpoints, metrics, container image builds — which is exactly the plumbing that Quarkus and Spring Boot provide.
+The route logic does not change. The YAML files are byte-for-byte identical. What changes is the runtime plumbing (dependency management, health endpoints, metrics, container image builds), which is exactly the plumbing that Quarkus and Spring Boot provide.
 
 ### Export options
 
@@ -685,11 +685,11 @@ The route logic does not change. The YAML files are byte-for-byte identical. Wha
 | `--package-name` | Java package for generated classes | `--package-name=com.eipbook.router` |
 | `--fresh` | Delete existing target directory before export | `--fresh` |
 
-Since Camel 4.22 the CLI resolves the Quarkus version to use rather than falling back to a hardcoded one, so `--quarkus-version` is genuinely an override now rather than the only way to avoid a stale default.
+Since Camel 4.22 the CLI resolves the Quarkus version to use rather than falling back to a hardcoded one, so `--quarkus-version` is an override now rather than the only way to avoid a stale default.
 
 ## The update command
 
-Camel evolves rapidly — new components, deprecated APIs, breaking changes between major versions. The `camel update` command helps you keep your routes current.
+Camel evolves rapidly: new components, deprecated APIs, breaking changes between major versions. The `camel update` command helps you keep your routes current.
 
 ### Checking for updates
 
@@ -711,7 +711,7 @@ camel update list
 camel update run
 ```
 
-This applies [OpenRewrite](https://docs.openrewrite.org/) recipes to your route files and configuration. OpenRewrite is a source-code transformation engine — it parses your files, applies migration rules, and writes back the modified source. The CLI bundles Camel-specific recipes for each version upgrade.
+This applies [OpenRewrite](https://docs.openrewrite.org/) recipes to your route files and configuration. OpenRewrite is a source-code transformation engine: it parses your files, applies migration rules, and writes back the modified source. The CLI bundles Camel-specific recipes for each version upgrade.
 
 What `camel update run` can do:
 
@@ -726,7 +726,7 @@ What it cannot do:
 - Migrate custom CDI beans
 - Update third-party library dependencies
 
-For major version upgrades (3.x to 4.x), the CLI's recipes handle the bulk of the mechanical changes. You still need to review the migration guide for semantic changes — behavior differences that cannot be detected from syntax alone.
+For major version upgrades (3.x to 4.x), the CLI's recipes handle the bulk of the mechanical changes. You still need to review the migration guide for semantic changes: behavior differences that cannot be detected from syntax alone.
 
 ## Plugins
 
@@ -760,7 +760,7 @@ camel kubernetes logs order-router
 camel kubernetes delete order-router
 ```
 
-This plugin works by running `camel export --runtime=quarkus` behind the scenes, building a container image, and deploying it to the cluster. It is a convenience wrapper — for production deployments, use the explicit export-and-deploy workflow described in Appendix T.
+This plugin works by running `camel export --runtime=quarkus` behind the scenes, building a container image, and deploying it to the cluster. It is a convenience wrapper: for production deployments, use the explicit export-and-deploy workflow described in Appendix T.
 
 ### Test plugin
 
@@ -770,7 +770,7 @@ The test plugin integrates [Citrus](https://citrusframework.org/) test capabilit
 camel test order-router-test.yaml
 ```
 
-Citrus tests can verify that a route produces the expected output for a given input, assert header values, and validate message content — all from YAML test definitions without writing Java. See Appendix W for a full treatment of Camel testing with Citrus.
+Citrus tests can verify that a route produces the expected output for a given input, assert header values, and validate message content, all from YAML test definitions without writing Java. See Appendix W for a full treatment of Camel testing with Citrus.
 
 ## Command reference
 
@@ -781,7 +781,7 @@ A complete reference of CLI commands, grouped by category.
 | Command | Description |
 |---------|-------------|
 | `camel run <files>` | Run routes from YAML, Java, or XML files |
-| `camel dev <files>` | Alias for `camel run --dev` — run with live reload |
+| `camel dev <files>` | Alias for `camel run --dev`: run with live reload |
 | `camel run --dev <files>` | Run with live reload, developer console, and enhanced tracing |
 | `camel run --open-api <files>` | Run and serve generated OpenAPI specification |
 | `camel shell` | Enter interactive shell with tab completion |
@@ -795,8 +795,8 @@ A complete reference of CLI commands, grouped by category.
 | `camel get routes` | Show route status, exchange counts, and processing times |
 | `camel get health` | Display health check results for all integrations |
 | `camel get kafka` | Show Kafka consumer lag per topic/partition |
-| `camel get endpoint` | Show endpoint statistics — message counts and timing |
-| `camel get context` | Display CamelContext details — version, uptime, component list |
+| `camel get endpoint` | Show endpoint statistics: message counts and timing |
+| `camel get context` | Display CamelContext details: version, uptime, component list |
 
 ### Tracing and debugging
 
@@ -852,13 +852,13 @@ camel cmd route-diagram routes/*.yaml
 camel cmd route-topology routes/*.yaml
 ```
 
-That makes them usable at design time — on a branch, in review, before any infrastructure is up.
+That makes them usable at design time: on a branch, in review, before any infrastructure is up.
 
 Under the covers these use `camel.main.dumpRoutes=json`, which also writes a `route-topology.json` alongside the per-route structure files when topology dumping is enabled, as it is by default. Camel 4.22 always writes that file, with empty `nodes` and `edges` arrays when there is nothing to connect, so its presence is a reliable signal that the dump finished. Earlier versions skipped it silently when there were no routes.
 
 ## Configuration file
 
-The CLI keeps user preferences — including the TUI settings from [Appendix V]({{ '/docs/40-appendix-camel-tui/' | relative_url }}) — in a properties file. Camel 4.22 renamed it from `camel-jbang-user.properties` to `camel-cli.properties`:
+The CLI keeps user preferences (including the TUI settings from [Appendix V]({{ '/docs/40-appendix-camel-tui/' | relative_url }})) in a properties file. Camel 4.22 renamed it from `camel-jbang-user.properties` to `camel-cli.properties`:
 
 | Scope | Path |
 |-------|------|
@@ -935,7 +935,7 @@ Confirm that both routes are started, check exchange counts, and verify no failu
 
 ### Step 7: Iterate
 
-Edit `order-router.yaml` — add a new branch for `PRIORITY` orders, change a log message, adjust the REST path. Dev mode detects the change and reloads within seconds. No restart, no rebuild.
+Edit `order-router.yaml`: add a new branch for `PRIORITY` orders, change a log message, adjust the REST path. Dev mode detects the change and reloads within seconds. No restart, no rebuild.
 
 ### Step 8: Export to Quarkus
 
@@ -962,25 +962,25 @@ Follow Appendix T to build a container image, generate Kubernetes manifests, and
 
 ---
 
-The entire lifecycle — from a blank YAML file to a production Kubernetes deployment — uses the same route definitions. The CLI is the on-ramp: prototype fast, validate with tracing and inspection, and export when ready. The route logic never changes; only the runtime packaging evolves.
+The entire lifecycle (from a blank YAML file to a production Kubernetes deployment) uses the same route definitions. The CLI is the on-ramp: prototype fast, validate with tracing and inspection, and export when ready. The route logic never changes; only the runtime packaging evolves.
 
 ## Key takeaways
 
-- **`camel run` is a zero-config runtime** — write a YAML route, run it, and dependencies are resolved automatically. No Maven project needed for prototyping.
-- **`camel trace` is your primary debugging tool** — see every exchange, every routing decision, every processing step in real time. Filter by route or failure status.
-- **`camel get` commands provide operational visibility** — route status, health checks, Kafka consumer lag, and endpoint statistics from the command line.
-- **`camel infra` spins up infrastructure on demand** — Kafka, Redis, PostgreSQL containers without touching the compose files.
-- **`camel export` bridges prototype and production** — generate a complete Quarkus or Spring Boot Maven project from your YAML routes. Same route files, production-grade runtime.
-- **`camel update` keeps routes current** — OpenRewrite recipes handle mechanical migration tasks when upgrading Camel versions.
-- **The CLI inspects any Camel application** — not just CLI-launched routes. Use `camel ps`, `camel get`, and `camel trace` against Quarkus and Spring Boot services with the management component enabled.
+- **`camel run` is a zero-config runtime**: write a YAML route, run it, and dependencies are resolved automatically. No Maven project needed for prototyping.
+- **`camel trace` is your primary debugging tool**: see every exchange, every routing decision, every processing step in real time. Filter by route or failure status.
+- **`camel get` commands provide operational visibility**: route status, health checks, Kafka consumer lag, and endpoint statistics from the command line.
+- **`camel infra` spins up infrastructure on demand**: Kafka, Redis, PostgreSQL containers without touching the compose files.
+- **`camel export` bridges prototype and production**: generate a complete Quarkus or Spring Boot Maven project from your YAML routes. Same route files, production-grade runtime.
+- **`camel update` keeps routes current**: OpenRewrite recipes handle mechanical migration tasks when upgrading Camel versions.
+- **The CLI inspects any Camel application**: not just CLI-launched routes. Use `camel ps`, `camel get`, and `camel trace` against Quarkus and Spring Boot services with the management component enabled.
 
 ## Further reading
 
 - [Camel CLI documentation](https://camel.apache.org/manual/camel-jbang.html)
 - [Camel YAML DSL reference](https://camel.apache.org/components/4.22.x/others/yaml-dsl.html)
-- [JBang](https://www.jbang.dev/) — the Java runner that powers the CLI
+- [JBang](https://www.jbang.dev/): the Java runner that powers the CLI
 - [OpenRewrite Camel recipes](https://docs.openrewrite.org/recipes/apache/camel)
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — the routes run on Camel CLI 4.22.1 against the stack on Docker Engine: `POST /api/orders` with `orderType: EXPRESS` returns 200 and the enricher publishes `ORD-9001` with customer `Acme Freight`, tier `GOLD`, from Redis (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: the routes run on Camel CLI 4.22.1 against the stack on Docker Engine: `POST /api/orders` with `orderType: EXPRESS` returns 200 and the enricher publishes `ORD-9001` with customer `Acme Freight`, tier `GOLD`, from Redis (2026-10-09).*

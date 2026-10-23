@@ -9,7 +9,7 @@ duration: "25 minutes"
 Quarkus Dev Mode is where JBang prototyping meets production-grade development. This appendix covers the features that make Camel Quarkus development fast: automatic infrastructure provisioning, live code reload, continuous testing, and the Dev UI.
 
 The code is in `examples/23-quarkus-dev/`. Unlike every other example in this
-tutorial, it is meant to be edited while it runs — and it needs no
+tutorial, it is meant to be edited while it runs, and it needs no
 infrastructure started first:
 
 ```bash
@@ -17,7 +17,7 @@ cd examples/23-quarkus-dev/quarkus
 mvn quarkus:dev
 ```
 
-## Dev Services — automatic infrastructure
+## Dev Services: automatic infrastructure
 
 When you run `mvn quarkus:dev`, Quarkus Dev Services automatically starts containers for your dependencies. No compose stack needed during development:
 
@@ -42,8 +42,8 @@ All containers are cleaned up when dev mode exits.
 > **Dev Services back off the moment you configure the connection yourself.**
 > This is the single most common reason they appear not to work. If
 > `application.properties` sets `kafka.bootstrap.servers` outside a profile,
-> Quarkus takes that as you naming a broker deliberately and never starts a
-> container — with no warning and no log line to explain the silence.
+> Quarkus takes that as you naming a broker explicitly and never starts a
+> container, with no warning and no log line to explain the silence.
 >
 > Scope the property to the profiles that need it:
 >
@@ -75,7 +75,7 @@ You can customize the containers that Dev Services provisions:
 
 ### Shared Dev Services
 
-Multiple services can share the same Dev Services container by setting `%dev.quarkus.kafka.devservices.service-name=shared-kafka` — services with the same `service-name` reuse one container. This lets you run `mvn quarkus:dev` in two terminals with both services on the same broker.
+Multiple services can share the same Dev Services container by setting `%dev.quarkus.kafka.devservices.service-name=shared-kafka`: services with the same `service-name` reuse one container. This lets you run `mvn quarkus:dev` in two terminals with both services on the same broker.
 
 ### When to use Dev Services vs. the compose stack
 
@@ -97,7 +97,7 @@ mvn quarkus:dev
 # Change a resource file → Quarkus picks it up on next request
 ```
 
-The reload is triggered on the next HTTP request or message consumption — Quarkus does not restart eagerly. This means you can save multiple files before triggering a rebuild, and only one restart happens.
+The reload is triggered on the next HTTP request or message consumption: Quarkus does not restart eagerly. This means you can save multiple files before triggering a rebuild, and only one restart happens.
 
 ### Camel route reload
 
@@ -149,7 +149,7 @@ mvn quarkus:dev
 # Tests re-run automatically on every code change
 ```
 
-Only tests affected by the changed code are re-run — Quarkus tracks which classes each test touches and runs the minimal set. This makes continuous testing practical even with a large test suite.
+Only tests affected by the changed code are re-run: Quarkus tracks which classes each test touches and runs the minimal set. This makes continuous testing practical even with a large test suite.
 
 With Camel test utilities:
 
@@ -215,10 +215,10 @@ The Quarkus Dev UI is available at `http://localhost:8080/q/dev-ui` during dev m
 
 When `camel-quarkus-core` is on the classpath, the Dev UI includes Camel-specific panels:
 
-- **Routes** — Lists all active routes with their status (Started/Stopped), message counts, and processing times. You can stop and restart individual routes without restarting the application.
-- **Endpoints** — Shows every endpoint registered in the CamelContext — useful for verifying that Kafka topics, direct endpoints, and timers are wired correctly.
-- **Type Converters** — Lists all registered type converters, helpful when debugging marshalling issues.
-- **Components** — Shows which Camel components are loaded and their configuration properties.
+- **Routes**: Lists all active routes with their status (Started/Stopped), message counts, and processing times. You can stop and restart individual routes without restarting the application.
+- **Endpoints**: Shows every endpoint registered in the CamelContext, useful for verifying that Kafka topics, direct endpoints, and timers are wired correctly.
+- **Type Converters**: Lists all registered type converters, helpful when debugging marshalling issues.
+- **Components**: Shows which Camel components are loaded and their configuration properties.
 
 Other useful panels include **Configuration** (all properties and effective values), **Continuous Testing** (results and affected-test tracking), **Dev Services** (running containers and connection strings), and **Health** (liveness/readiness probes reflecting Camel route health).
 
@@ -241,22 +241,22 @@ This logs each processor the exchange passes through, including headers and body
 
 ## Common pitfalls
 
-**Port conflicts with Dev Services** — If the compose stack is already running, Dev Services will try to start duplicate containers. Disable Dev Services for the conflicting service:
+**Port conflicts with Dev Services**: If the compose stack is already running, Dev Services will try to start duplicate containers. Disable Dev Services for the conflicting service:
 
 ```properties
 %dev.quarkus.kafka.devservices.enabled=false
 %dev.kafka.bootstrap.servers=localhost:9092
 ```
 
-**Stale CamelContext after refactoring** — Renaming a `RouteBuilder` class sometimes leaves the old route registered alongside the new one. Press `s` in the dev mode terminal to force a full restart, or stop and restart dev mode entirely.
+**Stale CamelContext after refactoring**: Renaming a `RouteBuilder` class sometimes leaves the old route registered alongside the new one. Press `s` in the dev mode terminal to force a full restart, or stop and restart dev mode entirely.
 
-**Orphaned containers** — If dev mode is killed with `kill -9` instead of `Ctrl+C`, Dev Services containers are not cleaned up. Remove them with `docker rm -f $(docker ps -q --filter label=quarkus-dev-service)`.
+**Orphaned containers**: If dev mode is killed with `kill -9` instead of `Ctrl+C`, Dev Services containers are not cleaned up. Remove them with `docker rm -f $(docker ps -q --filter label=quarkus-dev-service)`.
 
-**Native build differences** — Code that works in dev mode may fail in a native build due to GraalVM restrictions. Custom processors that use reflection need `@RegisterForReflection`; Camel Quarkus extensions handle most reflection registration automatically. Test periodically with `mvn package -Dnative`.
+**Native build differences**: Code that works in dev mode may fail in a native build due to GraalVM restrictions. Custom processors that use reflection need `@RegisterForReflection`; Camel Quarkus extensions handle most reflection registration automatically. Test periodically with `mvn package -Dnative`.
 
 ## The promotion workflow
 
-{% include excalidraw.html file="23-promotion-workflow" alt="JBang to Quarkus promotion workflow" caption="Figure N.1 — From JBang prototype to native Quarkus binary" %}
+{% include excalidraw.html file="23-promotion-workflow" alt="JBang to Quarkus promotion workflow" caption="Figure N.1: From JBang prototype to native Quarkus binary" %}
 
 ```bash
 # Step 1: Prototype
@@ -277,4 +277,4 @@ The native build produces a GraalVM native image: ~20ms startup, ~50MB memory. I
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 2 continuous tests pass with Dev Services starting Kafka on a random port, and the packaged application boots on Docker Engine (2026-10-09). The interactive dev-mode console is described from use, not captured by an automated check.*
+*Verification status: <span class="status status--verified">verified</span>, built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 2 continuous tests pass with Dev Services starting Kafka on a random port, and the packaged application boots on Docker Engine (2026-10-09). The interactive dev-mode console is described from use, not captured by an automated check.*

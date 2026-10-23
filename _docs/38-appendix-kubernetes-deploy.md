@@ -2,11 +2,11 @@
 title: "Appendix T: Deploying Camel to Kubernetes"
 order: 38
 part: appendices
-description: "Standard Maven builds, Containerfile images and Kubernetes deployments for Camel applications — Quarkus and Spring Boot on minikube (docker driver, containerd) with Strimzi Kafka and Redis."
+description: "Standard Maven builds, Containerfile images and Kubernetes deployments for Camel applications: Quarkus and Spring Boot on minikube (docker driver, containerd) with Strimzi Kafka and Redis."
 duration: "45 minutes"
 ---
 
-Every chapter in this tutorial runs against a local compose stack. But production Camel applications run on Kubernetes. This appendix covers the full deployment lifecycle — building container images, generating manifests, deploying to a real cluster, scaling, and externalizing configuration — using standard Maven tooling and a `Containerfile` per runtime. The only operator is Strimzi, for Kafka.
+Every chapter in this tutorial runs against a local compose stack. But production Camel applications run on Kubernetes. This appendix covers the full deployment lifecycle (building container images, generating manifests, deploying to a real cluster, scaling, and externalizing configuration) using standard Maven tooling and a `Containerfile` per runtime. The only operator is Strimzi, for Kafka.
 
 The code is in `examples/38-kubernetes-deploy/`.
 
@@ -24,7 +24,7 @@ cd examples/38-kubernetes-deploy/spring-boot
 mvn spring-boot:run
 ```
 
-{% include excalidraw.html file="38-kubernetes-deploy" alt="minikube cluster with Camel application pods, Strimzi Kafka, and Redis" caption="Figure T.1 — Kubernetes deployment architecture: the Camel application consumes orders from Kafka, enriches via Redis, and publishes to an enriched orders topic." %}
+{% include excalidraw.html file="38-kubernetes-deploy" alt="minikube cluster with Camel application pods, Strimzi Kafka, and Redis" caption="Figure T.1: Kubernetes deployment architecture: the Camel application consumes orders from Kafka, enriches via Redis, and publishes to an enriched orders topic." %}
 
 ## Why standard builds
 
@@ -37,7 +37,7 @@ Standard builds give you:
 | **Portability** | The same image and manifests work on Minikube, EKS, GKE, AKS, and OpenShift |
 | **CI/CD integration** | `mvn package` in any pipeline; no custom CLI or operator dependency |
 | **Team familiarity** | Dockerfiles, Deployments, and ConfigMaps are universal Kubernetes knowledge |
-| **Debugging** | `kubectl logs`, `kubectl describe pod` — nothing between your code and the cluster |
+| **Debugging** | `kubectl logs`, `kubectl describe pod`: nothing between your code and the cluster |
 
 ## Prerequisites
 
@@ -80,13 +80,13 @@ Two choices in that command matter later:
   with `minikube -p eip image load`.
 - **`--ports=127.0.0.1:30088:30088`.** The application's Service is a NodePort
   on 30088, and this publishes it on the host's loopback when the profile is
-  created. `http://127.0.0.1:30088` reaches the Service directly — no
+  created. `http://127.0.0.1:30088` reaches the Service directly: no
   `kubectl port-forward`, no `minikube tunnel`, no `minikube service`, all of
   which drop mid-session. Ports are fixed at creation; adding one means
   recreating the profile (`--replace`).
 
-Every later command names its target explicitly — `minikube -p eip`,
-`kubectl --context eip`, `helm --kube-context eip` — so nothing depends on, or
+Every later command names its target explicitly (`minikube -p eip`,
+`kubectl --context eip`, `helm --kube-context eip`) so nothing depends on, or
 changes, your current kubectl context.
 
 The script does all of this, plus the infrastructure below:
@@ -171,7 +171,7 @@ This creates `eip.orders.incoming` and `eip.orders.enriched`, each with 3 partit
 
 Redis runs from the official image as a plain Deployment and Service in its
 own namespace (`k8s-infra/redis.yaml`): one replica, no persistence, no
-authentication — development only.
+authentication: development only.
 
 ```bash
 kubectl --context eip apply -f examples/38-kubernetes-deploy/k8s-infra/redis.yaml
@@ -195,7 +195,7 @@ The example is an order-processing pipeline with three Camel routes:
 | **OrderProcessorRoute** | Kafka consumer → enriches each order with customer name from Redis → publishes to `eip.orders.enriched` |
 | **CacheLoaderRoute** | Timer (runs once at startup) → pre-populates Redis with sample customer records |
 
-The route logic is identical across runtimes — only the class annotations and Redis API differ:
+The route logic is identical across runtimes; only the class annotations and Redis API differ:
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 
@@ -245,7 +245,7 @@ public class OrderProcessorRoute extends RouteBuilder {
 ```
 {% endraw %}
 
-The `enrichFromCache` method looks up `customer:<customerId>` in Redis and adds the customer name to the order. On a cache miss, it falls back to a default value — in production, you'd call a customer service here.
+The `enrichFromCache` method looks up `customer:<customerId>` in Redis and adds the customer name to the order. On a cache miss, it falls back to a default value; in production, you'd call a customer service here.
 
 ## Building container images
 
@@ -272,7 +272,7 @@ minikube -p eip image load eip/eip-k8s-deploy-springboot:1.0
 
 The Quarkus image copies the fast-jar layout (`target/quarkus-app/`) and starts
 it with the image's `run-java.sh`; the Spring Boot image runs the executable
-jar. Both run as UID 185 and use an exact tag — never `latest` — so a rebuild
+jar. Both run as UID 185 and use an exact tag (never `latest`), so a rebuild
 is an explicit `image load` followed by `kubectl rollout restart`.
 
 Why not build inside the node? With the containerd runtime there is no Docker
@@ -327,12 +327,12 @@ manifest is generated with no such variable, and the pod connects to
 `localhost:9092`.) The `container-image` keys only name the image the manifest references; the
 image itself comes from the `Containerfile` above. Health probes are
 auto-configured because `camel-quarkus-microprofile-health` brings SmallRye
-Health — the extension wires `/q/health/live` and `/q/health/ready` into the
+Health: the extension wires `/q/health/live` and `/q/health/ready` into the
 generated Deployment.
 
 ### Spring Boot: hand-written manifests
 
-The Spring Boot variant includes manifests in `k8s/` that you write and version-control. This is educational — you see exactly what Kubernetes resources your application needs.
+The Spring Boot variant includes manifests in `k8s/` that you write and version-control. This is educational: you see exactly what Kubernetes resources your application needs.
 
 **`configmap.yaml`** externalizes the connection settings:
 
@@ -411,7 +411,7 @@ spec:
   type: NodePort
 ```
 
-Note `imagePullPolicy: Never` — Kubernetes uses the image `minikube image load` put in the node instead of pulling from a registry. In production, you'd push to a registry and use `IfNotPresent` or `Always`.
+Note `imagePullPolicy: Never`: Kubernetes uses the image `minikube image load` put in the node instead of pulling from a registry. In production, you'd push to a registry and use `IfNotPresent` or `Always`.
 
 ## Deploying to the cluster
 
@@ -426,7 +426,7 @@ kubectl --context eip apply -f examples/38-kubernetes-deploy/spring-boot/k8s/
 ```
 
 Both variants deploy as `deployment/eip-k8s-deploy` behind the same NodePort,
-so deploying one replaces the other — delete the Deployment first when you
+so deploying one replaces the other; delete the Deployment first when you
 switch, because the two select their pods with different labels and a
 Deployment's selector is immutable. Watch the rollout:
 
@@ -499,23 +499,23 @@ kubectl --context eip scale deployment/eip-k8s-deploy --replicas=3
 kubectl --context eip get pods -w
 ```
 
-When the new pods start, Kafka triggers a consumer group rebalance. The 3 partitions of `eip.orders.incoming` are distributed across the 3 pods — each pod processes a subset of the partitions. Watch the logs to see partition assignments:
+When the new pods start, Kafka triggers a consumer group rebalance. The 3 partitions of `eip.orders.incoming` are distributed across the 3 pods: each pod processes a subset of the partitions. Watch the logs to see partition assignments:
 
 ```bash
 kubectl --context eip logs -f deployment/eip-k8s-deploy --all-containers --prefix
 ```
 
-Scaling back down reverses the process — Kafka redistributes partitions to the remaining consumers.
+Scaling back down reverses the process: Kafka redistributes partitions to the remaining consumers.
 
 > **Partition count = max parallelism.** Our topics have 3 partitions, so scaling beyond 3 replicas means some pods will be idle Kafka consumers. For higher throughput, increase the partition count when creating the topic.
 
 ## Externalized configuration
 
-The `application.properties` in the container image uses `localhost` for Kafka and Redis — fine for local development. Inside the cluster, the ConfigMap overrides these via environment variables.
+The `application.properties` in the container image uses `localhost` for Kafka and Redis, which is fine for local development. Inside the cluster, the ConfigMap overrides these via environment variables.
 
 Spring Boot automatically maps environment variables to properties: `KAFKA_BROKERS` overrides `kafka.brokers`, `SPRING_DATA_REDIS_HOST` overrides `spring.data.redis.host`.
 
-Quarkus does the same — environment variables take precedence over `application.properties` values following the MicroProfile Config specification.
+Quarkus does the same: environment variables take precedence over `application.properties` values following the MicroProfile Config specification.
 
 For sensitive data like Redis passwords, use a Kubernetes `Secret` instead of a ConfigMap:
 
@@ -540,7 +540,7 @@ Remove the application and infrastructure, then stop the profile:
 ./scripts/setup-minikube-stack.sh --delete   # or remove the profile entirely
 ```
 
-By hand, the same order — custom resources while their operator still runs:
+By hand, the same order: custom resources while their operator still runs:
 
 ```bash
 kubectl --context eip delete deployment/eip-k8s-deploy service/eip-k8s-deploy
@@ -553,12 +553,12 @@ minikube stop -p eip
 
 ## What you learned
 
-- **Container image builds** — a `Containerfile` per runtime on a pinned UBI 10 OpenJDK 25 image, built with `docker build` and loaded into minikube's containerd with `minikube image load`
-- **Host access without tunnels** — a NodePort published on `127.0.0.1` when the profile is created
-- **Manifest generation** — Quarkus auto-generates Kubernetes resources from `application.properties`; Spring Boot uses hand-written YAMLs that are explicit and version-controlled
-- **Health probes** — MicroProfile Health and Spring Boot Actuator provide liveness and readiness checks that Kubernetes uses for pod lifecycle management
-- **Scaling** — `kubectl scale` combined with Kafka consumer groups gives you horizontal scaling with automatic partition rebalancing
-- **Externalized configuration** — ConfigMaps and Secrets override application properties inside the cluster without rebuilding the image
+- **Container image builds**: a `Containerfile` per runtime on a pinned UBI 10 OpenJDK 25 image, built with `docker build` and loaded into minikube's containerd with `minikube image load`
+- **Host access without tunnels**: a NodePort published on `127.0.0.1` when the profile is created
+- **Manifest generation**: Quarkus auto-generates Kubernetes resources from `application.properties`; Spring Boot uses hand-written YAMLs that are explicit and version-controlled
+- **Health probes**: MicroProfile Health and Spring Boot Actuator provide liveness and readiness checks that Kubernetes uses for pod lifecycle management
+- **Scaling**: `kubectl scale` combined with Kafka consumer groups gives you horizontal scaling with automatic partition rebalancing
+- **Externalized configuration**: ConfigMaps and Secrets override application properties inside the cluster without rebuilding the image
 
 ## References
 
@@ -573,4 +573,4 @@ Routes instead of NodePorts, see
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — on a fresh minikube profile (Docker Engine, docker driver, containerd, Kubernetes v1.36.5, Strimzi Kafka Ready): both variants built with Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) deploy, report ready (`/q/health/ready`, `/actuator/health/readiness` → 200) and enrich a test order with `Global Freight Ltd` from Redis; scaled to three replicas, all three pods take partitions (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: on a fresh minikube profile (Docker Engine, docker driver, containerd, Kubernetes v1.36.5, Strimzi Kafka Ready), both variants built with Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) deploy, report ready (`/q/health/ready`, `/actuator/health/readiness` → 200) and enrich a test order with `Global Freight Ltd` from Redis; scaled to three replicas, all three pods take partitions (2026-10-09).*

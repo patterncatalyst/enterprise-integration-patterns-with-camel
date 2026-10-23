@@ -2,7 +2,7 @@
 title: "Message Metadata"
 order: 8
 part: message-construction
-description: "Request-reply, correlation identifiers, return addresses, message sequences, expiration, and format indicators — the metadata that makes asynchronous conversations possible."
+description: "Request-reply, correlation identifiers, return addresses, message sequences, expiration, and format indicators: the metadata that makes asynchronous conversations possible."
 duration: "45 minutes"
 ---
 
@@ -39,17 +39,17 @@ cd examples/08-message-metadata/yaml-dsl
 camel run *
 ```
 
-A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations — without coupling sender and receiver.
+A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations, without coupling sender and receiver.
 
-{% include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1 — Request-Reply using separate channels and a Correlation Identifier to match replies." %}
+{% include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1: Request-Reply using separate channels and a Correlation Identifier to match replies." %}
 
-This chapter covers six patterns that address these questions. Together with the three message types from the previous chapter, they complete Message Construction — everything that goes *into* a message before it hits the wire.
+This chapter covers six patterns that address these questions. Together with the three message types from the previous chapter, they complete Message Construction: everything that goes *into* a message before it hits the wire.
 
 ## Pattern: Request-Reply
 
 ### The problem
 
-When order-service publishes an `OrderPlaced` event, it doesn't expect a response. That's the beauty of events. But during checkout, order-service needs to call inventory-service synchronously to check if items are in stock *before* accepting the order. The response matters — the order shouldn't proceed without confirmation.
+When order-service publishes an `OrderPlaced` event, it doesn't expect a response. That's the beauty of events. But during checkout, order-service needs to call inventory-service synchronously to check if items are in stock *before* accepting the order. The response matters: the order shouldn't proceed without confirmation.
 
 HTTP makes this trivial: send a request, get a response. But what if inventory-service is a Kafka-based microservice? You want to use the same messaging infrastructure for request-reply without switching to HTTP.
 
@@ -117,7 +117,7 @@ In a second terminal, run the requestor route. Use `camel get` to see both route
 camel get route
 ```
 
-This shows `InOut` vs `InOnly` for each route — a quick way to verify that request-reply is wired correctly before promoting to a Quarkus project.
+This shows `InOut` vs `InOnly` for each route: a quick way to verify that request-reply is wired correctly before promoting to a Quarkus project.
 
 ### When to avoid request-reply over messaging
 
@@ -126,7 +126,7 @@ Request-reply over Kafka adds complexity compared to an HTTP call. Use it when:
 - You need Kafka's durability guarantees (the request survives a consumer restart).
 - You're already in a Kafka-centric architecture and want consistency.
 
-Avoid it when a simple REST call would suffice — the overhead of a reply topic, correlation, and timeout management isn't worth it for a straightforward synchronous call to a service that already has an HTTP API.
+Avoid it when a simple REST call would suffice: the overhead of a reply topic, correlation, and timeout management isn't worth it for a straightforward synchronous call to a service that already has an HTTP API.
 
 ## Pattern: Return Address
 
@@ -134,11 +134,11 @@ Avoid it when a simple REST call would suffice — the overhead of a reply topic
 
 The **Return Address** pattern specifies where the reply should go. Instead of hardcoding the reply destination, the requestor includes the return address *in the message*, so the replier sends the response to wherever the requestor specifies.
 
-This decouples the replier from the requestor's infrastructure. The replier doesn't need to know *who* asked — it just replies to the address it was given. Different requestors can specify different reply channels.
+This decouples the replier from the requestor's infrastructure. The replier doesn't need to know *who* asked; it just replies to the address it was given. Different requestors can specify different reply channels.
 
 ### How it works in practice
 
-In Kafka, the return address is the **reply topic** — a header (or property) on the request message that tells the replier where to send the response. Camel's Kafka component supports this with `CamelKafkaReplyTopic`:
+In Kafka, the return address is the **reply topic**: a header (or property) on the request message that tells the replier where to send the response. Camel's Kafka component supports this with `CamelKafkaReplyTopic`:
 
 ```java
 // Requestor specifies the return address
@@ -164,7 +164,7 @@ from("direct:stock-check-from-analytics")
         + "&requestTimeout=30000");
 ```
 
-The replier routes are identical in both cases — it just replies to whatever `CamelKafkaReplyTopic` header it finds. The return address makes the replier completely agnostic to who's asking.
+The replier routes are identical in both cases; it just replies to whatever `CamelKafkaReplyTopic` header it finds. The return address makes the replier completely agnostic to who's asking.
 
 ## Pattern: Correlation Identifier
 
@@ -176,7 +176,7 @@ When order-service sends a stock check request and inventory-service sends back 
 
 A **Correlation Identifier** is a unique ID placed on the request message and copied onto the reply. The requestor generates a correlation ID, attaches it to the request, and when the reply arrives, matches it to the outstanding request by the same ID.
 
-Camel handles correlation automatically in `InOut` exchanges — the framework generates a correlation ID, attaches it to the request, and matches the reply. But you can also do it explicitly when you need custom correlation logic:
+Camel handles correlation automatically in `InOut` exchanges: the framework generates a correlation ID, attaches it to the request, and matches the reply. But you can also do it explicitly when you need custom correlation logic:
 
 ### How Camel models it
 
@@ -217,15 +217,15 @@ from("kafka:eip.inventory.replies?brokers=localhost:9092&groupId=order-service")
 
 ### Correlation in our event-driven domain
 
-Even without explicit request-reply, correlation is everywhere in the shipping domain. The `order_id` field is a natural correlation identifier — it ties together `OrderPlaced`, `InventoryReserved`, `PaymentProcessed`, and `ShipmentScheduled` events across services. When debugging a problem with order 42, you `grep` for `order_id=42` across all topics and reconstruct the full conversation.
+Even without explicit request-reply, correlation is everywhere in the shipping domain. The `order_id` field is a natural correlation identifier: it ties together `OrderPlaced`, `InventoryReserved`, `PaymentProcessed`, and `ShipmentScheduled` events across services. When debugging a problem with order 42, you `grep` for `order_id=42` across all topics and reconstruct the full conversation.
 
-For distributed tracing, Camel propagates OpenTelemetry trace IDs as headers. The trace ID is a correlation identifier that spans the entire request lifecycle — from the initial HTTP request through every Kafka message to the final notification. More on this in Part 8 (System Management).
+For distributed tracing, Camel propagates OpenTelemetry trace IDs as headers. The trace ID is a correlation identifier that spans the entire request lifecycle, from the initial HTTP request through every Kafka message to the final notification. More on this in Part 8 (System Management).
 
 ## Pattern: Message Sequence
 
 ### The problem
 
-A large customer places a bulk order with 500 line items. Sending all 500 items in a single Kafka message could exceed the maximum message size (default 1 MB). Even if it fits, a single large message blocks the consumer while it processes all 500 items — other orders wait.
+A large customer places a bulk order with 500 line items. Sending all 500 items in a single Kafka message could exceed the maximum message size (default 1 MB). Even if it fits, a single large message blocks the consumer while it processes all 500 items; other orders wait.
 
 You need to split the order into multiple messages. But the receiver needs to know: *Is this part of a larger set? Which part? Am I done?*
 
@@ -236,7 +236,7 @@ A **Message Sequence** splits a large message into numbered parts, with metadata
 - The **total count** or an **end-of-sequence** flag (so the receiver knows when it has all parts).
 - A **sequence identifier** that groups the parts (so the receiver can distinguish between parts of order 42 and parts of order 43).
 
-Camel's **Splitter** EIP produces message sequences automatically: each split message gets `CamelSplitIndex`, `CamelSplitSize`, and `CamelSplitComplete` headers. On the receiving side, Camel's **Aggregator** EIP reassembles the parts — which we'll cover in Part 6 (Message Transformation).
+Camel's **Splitter** EIP produces message sequences automatically: each split message gets `CamelSplitIndex`, `CamelSplitSize`, and `CamelSplitComplete` headers. On the receiving side, Camel's **Aggregator** EIP reassembles the parts, which we'll cover in Part 6 (Message Transformation).
 
 ### How Camel models it
 
@@ -272,15 +272,15 @@ from("kafka:eip.orders.line-items?brokers=localhost:9092&groupId=fulfillment-ser
 
 ### Kafka ordering and sequences
 
-When splitting a message sequence across Kafka, use the **same key** for all parts (`key=${header.sequenceId}`). Kafka guarantees ordering within a partition, and messages with the same key go to the same partition. This means parts arrive in order at the consumer — which simplifies reassembly.
+When splitting a message sequence across Kafka, use the **same key** for all parts (`key=${header.sequenceId}`). Kafka guarantees ordering within a partition, and messages with the same key go to the same partition. This means parts arrive in order at the consumer, which simplifies reassembly.
 
-If parts arrive out of order (because they were keyed differently or the topic was repartitioned), the aggregator still works — it just waits for all parts regardless of arrival order. The `completionTimeout` is a safety net: if a part is lost, the aggregator times out rather than waiting forever.
+If parts arrive out of order (because they were keyed differently or the topic was repartitioned), the aggregator still works; it just waits for all parts regardless of arrival order. The `completionTimeout` is a safety net: if a part is lost, the aggregator times out rather than waiting forever.
 
 ## Pattern: Message Expiration
 
 ### The problem
 
-A shipping estimate request is useless if it arrives 30 minutes late — the customer has already left the checkout page. A flash sale notification that arrives after the sale ends is worse than useless — it sends customers to a page that shows full prices.
+A shipping estimate request is useless if it arrives 30 minutes late: the customer has already left the checkout page. A flash sale notification that arrives after the sale ends is worse than useless: it sends customers to a page that shows full prices.
 
 Some messages have a shelf life. If they can't be processed within that window, they should be discarded rather than processed stale.
 
@@ -336,13 +336,13 @@ from("pulsar:persistent://public/default/flash-sale"
     .to("direct:send-notification");
 ```
 
-This is one of the cases where Pulsar's feature set makes a pattern simpler — you don't need application-level expiration checks because the broker handles it.
+This is one of the cases where Pulsar's feature set makes a pattern simpler: you don't need application-level expiration checks because the broker handles it.
 
 ## Pattern: Format Indicator
 
 ### The problem
 
-The accounting system sends CSV files. The partner API sends XML. Internal services send JSON. A legacy system sends fixed-width text. When a message arrives, the consumer needs to know the format *before* trying to parse it — unmarshaling JSON as XML doesn't end well.
+The accounting system sends CSV files. The partner API sends XML. Internal services send JSON. A legacy system sends fixed-width text. When a message arrives, the consumer needs to know the format *before* trying to parse it: unmarshaling JSON as XML doesn't end well.
 
 ### The solution
 
@@ -397,7 +397,7 @@ from("kafka:eip.accounting.exports?brokers=localhost:9092&groupId=accounting-imp
 
 ### Schema registry as a format indicator
 
-In Avro-based systems with Apicurio Registry, the format indicator is built into the serialized bytes. The first byte is a magic byte (`0x00`), followed by a global schema ID. The deserializer reads the ID, fetches the schema from the registry, and deserializes accordingly. No explicit headers needed — the format indicator is embedded in the payload.
+In Avro-based systems with Apicurio Registry, the format indicator is built into the serialized bytes. The first byte is a magic byte (`0x00`), followed by a global schema ID. The deserializer reads the ID, fetches the schema from the registry, and deserializes accordingly. No explicit headers needed: the format indicator is embedded in the payload.
 
 This is one reason the shipping domain uses Avro + Apicurio: the format indicator is automatic, machine-verifiable, and supports schema evolution.
 
@@ -424,37 +424,37 @@ Each pattern solves one specific problem. Together, they make asynchronous conve
 
 ## Common pitfalls
 
-**Correlation without cleanup.** If you maintain a map of outstanding correlation IDs (for manual request-reply), and a reply never arrives, the map leaks. Use a timeout to expire stale entries — Camel's `requestTimeout` handles this automatically in `InOut` exchanges.
+**Correlation without cleanup.** If you maintain a map of outstanding correlation IDs (for manual request-reply), and a reply never arrives, the map leaks. Use a timeout to expire stale entries: Camel's `requestTimeout` handles this automatically in `InOut` exchanges.
 
 **TTL without clock sync.** If the producer's clock says it's 10:00:00 and the consumer's clock says it's 10:05:30, a 5-minute TTL has already expired by the time it arrives. Use NTP to keep clocks synchronized, or use durations (created + TTL milliseconds) rather than absolute timestamps. In a Kubernetes environment, all pods typically share the same NTP source, so this is less of an issue than with physical servers.
 
 **Sequences without idempotency.** If the consumer crashes halfway through processing a sequence and restarts, it may process some parts twice. Use idempotent consumption (covered in Part 7) to handle duplicate deliveries.
 
-**Format assumptions.** Don't assume format from the topic name. `eip.accounting.exports` could carry JSON today and CSV tomorrow. Use explicit format indicators — headers or schema registry — so consumers adapt automatically.
+**Format assumptions.** Don't assume format from the topic name. `eip.accounting.exports` could carry JSON today and CSV tomorrow. Use explicit format indicators (headers or schema registry) so consumers adapt automatically.
 
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 5: "Message Construction"
-- [enterpriseintegrationpatterns.com — Request-Reply](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReply.html)
-- [enterpriseintegrationpatterns.com — Return Address](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ReturnAddress.html)
-- [enterpriseintegrationpatterns.com — Correlation Identifier](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CorrelationIdentifier.html)
-- [enterpriseintegrationpatterns.com — Message Sequence](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageSequence.html)
-- [enterpriseintegrationpatterns.com — Message Expiration](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageExpiration.html)
-- [enterpriseintegrationpatterns.com — Format Indicator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/FormatIndicator.html)
-- [Apache Camel — Splitter EIP](https://camel.apache.org/components/4.22.x/eips/split-eip.html)
-- [Apache Camel — Aggregator EIP](https://camel.apache.org/components/4.22.x/eips/aggregate-eip.html)
+- [enterpriseintegrationpatterns.com: Request-Reply](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RequestReply.html)
+- [enterpriseintegrationpatterns.com: Return Address](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ReturnAddress.html)
+- [enterpriseintegrationpatterns.com: Correlation Identifier](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CorrelationIdentifier.html)
+- [enterpriseintegrationpatterns.com: Message Sequence](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageSequence.html)
+- [enterpriseintegrationpatterns.com: Message Expiration](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageExpiration.html)
+- [enterpriseintegrationpatterns.com: Format Indicator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/FormatIndicator.html)
+- [Apache Camel: Splitter EIP](https://camel.apache.org/components/4.22.x/eips/split-eip.html)
+- [Apache Camel: Aggregator EIP](https://camel.apache.org/components/4.22.x/eips/aggregate-eip.html)
 
 ## What you learned
 
-- **Request-Reply** implements synchronous conversations over asynchronous messaging — Camel's `InOut` exchange pattern manages the wiring.
-- **Return Address** decouples the replier from the requestor — the reply destination travels with the message.
-- **Correlation Identifier** matches replies to requests — Camel auto-generates these for `InOut`, or you can use domain identifiers like `order_id`.
-- **Message Sequence** splits large messages into numbered parts — Camel's Splitter produces sequence metadata automatically.
-- **Message Expiration** discards stale messages — implement at the application level with headers (Kafka) or use Pulsar's native TTL.
-- **Format Indicator** tells the receiver how to parse the body — use headers, schema registry, or Avro's embedded schema ID.
+- **Request-Reply** implements synchronous conversations over asynchronous messaging: Camel's `InOut` exchange pattern manages the wiring.
+- **Return Address** decouples the replier from the requestor: the reply destination travels with the message.
+- **Correlation Identifier** matches replies to requests: Camel auto-generates these for `InOut`, or you can use domain identifiers like `order_id`.
+- **Message Sequence** splits large messages into numbered parts: Camel's Splitter produces sequence metadata automatically.
+- **Message Expiration** discards stale messages: implement at the application level with headers (Kafka) or use Pulsar's native TTL.
+- **Format Indicator** tells the receiver how to parse the body: use headers, schema registry, or Avro's embedded schema ID.
 
-This completes Part 4 — Message Construction. Next: Part 5 — Message Routing, where we explore the patterns that determine *where* a message goes: content-based router, message filter, splitter, aggregator, and the full routing catalog.
+This completes Part 4, Message Construction. Next: Part 5, Message Routing, where we explore the patterns that determine *where* a message goes: content-based router, message filter, splitter, aggregator, and the full routing catalog.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 12 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 12 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

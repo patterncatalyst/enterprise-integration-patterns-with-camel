@@ -2,13 +2,13 @@
 title: "Appendix J: The Loan Broker Case Study"
 order: 28
 part: appendices
-description: "A complete EIP case study — the classic Loan Broker from Hohpe & Woolf, reimagined with Apache Camel, Kafka, and the shipping domain."
+description: "A complete EIP case study: the classic Loan Broker from Hohpe & Woolf, reimagined with Apache Camel, Kafka, and the shipping domain."
 duration: "45 minutes"
 ---
 
-The Loan Broker is the original end-to-end EIP case study from *Enterprise Integration Patterns*. It combines nearly every major pattern: Content-Based Router, Recipient List, Scatter-Gather, Aggregator, Message Translator, and more. This appendix rebuilds the Loan Broker with Camel on Quarkus and Spring Boot, using Kafka as the messaging backbone — and then maps its lessons back to our shipping domain.
+The Loan Broker is the original end-to-end EIP case study from *Enterprise Integration Patterns*. It combines nearly every major pattern: Content-Based Router, Recipient List, Scatter-Gather, Aggregator, Message Translator, and more. This appendix rebuilds the Loan Broker with Camel on Quarkus and Spring Boot, using Kafka as the messaging backbone, and then maps its lessons back to our shipping domain.
 
-{% include excalidraw.html file="28-loan-broker" alt="Loan Broker Scatter-Gather architecture" caption="Figure J.1 — The Loan Broker: gateway, enricher, recipient list, bank services, and aggregator." %}
+{% include excalidraw.html file="28-loan-broker" alt="Loan Broker Scatter-Gather architecture" caption="Figure J.1: The Loan Broker: gateway, enricher, recipient list, bank services, and aggregator." %}
 
 The code is in `examples/loan-broker/`.
 
@@ -122,7 +122,7 @@ from("platform-http:/api/loans?httpMethodRestrict=POST")
 
 **Pattern: Messaging Gateway.** The REST endpoint shields the customer from the asynchronous messaging system. The customer gets an immediate 202 Accepted with a request ID for polling.
 
-## Step 2: Content Enricher — Credit Bureau
+## Step 2: Content Enricher: Credit Bureau
 
 Enrich the loan request with credit bureau data:
 
@@ -160,7 +160,7 @@ from("direct:credit-bureau-lookup")
 
 **Pattern: Content Enricher.** The `enrich()` DSL fetches credit bureau data and merges it into the loan request using an `AggregationStrategy`.
 
-## Step 3: Recipient List — Bank selection
+## Step 3: Recipient List: Bank selection
 
 Determine which banks qualify for this loan and fan out requests:
 
@@ -226,7 +226,7 @@ public class BankEndpointResolver {
 }
 ```
 
-**Pattern: Recipient List.** The list of banks is computed dynamically based on the enriched request data — credit score, amount, and debt-to-income ratio. Each qualifying bank gets its own Kafka topic.
+**Pattern: Recipient List.** The list of banks is computed dynamically based on the enriched request data: credit score, amount, and debt-to-income ratio. Each qualifying bank gets its own Kafka topic.
 
 ## Step 4: Bank services
 
@@ -257,7 +257,7 @@ from("kafka:loan.bank.request.bank-a?brokers=localhost:9092&groupId=bank-a")
 
 Each bank has its own pricing algorithm, approval criteria, and conditions, but they all publish to the same `loan.bank.reply` topic, keyed by request ID for aggregation.
 
-## Step 5: Aggregator — Collect and select
+## Step 5: Aggregator: Collect and select
 
 Aggregate bank replies, selecting the best offer:
 
@@ -308,7 +308,7 @@ public class BestLoanOfferStrategy implements AggregationStrategy {
 }
 ```
 
-**Pattern: Aggregator (Scatter-Gather).** The aggregator collects replies correlated by `requestId`. It completes when either all expected bank replies arrive (`completionSize`) or the 15-second timeout expires — whichever comes first. The aggregation strategy selects the lowest interest rate among approved offers.
+**Pattern: Aggregator (Scatter-Gather).** The aggregator collects replies correlated by `requestId`. It completes when either all expected bank replies arrive (`completionSize`) or the 15-second timeout expires, whichever comes first. The aggregation strategy selects the lowest interest rate among approved offers.
 
 ## Step 6: Result Gateway
 
@@ -445,18 +445,18 @@ from("kafka:eip.shipping.rate-requests?brokers=localhost:9092&groupId=carrier-sc
 
 ## Lessons from the Loan Broker
 
-1. **Scatter-Gather is the natural shape of comparison shopping** — any time you need quotes, bids, or evaluations from multiple providers, this pattern applies.
+1. **Scatter-Gather is the natural shape of comparison shopping.** Any time you need quotes, bids, or evaluations from multiple providers, this pattern applies.
 
 2. **Correlation is everything.** Without the `requestId` flowing through every message (Kafka key, aggregation correlation, result lookup), the system cannot reassemble a coherent answer from scattered replies.
 
 3. **Timeouts are a feature, not an edge case.** Not all banks (or carriers) will reply. The aggregator's `completionTimeout` ensures the customer gets *some* answer even when a provider is slow or down. Design for partial results from the start.
 
-4. **The Recipient List makes the system extensible.** Adding a new bank (or carrier) means adding one eligibility rule and one consumer — no changes to the core flow.
+4. **The Recipient List makes the system extensible.** Adding a new bank (or carrier) means adding one eligibility rule and one consumer; no changes to the core flow.
 
 5. **Enrichment before routing is a common prerequisite.** The credit bureau lookup happens before bank selection because the selection depends on enriched data. In the shipping domain, customs classification must happen before carrier selection for international shipments.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: `POST /api/loans` (Quarkus) and `/camel/api/loans` (Spring Boot) return 202 with a request id, and the lowest approved rate is published to `loan.results` (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: `POST /api/loans` (Quarkus) and `/camel/api/loans` (Spring Boot) return 202 with a request id, and the lowest approved rate is published to `loan.results` (2026-10-09).*
 
-*The gateway path differs by runtime: `/api/loans` on Quarkus, `/camel/api/loans` on Spring Boot, whose camel-servlet mapping sits under `/camel`. The Spring Boot gateway also used to return an empty HTTP 500 — `restConfiguration()` sets `bindingMode(json)`, so Camel already serialises the response, and the route marshalled it a second time. Quarkus tolerated that by double-encoding the body; camel-servlet did not. The redundant marshal is gone from both.*
+*The gateway path differs by runtime: `/api/loans` on Quarkus, `/camel/api/loans` on Spring Boot, whose camel-servlet mapping sits under `/camel`. The Spring Boot gateway also used to return an empty HTTP 500: `restConfiguration()` sets `bindingMode(json)`, so Camel already serialises the response, and the route marshalled it a second time. Quarkus tolerated that by double-encoding the body; camel-servlet did not. The redundant marshal is gone from both.*

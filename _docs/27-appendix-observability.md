@@ -6,7 +6,7 @@ description: "OpenTelemetry instrumentation, Grafana dashboards, distributed tra
 duration: "25 minutes"
 ---
 
-Chapter 17 introduced the observability patterns — Control Bus, Message Store, Message History, and monitoring Wire Taps. This appendix goes deeper into the implementation: how to instrument Camel routes with OpenTelemetry, build Grafana dashboards, and trace messages across services.
+Chapter 17 introduced the observability patterns (Control Bus, Message Store, Message History, and monitoring Wire Taps). This appendix goes deeper into the implementation: how to instrument Camel routes with OpenTelemetry, build Grafana dashboards, and trace messages across services.
 
 The code is in `examples/27-observability-stack/`.
 
@@ -24,7 +24,7 @@ cd examples/27-observability-stack/spring-boot
 mvn spring-boot:run
 ```
 
-{% include excalidraw.html file="27-appendix-observability" alt="LGTM observability stack: Camel services to OTel Collector to Loki, Tempo, Mimir, and Grafana" caption="Figure I.1 — The LGTM observability pipeline: Camel services emit traces, metrics, and logs via OpenTelemetry to the OTel Collector, which fans out to Loki, Tempo, and Mimir for Grafana visualization." %}
+{% include excalidraw.html file="27-appendix-observability" alt="LGTM observability stack: Camel services to OTel Collector to Loki, Tempo, Mimir, and Grafana" caption="Figure I.1: The LGTM observability pipeline: Camel services emit traces, metrics, and logs via OpenTelemetry to the OTel Collector, which fans out to Loki, Tempo, and Mimir for Grafana visualization." %}
 
 ## The LGTM stack
 
@@ -38,7 +38,7 @@ Our optional `compose.lgtm.yaml` overlay provides the Grafana LGTM stack:
 | **Mimir** | Metrics (Prometheus-compatible) | 9009 |
 | **OTel Collector** | Telemetry pipeline | 4317 (gRPC), 4318 (HTTP), 13133 (health) |
 
-Your application never talks to Tempo, Loki or Mimir directly — it sends
+Your application never talks to Tempo, Loki or Mimir directly: it sends
 everything to the collector on 4317 or 4318, and the collector fans it out.
 Tempo does run an OTLP receiver of its own, but only inside the container
 network, where the collector reaches it on `tempo:4318`. That is worth knowing
@@ -84,14 +84,14 @@ camel run MyRoute.java --observe   # health, metrics, dev console, Camel tracing
 Metrics get scraped, traces and logs get exported, and none of it needs a
 property file.
 
-It is a **different stack** — Prometheus,
-VictoriaTraces, VictoriaLogs and Perses, not Loki, Tempo, Mimir and Grafana —
+It is a **different stack** (Prometheus,
+VictoriaTraces, VictoriaLogs and Perses, not Loki, Tempo, Mimir and Grafana),
 so dashboards and queries are not portable between the two. It is aimed at
 the dev loop, not at what you ship. Use it while you are working out what
 your routes do; the production sections below cover what you deploy.
 
-If you want auto-instrumentation of the libraries around Camel — JDBC, HTTP
-clients, Kafka clients, gRPC — there is also `--open-telemetry-agent`, which
+If you want auto-instrumentation of the libraries around Camel (JDBC, HTTP
+clients, Kafka clients, gRPC), there is also `--open-telemetry-agent`, which
 attaches the OpenTelemetry Java Agent and feeds the TUI's Spans tab. See
 [Appendix U]({% link _docs/39-appendix-camel-cli.md %}).
 
@@ -100,7 +100,7 @@ attaches the OpenTelemetry Java Agent and feeds the TUI's Spans tab. See
 ### Dependencies
 
 The OpenTelemetry extensions get you *traces*. Metrics and logs need one more
-dependency each, and this is the step most people miss — see
+dependency each, and this is the step most people miss: see
 [all three signals](#getting-all-three-signals) below for why.
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
@@ -201,8 +201,8 @@ looks like success:
 - **Metrics.** Camel registers its route meters through Micrometer. The usual
   Micrometer setup is a Prometheus registry, which *exposes* meters at
   `/q/metrics` or `/actuator/prometheus` and waits to be scraped. Nothing in
-  this stack scrapes it. The application looks instrumented — 93 `camel_*`
-  meters, right there in the browser — while Mimir stays empty. The fix is a
+  this stack scrapes it. The application looks instrumented (93 `camel_*`
+  meters, right there in the browser) while Mimir stays empty. The fix is a
   registry that pushes: the Quarkus `micrometer-opentelemetry` bridge, or
   `micrometer-registry-otlp` on Spring Boot.
 - **Logs.** Writing JSON to the console does not put logs in Loki. Something
@@ -213,9 +213,9 @@ On Spring Boot there is one more trap. Camel's tracer looks for a single
 `OpenTelemetry` instance in the Camel registry and, failing that, calls
 `GlobalOpenTelemetry.get()`. The OpenTelemetry Spring Boot starter keeps its
 SDK as a Spring bean and never registers it globally, so Camel falls back to
-the no-op instance and silently drops every route span — while HTTP spans from
-the starter's own instrumentation keep arriving, which makes tracing look like
-it works. Publish the bean yourself:
+the no-op instance and silently drops every route span, even as HTTP spans
+from the starter's own instrumentation keep arriving, which makes tracing
+look like it works. Publish the bean yourself:
 
 ```java
 @Configuration
@@ -244,7 +244,7 @@ Each span includes:
 
 - Route ID, node ID, and processor name
 - Exchange ID (for correlation)
-- Message headers (configurable — default excludes sensitive headers)
+- Message headers (configurable; default excludes sensitive headers)
 - Duration and status (OK / ERROR)
 
 #### What changed in Camel 4.21
@@ -252,7 +252,7 @@ Each span includes:
 If you have used Camel tracing before, the span tree is a different shape now,
 and the chapter you remember was written against the old one:
 
-- Processors that send to an endpoint — `to`, `toD`, `wireTap`, `enrich` — no
+- Processors that send to an endpoint (`to`, `toD`, `wireTap`, `enrich`) no
   longer emit a redundant *processor* span wrapping the endpoint span. They are
   identified by the new `org.apache.camel.EndpointSending` marker interface.
   Trees are shallower and there are fewer spans per exchange.
@@ -280,7 +280,7 @@ camel.opentelemetry2.disable-core-processors=true
 
 Camel propagates OpenTelemetry trace context through Kafka headers automatically. When order-service publishes to `eip.orders.placed` and inventory-service consumes it, both spans appear under the same trace:
 
-{% include excalidraw.html file="27-trace-tree" alt="Distributed trace showing spans across order-service and inventory-service, linked via Kafka header propagation" caption="Figure I.1 — Distributed trace: the produce span in order-service and the consume span in inventory-service are linked under the same trace ID via Kafka header propagation." %}
+{% include excalidraw.html file="27-trace-tree" alt="Distributed trace showing spans across order-service and inventory-service, linked via Kafka header propagation" caption="Figure I.1: Distributed trace: the produce span in order-service and the consume span in inventory-service are linked under the same trace ID via Kafka header propagation." %}
 
 ## Custom spans
 
@@ -366,7 +366,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=metrics")
 
 ## Logs in Loki
 
-Logs reach Loki over OTLP, on the same exporter as traces and metrics — there
+Logs reach Loki over OTLP, on the same exporter as traces and metrics: there
 is no log shipper and no file to tail. Turning on the log signal is the whole
 configuration:
 
@@ -381,12 +381,12 @@ otel.logs.exporter=otlp
 ```
 
 Formatting the console as JSON is a separate concern and does *not* put logs in
-Loki. It is worth doing if something else consumes your stdout, but on its own
-it ships nothing.
+Loki. Do it if something else consumes your stdout, but on its own it ships
+nothing.
 
 Because the log records go through the OpenTelemetry SDK, they arrive carrying
-resource and scope attributes as Loki labels, and — for anything logged inside
-a route — the trace and span IDs of the exchange that produced them. That last
+resource and scope attributes as Loki labels, and (for anything logged inside
+a route) the trace and span IDs of the exchange that produced them. That last
 part is what lets you pivot from a slow trace in Tempo straight to the log
 lines it emitted.
 
@@ -416,7 +416,7 @@ and, to narrow to one route:
 
 Build dashboards around these queries:
 
-These are the metric names as they arrive in Mimir through the OTLP bridge —
+These are the metric names as they arrive in Mimir through the OTLP bridge:
 see the two naming traps above before adapting them.
 
 **Order throughput**:
@@ -424,7 +424,7 @@ see the two naming traps above before adapting them.
 rate(camel_exchanges_total{routeId="traced-order-pipeline"}[5m])
 ```
 
-**Error rate** — wrapped in `or vector(0)` because the failure counter does not
+**Error rate**: wrapped in `or vector(0)` because the failure counter does not
 exist until the first failure:
 ```promql
 (
@@ -434,7 +434,7 @@ exist until the first failure:
 / rate(camel_exchanges_total{routeId="traced-order-pipeline"}[5m])
 ```
 
-**P99 route latency** — note the bucket is in milliseconds on this path:
+**P99 route latency**: note the bucket is in milliseconds on this path:
 ```promql
 histogram_quantile(
   0.99,
@@ -444,7 +444,7 @@ histogram_quantile(
 )
 ```
 
-**Request rate by service, from Tempo's span metrics** — Tempo's
+**Request rate by service, from Tempo's span metrics**: Tempo's
 `metrics_generator` writes these into Mimir itself, so they are available
 without instrumenting anything further:
 ```promql
@@ -466,8 +466,8 @@ done | docker exec -i eip-kafka /opt/kafka/bin/kafka-console-producer.sh \
   --bootstrap-server localhost:9092 --topic eip.orders.placed
 ```
 
-Give it half a minute — Tempo does not make a trace searchable the instant it
-arrives, and the metric export interval is ten seconds — then check all three
+Give it half a minute (Tempo does not make a trace searchable the instant it
+arrives, and the metric export interval is ten seconds), then check all three
 signals without opening Grafana:
 
 ```bash
@@ -489,4 +489,4 @@ problem described in [getting all three signals](#getting-all-three-signals).
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass on Docker Engine; run against `setup-stack.sh --lgtm` with orders sent to `eip.orders.placed`, Tempo returns the routes' traces (10 from the Spring Boot run) and Mimir has `camel_exchanges_total` series (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass on Docker Engine; run against `setup-stack.sh --lgtm` with orders sent to `eip.orders.placed`, Tempo returns the routes' traces (10 from the Spring Boot run) and Mimir has `camel_exchanges_total` series (2026-10-09).*
