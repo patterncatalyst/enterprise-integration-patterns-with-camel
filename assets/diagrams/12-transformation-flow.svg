@@ -44,5 +44,5 @@
 <path d="M475,120 L475,170" fill="none" stroke="#555" stroke-width="2" marker-end="url(#a)"/>
 <text x="481.0" y="139.0" font-size="11" fill="#ffffff" stroke="#ffffff" stroke-width="3" paint-order="stroke" text-anchor="middle">lookup</text>
 <text x="481.0" y="139.0" font-size="11" fill="#555" text-anchor="middle">lookup</text>
-<text x="450" y="50" font-size="11" fill="#555555" text-anchor="middle">Pipes and Filters — each step transforms the message</text>
+<text x="450" y="50" font-size="11" fill="#555555" text-anchor="middle">Pipes and Filters: each step transforms the message</text>
 </svg>
