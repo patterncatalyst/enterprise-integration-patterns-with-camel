@@ -223,6 +223,15 @@ When Kafka component-level properties are set in `application.properties`, every
 
 **Treating the message bus as just a broker.** A broker is infrastructure; a bus is infrastructure plus conventions. If every service has its own topic naming scheme, serialization format, and error handling strategy, you have a broker, not a bus. The value of a message bus is the standardization.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                               # Kafka, Pulsar, PostgreSQL
+cd examples/06-channel-infra/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run * --port=8082)
+```
+
+The inbound Channel Adapter accepts HTTP orders and publishes them to Kafka, the Message Bus fans incoming orders out to three independent consumer groups (inventory, payment, notification), the Messaging Bridge forwards partner orders from Pulsar to Kafka and shipping events from Kafka to Pulsar, and the outbound Channel Adapter dispatches fulfilled orders to a simulated shipping API; watch the topics and consumer groups in Kafka UI at `http://localhost:8090`.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 4: "Messaging Channels"
@@ -240,7 +249,3 @@ When Kafka component-level properties are set in `application.properties`, every
 - Camel's component-level configuration in `application.properties` standardizes the bus so routes only need to name their channel and consumer group.
 
 This completes Part 3, Messaging Channels. Next, we move inside the message itself: Part 4 covers Message Construction, which includes command, document, and event messages, request-reply, correlation, sequencing, and expiration.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

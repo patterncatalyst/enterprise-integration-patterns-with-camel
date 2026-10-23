@@ -315,6 +315,15 @@ from("direct:adapter-metrics")
 
 **Managing adapters without alerting.** A circuit breaker that silently routes to the DLQ doesn't help if nobody notices. Combine circuit breaker state changes with alerting (PagerDuty, Slack, email) so the operations team can investigate.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                                  # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/18-testing-management/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run)
+```
+
+Watch the test-message injector publish a synthetic order every 30 seconds and the verifier log PASS or FAIL, the Detour route bypass enrichment while `feature.enrichment.enabled=false`, the Smart Proxy forward payment requests to the mock gateway by default, and the circuit breaker open after repeated inventory failures and route the fallback to the DLQ.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 10: "System Management"
@@ -333,7 +342,3 @@ from("direct:adapter-metrics")
 - **Channel Adapter Management** combines circuit breakers, dead letter channels, and monitoring to handle external system failures gracefully.
 
 This completes Part 8, System Management (8 patterns across 2 chapters), and the entire EIP pattern catalog. All 65 Enterprise Integration Patterns have been covered across Parts 1-8. Part 9, Deep-Dive Appendices, covers advanced topics like schema evolution, testing strategies, performance tuning, and production deployment.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

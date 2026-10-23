@@ -560,6 +560,15 @@ minikube stop -p eip
 - **Scaling**: `kubectl scale` combined with Kafka consumer groups gives you horizontal scaling with automatic partition rebalancing
 - **Externalized configuration**: ConfigMaps and Secrets override application properties inside the cluster without rebuilding the image
 
+## Build, run, observe
+
+```bash
+./scripts/setup-minikube-stack.sh
+./examples/38-kubernetes-deploy/deploy-minikube.sh quarkus
+```
+
+The script builds the image, loads it into the `eip` minikube profile, deploys the Helm chart, and sends one test order so you can watch it get enriched with `Global Freight Ltd` from Redis and the pods take partitions when scaled to three replicas.
+
 ## References
 
 - [Quarkus Kubernetes guide](https://quarkus.io/guides/deploying-to-kubernetes)
@@ -570,7 +579,3 @@ minikube stop -p eip
 To run the same example on OpenShift, with images built inside the cluster and
 Routes instead of NodePorts, see
 [Appendix Z]({{ '/docs/44-appendix-openshift-local/' | relative_url }}).
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: on a fresh minikube profile (Docker Engine, docker driver, containerd, Kubernetes v1.36.5, Strimzi Kafka Ready), both variants built with Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) deploy, report ready (`/q/health/ready`, `/actuator/health/readiness` → 200) and enrich a test order with `Global Freight Ltd` from Redis; scaled to three replicas, all three pods take partitions (2026-10-09).*

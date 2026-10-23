@@ -253,9 +253,3 @@ Every pattern chapter follows this loop: understand the pattern, see how Camel i
 - The consistent loop you'll follow in every pattern chapter: start, trigger, observe.
 
 Next, we step back and look at the big picture, the four fundamental ways applications can share data, before diving into the messaging patterns that this tutorial is built around.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: the domain model and order flow are exercised by the routing-fundamentals example, which passes its 14 Citrus integration tests against live Kafka on Docker Engine with Camel 4.22.1 (2026-10-09). The Avro schema shown is illustrative; the examples serialize JSON.*
-
-*To confirm on re-verification: Avro schema example is structurally valid; topic naming convention matches what the example code actually produces; the message flow diagram accurately reflects the event choreography once services are implemented.*

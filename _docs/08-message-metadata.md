@@ -432,6 +432,15 @@ Each pattern solves one specific problem. Together, they make asynchronous conve
 
 **Format assumptions.** Don't assume format from the topic name. `eip.accounting.exports` could carry JSON today and CSV tomorrow. Use explicit format indicators (headers or schema registry) so consumers adapt automatically.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/08-message-metadata/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the Correlation Identifier, Message Sequence, Message Expiration, and Format Indicator routes stamp headers on generated orders and route by that metadata.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 5: "Message Construction"
@@ -454,7 +463,3 @@ Each pattern solves one specific problem. Together, they make asynchronous conve
 - **Format Indicator** tells the receiver how to parse the body: use headers, schema registry, or Avro's embedded schema ID.
 
 This completes Part 4, Message Construction. Next: Part 5, Message Routing, where we explore the patterns that determine *where* a message goes: content-based router, message filter, splitter, aggregator, and the full routing catalog.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 12 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

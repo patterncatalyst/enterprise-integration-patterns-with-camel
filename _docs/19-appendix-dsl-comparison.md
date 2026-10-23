@@ -449,6 +449,11 @@ If you're moving an existing Camel Spring Boot application to Quarkus:
 
 Spring Boot is a perfectly valid choice for Camel. If your organization standardizes on Spring, Camel Spring Boot is mature and well-supported. The patterns in this tutorial (every `RouteBuilder`, every EIP call, every Kafka/Pulsar/Redis integration) work identically on both runtimes. Only the surrounding framework glue changes.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>, all three variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: given orders on `eip.orders.placed`, Quarkus, Spring Boot and the YAML DSL route each classify `DSL-1` (amount 640) as `HIGH_VALUE` and `DSL-2` as `STANDARD`, with no errors (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                                 # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/19-dsl-comparison/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run order-classifier.camel.yaml)
+```
+
+All three runtimes run the identical order-classifier route; send an order to `eip.orders.placed` and confirm Quarkus, Spring Boot, and the YAML DSL each classify it the same way, `HIGH_VALUE` above 500, `STANDARD` otherwise.

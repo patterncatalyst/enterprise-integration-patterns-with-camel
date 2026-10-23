@@ -368,6 +368,15 @@ Wire taps feed the metrics pillar. OpenTelemetry feeds traces. Structured loggin
 
 **Metrics with high-cardinality tags.** Using `order_id` or `customer_id` as a Prometheus tag creates millions of time series and overwhelms the metrics backend. Use low-cardinality tags: country, priority, status, route ID.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                              # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/17-observability/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run * --port=8082)
+```
+
+Watch wire-tap copies accumulate on `eip.orders.audit`, message-store rows land in the PostgreSQL `system.message_store` table, message-history entries trace each order's full route path in the logs, and the Control Bus REST endpoint report live route status, all without altering the main `eip.orders.processed` flow.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 10: "System Management"
@@ -387,7 +396,3 @@ Wire taps feed the metrics pillar. OpenTelemetry feeds traces. Structured loggin
 - **Wire Tap (for monitoring)** feeds metrics without affecting business routes: use Micrometer counters with low-cardinality tags for Prometheus-compatible dashboards.
 
 Next: testing and management patterns, including Test Message, Detour, Smart Proxy, and Channel Adapter management.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run with `camel run * --port=8082`, the Control Bus answers `GET /control/status/control-bus-status` with 200, and their Citrus test passes (2026-10-09).*

@@ -218,6 +218,11 @@ Key metrics to watch:
 - **Under-replicated partitions**: Replicas out of sync. Indicates broker issues.
 - **Request latency**: Producer/consumer round-trip time. High latency = broker overload.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 4 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                                   # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/20-kafka-deep-dive/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run)
+```
+
+Watch the partitioned producer publish orders keyed by order ID every 5 seconds and confirm same-key orders land on the same partition, while the transactional pipeline enriches and commits each order to `eip.orders.enriched` and the lag monitor logs consumer-group offsets every 30 seconds.

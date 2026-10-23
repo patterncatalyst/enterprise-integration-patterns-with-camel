@@ -242,6 +242,13 @@ A typical shipping domain pipeline combines all three:
 
 When the Camel route has a bug and you need to reprocess, you reset the Camel consumer group offsets (Appendix N). When the source connector misses rows, you alter the connector offset. When the sink connector writes to the wrong table, you fix the config and reset its offset. Each component has its own offset management surface.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>; `connect-offsets-demo.sh` runs to completion against Kafka Connect on the compose stack on Docker Engine: the PATCH rewind takes the topic from 10 to 20 records and DELETE leaves no offsets. The script now waits for Connect to answer before starting (2026-10-09).*
+```bash
+./scripts/setup-stack.sh
+cd examples/36-kafka-connect-offsets
+docker compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d connect
+./connect-offsets-demo.sh
+```
+
+The script creates a `FileStreamSourceConnector` over 10 orders, stops it, PATCHes its offset back to 0, and resumes it; watch the target topic grow from 10 records to 20, which is the proof the rewind took effect before the script finishes with a full `DELETE` reset.

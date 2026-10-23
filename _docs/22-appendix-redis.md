@@ -206,6 +206,11 @@ quarkus.redis.max-pool-size=20
 quarkus.redis.max-pool-waiting=50
 ```
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                                     # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/22-redis-integration/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run)
+```
+
+Watch the caching enricher serve customer data from Redis on cache hits and fall back to the simulated database on misses, the idempotent receiver use Redis `SET NX` to skip redelivered payment events, and the distributed lock ensure only one instance runs the nightly export.
