@@ -6,22 +6,22 @@ description: "How Java virtual threads work under the hood, and how they transfo
 duration: "30 minutes"
 ---
 
-Integration routes spend most of their time waiting — waiting for Kafka to acknowledge a produce, waiting for an HTTP enrichment service to respond, waiting for a JDBC query to return rows. Platform threads block during every one of those waits, and each blocked thread consumes roughly 1 MB of stack memory plus an OS scheduling slot. A Camel application with 200 concurrent routes processing I/O-bound messages needs 200 platform threads just to block. Virtual threads change the economics entirely: a virtual thread costs about 1 KB of stack, parks for free when it hits I/O, and resumes on any available carrier thread when the I/O completes. The same 200-route application can now run thousands of concurrent messages with a handful of carrier threads.
+Integration routes spend most of their time waiting: waiting for Kafka to acknowledge a produce, waiting for an HTTP enrichment service to respond, waiting for a JDBC query to return rows. Platform threads block during every one of those waits, and each blocked thread consumes roughly 1 MB of stack memory plus an OS scheduling slot. A Camel application with 200 concurrent routes processing I/O-bound messages needs 200 platform threads just to block. Virtual threads change the economics entirely: a virtual thread costs about 1 KB of stack, parks without tying up an OS thread when it hits I/O, and resumes on any available carrier thread when the I/O completes. The same 200-route application can now run thousands of concurrent messages with a handful of carrier threads.
 
-{% include excalidraw.html file="31-virtual-threads" alt="Platform threads vs virtual threads: 1:1 OS mapping vs M:N scheduling with carrier pool" caption="Figure M.1 — Platform threads map 1:1 to OS threads; virtual threads share a small carrier pool and park on I/O" %}
+{% include excalidraw.html file="31-virtual-threads" alt="Platform threads vs virtual threads: 1:1 OS mapping vs M:N scheduling with carrier pool" caption="Figure M.1: Platform threads map 1:1 to OS threads; virtual threads share a small carrier pool and park on I/O" %}
 
 ## How virtual threads work
 
-A platform thread is a thin wrapper around an OS thread. Creating one allocates a ~1 MB stack, registers a kernel-level scheduling entity, and ties the JVM thread to that OS thread for its entire lifetime. The OS scheduler decides which platform threads run on which CPU cores. This 1:1 mapping is simple and well-understood, but it means the maximum number of concurrent threads is bounded by OS resources — typically a few thousand before memory pressure or scheduler overhead degrades performance.
+A platform thread is a thin wrapper around an OS thread. Creating one allocates a ~1 MB stack, registers a kernel-level scheduling entity, and ties the JVM thread to that OS thread for its entire lifetime. The OS scheduler decides which platform threads run on which CPU cores. This 1:1 mapping is simple and well-understood, but it means the maximum number of concurrent threads is bounded by OS resources: typically a few thousand before memory pressure or scheduler overhead degrades performance.
 
-Virtual threads break the 1:1 mapping. The JVM maintains a small pool of platform threads called **carrier threads** (backed by a `ForkJoinPool`). Virtual threads are scheduled onto carrier threads by the JVM, not the OS. When a virtual thread executes application code, it is **mounted** on a carrier thread. When it blocks on I/O — a socket read, a file write, a `Thread.sleep()` — the JVM **unmounts** it from the carrier thread, saves its stack (the **continuation**), and frees the carrier to run another virtual thread.
+Virtual threads break the 1:1 mapping. The JVM maintains a small pool of platform threads called **carrier threads** (backed by a `ForkJoinPool`). Virtual threads are scheduled onto carrier threads by the JVM, not the OS. When a virtual thread executes application code, it is **mounted** on a carrier thread. When it blocks on I/O (a socket read, a file write, a `Thread.sleep()`), the JVM **unmounts** it from the carrier thread, saves its stack (the **continuation**), and frees the carrier to run another virtual thread.
 
-The key insight is that unmounting is a JVM-level operation, not an OS context switch. The virtual thread's continuation (its saved stack frames) is stored on the Java heap as a regular object. When the I/O completes, the JVM re-mounts the continuation onto any available carrier thread and resumes execution. The application code sees a blocking call that returned — it has no idea it was unmounted and re-mounted in between.
+The key insight is that unmounting is a JVM-level operation, not an OS context switch. The virtual thread's continuation (its saved stack frames) is stored on the Java heap as a regular object. When the I/O completes, the JVM re-mounts the continuation onto any available carrier thread and resumes execution. The application code sees a blocking call that returned: it has no idea it was unmounted and re-mounted in between.
 
 This M:N scheduling model (M virtual threads onto N carrier threads, where M >> N) means:
 
 - **Memory**: a virtual thread starts with ~1 KB of stack (grows as needed) vs ~1 MB for a platform thread
-- **Creation**: creating a virtual thread is roughly equivalent to allocating a small object — microseconds, not milliseconds
+- **Creation**: creating a virtual thread is roughly equivalent to allocating a small object (microseconds, not milliseconds)
 - **Blocking**: a blocked virtual thread consumes zero OS resources; only the heap-allocated continuation remains
 - **Carrier pool**: the default carrier pool size equals the number of available processors, tunable via `-Djdk.virtualThreadScheduler.parallelism`
 
@@ -40,11 +40,11 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 }
 ```
 
-## Pinning — when virtual threads lose their advantage
+## Pinning: when virtual threads lose their advantage
 
 Virtual threads cannot unmount from their carrier thread in two situations:
 
-1. **Inside a `synchronized` block or method** (JDK < 24): the virtual thread is *pinned* to its carrier thread for the duration of the synchronized section. If the code inside the block performs blocking I/O, the carrier thread is blocked too — defeating the purpose of virtual threads.
+1. **Inside a `synchronized` block or method** (JDK < 24): the virtual thread is *pinned* to its carrier thread for the duration of the synchronized section. If the code inside the block performs blocking I/O, the carrier thread is blocked too, defeating the purpose of virtual threads.
 
 2. **During a native method call**: JNI calls pin the virtual thread because the native code may hold references to the thread's stack.
 
@@ -96,7 +96,7 @@ When this property is set (and you are running on JDK 25+), Camel's `DefaultThre
 | Scheduled | `ScheduledThreadPoolExecutor` | **Still uses platform threads** |
 | Single thread | Single platform thread | **Still uses platform thread** |
 
-The key differences: bounded pools no longer queue tasks — instead, a semaphore caps concurrency, and all permitted tasks execute immediately on virtual threads. Scheduled and single-threaded executors remain on platform threads because virtual threads target concurrent I/O-bound work, not sequential or timed operations.
+The key differences: bounded pools no longer queue tasks; instead, a semaphore caps concurrency, and all permitted tasks execute immediately on virtual threads. Scheduled and single-threaded executors remain on platform threads because virtual threads target concurrent I/O-bound work, not sequential or timed operations.
 
 For Quarkus REST endpoints, you can additionally use the `@RunOnVirtualThread` annotation:
 
@@ -105,7 +105,7 @@ For Quarkus REST endpoints, you can additionally use the `@RunOnVirtualThread` a
 quarkus.virtual-threads.name-prefix=eip-vt-
 ```
 
-## SEDA with virtual threads — the key integration pattern
+## SEDA with virtual threads: the key integration pattern
 
 The SEDA (Staged Event-Driven Architecture) component is where virtual threads have the biggest impact in Camel. SEDA provides an in-memory queue between route segments, decoupling producers from consumers.
 
@@ -256,7 +256,7 @@ from("seda:enrich-order?virtualThreadPerTask=true&concurrentConsumers=100")
 
 ## When not to use virtual threads
 
-Virtual threads improve throughput for I/O-bound workloads. They provide no benefit — and can add overhead — for:
+Virtual threads improve throughput for I/O-bound workloads. They provide no benefit (and can add overhead) for:
 
 - **CPU-bound computation**: tight loops, encryption, compression, JSON serialization of large payloads. These tasks never block, so there is nothing to park on. Use platform threads with a bounded pool sized to your CPU core count.
 
@@ -298,11 +298,11 @@ Then analyze with `jfr print --events jdk.VirtualThreadPinned recording.jfr` to 
 
 When the LGTM observability stack is running (`./scripts/setup-stack.sh --lgtm`), JVM metrics exported via Micrometer include:
 
-- `jvm.threads.daemon` / `jvm.threads.live` — platform thread counts (virtual threads are not counted here)
-- `jvm.threads.started` — total threads started (includes virtual)
+- `jvm.threads.daemon` / `jvm.threads.live`: platform thread counts (virtual threads are not counted here)
+- `jvm.threads.started`: total threads started (includes virtual)
 - Custom Camel metrics: `camel.exchanges.inflight` shows concurrent processing load
 
-Virtual threads are intentionally lightweight and not individually tracked by JMX. Monitor throughput and latency at the route level rather than counting virtual threads.
+Virtual threads are lightweight by design and not individually tracked by JMX. Monitor throughput and latency at the route level rather than counting virtual threads.
 
 ### Thread dumps
 
@@ -310,4 +310,4 @@ Virtual threads appear in `jcmd <pid> Thread.dump_to_file -format=json <file>` o
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — conceptual reference chapter, no runnable example.*
+*Verification status: <span class="status status--verified">verified</span>: conceptual reference chapter, no runnable example.*

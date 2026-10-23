@@ -2,7 +2,7 @@
 title: "Channel Infrastructure"
 order: 6
 part: messaging-channels
-description: "Connecting disparate systems — channel adapters, messaging bridges, and the message bus."
+description: "Connecting disparate systems: channel adapters, messaging bridges, and the message bus."
 duration: "30 minutes"
 ---
 
@@ -28,17 +28,17 @@ cd examples/06-channel-infra/yaml-dsl
 camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 ```
 
-The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world — how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.
+The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world: how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.
 
-{% include excalidraw.html file="06-messaging-bridge" alt="Messaging Bridge connecting Kafka to Pulsar" caption="Figure 6.1 — A Camel Messaging Bridge forwards events from Kafka to Pulsar for cross-system integration." %}
+{% include excalidraw.html file="06-messaging-bridge" alt="Messaging Bridge connecting Kafka to Pulsar" caption="Figure 6.1: A Camel Messaging Bridge forwards events from Kafka to Pulsar for cross-system integration." %}
 
-These are the patterns that make messaging practical in heterogeneous environments — and they're where Camel's component library shines, because connecting disparate systems is exactly what Camel was built for.
+These are the patterns that make messaging practical in heterogeneous environments, and they're where Camel's component library shines, because connecting disparate systems is exactly what Camel was built for.
 
 ## Pattern: Channel Adapter
 
 ### The problem
 
-The shipping domain's order-service exposes a REST API. Customers create orders via HTTP POST. But the internal event flow is Kafka-based — inventory-service, payment-service, and the rest consume from Kafka topics, not REST endpoints. Something needs to bridge the gap between the synchronous HTTP world and the asynchronous messaging world.
+The shipping domain's order-service exposes a REST API. Customers create orders via HTTP POST. But the internal event flow is Kafka-based: inventory-service, payment-service, and the rest consume from Kafka topics, not REST endpoints. Something needs to bridge the gap between the synchronous HTTP world and the asynchronous messaging world.
 
 Similarly, the accounting system produces a nightly CSV file that needs to become a stream of Kafka messages for downstream processing. And the legacy CRM system has a SOAP API that needs to emit events when customer records change.
 
@@ -46,18 +46,18 @@ Each of these is the same problem: an application that doesn't speak messaging n
 
 ### The solution
 
-A **Channel Adapter** is a component that connects a non-messaging application to a messaging channel. It translates between the application's native protocol (HTTP, file, database, SOAP, FTP) and the messaging system. The application doesn't know it's part of a messaging architecture — the adapter handles the translation.
+A **Channel Adapter** is a component that connects a non-messaging application to a messaging channel. It translates between the application's native protocol (HTTP, file, database, SOAP, FTP) and the messaging system. The application doesn't know it's part of a messaging architecture; the adapter handles the translation.
 
 Channel adapters come in two directions:
 
-- **Inbound adapter** — Receives from the external system and produces to a message channel. Example: an HTTP endpoint that accepts order requests and publishes `OrderPlaced` events to Kafka.
-- **Outbound adapter** — Consumes from a message channel and sends to the external system. Example: a route that consumes `ShipmentScheduled` events and calls a carrier's REST API.
+- **Inbound adapter**: Receives from the external system and produces to a message channel. Example: an HTTP endpoint that accepts order requests and publishes `OrderPlaced` events to Kafka.
+- **Outbound adapter**: Consumes from a message channel and sends to the external system. Example: a route that consumes `ShipmentScheduled` events and calls a carrier's REST API.
 
 ### How Camel models it
 
 Every Camel component is, in essence, a channel adapter factory. The `platform-http` component adapts HTTP to messaging; the `file` component adapts the filesystem to messaging; the `sql` component adapts a database to messaging. When you write a Camel route, you're wiring channel adapters together.
 
-Here's the inbound adapter that bridges HTTP to Kafka — the front door of the shipping domain:
+Here's the inbound adapter that bridges HTTP to Kafka, the front door of the shipping domain:
 
 ```java
 // Inbound adapter: HTTP → Kafka
@@ -93,7 +93,7 @@ from("kafka:eip.shipping.scheduled?brokers=localhost:9092&groupId=carrier-adapte
     .log("Carrier notified for shipment ${body[shipment_id]}");
 ```
 
-The REST endpoint (`platform-http`) is the inbound channel adapter — it translates HTTP requests into Camel exchanges that flow into the Kafka-based messaging system. The HTTP client (`http:`) on the outbound side is the outbound channel adapter — it translates Kafka messages into HTTP requests to an external API.
+The REST endpoint (`platform-http`) is the inbound channel adapter: it translates HTTP requests into Camel exchanges that flow into the Kafka-based messaging system. The HTTP client (`http:`) on the outbound side is the outbound channel adapter: it translates Kafka messages into HTTP requests to an external API.
 
 ### Other common channel adapters in Camel
 
@@ -121,10 +121,10 @@ Or internally: some pattern examples in this tutorial use Pulsar for specific fe
 A **Messaging Bridge** connects two messaging systems so that messages flow between them transparently. It's a channel adapter between two messaging systems rather than between a messaging system and a non-messaging application.
 
 A bridge handles:
-- **Protocol translation** — Kafka's producer/consumer protocol to Pulsar's client protocol.
-- **Header mapping** — Kafka headers to Pulsar properties and vice versa.
-- **Serialization** — Converting between the two systems' native serialization if they differ.
-- **Reliability** — Ensuring no messages are lost in transit (typically by committing the source offset only after the destination acknowledges).
+- **Protocol translation**: Kafka's producer/consumer protocol to Pulsar's client protocol.
+- **Header mapping**: Kafka headers to Pulsar properties and vice versa.
+- **Serialization**: Converting between the two systems' native serialization if they differ.
+- **Reliability**: Ensuring no messages are lost in transit (typically by committing the source offset only after the destination acknowledges).
 
 ### How Camel models it
 
@@ -154,7 +154,7 @@ from("kafka:eip.shipping.scheduled"
         + "?producerName=kafka-bridge");
 ```
 
-The bridge route looks deceptively simple. The complexity is in the reliability: the Pulsar consumer must not acknowledge a message until the Kafka producer confirms receipt (and vice versa). Camel handles this when you use synchronous producers (`requestRequiredAcks=all` for Kafka, the default synchronous send for Pulsar) — the `to()` call blocks until the destination confirms, and only then does the `from()` consumer acknowledge.
+The bridge route looks deceptively simple. The complexity is in the reliability: the Pulsar consumer must not acknowledge a message until the Kafka producer confirms receipt (and vice versa). Camel handles this when you use synchronous producers (`requestRequiredAcks=all` for Kafka, the default synchronous send for Pulsar): the `to()` call blocks until the destination confirms, and only then does the `from()` consumer acknowledge.
 
 ## Pattern: Message Bus
 
@@ -164,21 +164,21 @@ As the shipping domain grows, new services appear: a fraud detection service, a 
 
 ### The solution
 
-A **Message Bus** is a shared messaging infrastructure that provides a common, standardized way for applications to connect. It's more than a broker — it's a broker plus conventions, shared configuration, and a consistent programming model that make integration plug-and-play.
+A **Message Bus** is a shared messaging infrastructure that provides a common, standardized way for applications to connect. It's more than a broker: it's a broker plus conventions, shared configuration, and a consistent programming model that make integration plug-and-play.
 
 In our shipping domain, the message bus is the combination of:
 
-1. **Kafka** — the broker (and Pulsar for specific use cases).
-2. **Apicurio Registry** — schema governance, so all services agree on event formats.
-3. **Topic naming convention** — `eip.<domain>.<event>`.
-4. **Serialization standard** — one agreed format, applied everywhere.
-5. **Camel on a common runtime** — the programming model, providing a consistent way to define routes. This tutorial uses Quarkus and Spring Boot; what matters for the bus is that the routing model is the same on both.
-6. **Shared configuration** — Connection strings, serializer classes, consumer group naming conventions, all defined once rather than repeated per service.
+1. **Kafka**: the broker (and Pulsar for specific use cases).
+2. **Apicurio Registry**: schema governance, so all services agree on event formats.
+3. **Topic naming convention**: `eip.<domain>.<event>`.
+4. **Serialization standard**: one agreed format, applied everywhere.
+5. **Camel on a common runtime**: the programming model, providing a consistent way to define routes. This tutorial uses Quarkus and Spring Boot; what matters for the bus is that the routing model is the same on both.
+6. **Shared configuration**: Connection strings, serializer classes, consumer group naming conventions, all defined once rather than repeated per service.
 
 **What the examples in this tutorial do:**
 
-- The pattern chapters follow `eip.<domain>.<event>` throughout. The two case studies do not — [Loan Broker]({{ '/docs/28-appendix-loan-broker/' | relative_url }}) uses `loan.*` and [Bond Trading]({{ '/docs/29-appendix-bond-trading/' | relative_url }}) uses `bond.*`, because each models a separate business domain rather than the shipping one.
-- Serialization is **JSON**, via `camel-jackson`, in every example. Avro with Apicurio-backed serializers is the stronger production choice — it gives you schema enforcement and compatibility checking rather than hoping producers and consumers agree — but JSON keeps the routes readable on the page, which matters more in a tutorial.
+- The pattern chapters follow `eip.<domain>.<event>` throughout. The two case studies do not: [Loan Broker]({{ '/docs/28-appendix-loan-broker/' | relative_url }}) uses `loan.*` and [Bond Trading]({{ '/docs/29-appendix-bond-trading/' | relative_url }}) uses `bond.*`, because each models a separate business domain rather than the shipping one.
+- Serialization is **JSON**, via `camel-jackson`, in every example. Avro with Apicurio-backed serializers is the stronger production choice: it gives you schema enforcement and compatibility checking rather than hoping producers and consumers agree, but JSON keeps the routes readable on the page, which matters more in a tutorial.
 - Apicurio runs in the local stack and is used by the integration tests' infrastructure, but no example route registers or resolves a schema through it.
 
 That gap between the described bus and the implemented one is itself the lesson: a message bus is conventions plus enforcement, and conventions nobody enforces drift. In production, the registry is what stops that.
@@ -193,7 +193,7 @@ The message bus concept manifests as shared Camel configuration. Instead of repe
 //   camel.component.kafka.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
 //   camel.component.kafka.auto-offset-reset=earliest
 
-// Routes become simple — the bus configuration is shared
+// Routes become simple: the bus configuration is shared
 from("kafka:eip.orders.placed?groupId=fraud-detection")
     .routeId("message-bus-fraud")
     .unmarshal().json(Map.class)
@@ -213,7 +213,7 @@ from("kafka:eip.payments.processed?groupId=fraud-detection")
     .to("direct:payment-fraud-check");
 ```
 
-When Kafka component-level properties are set in `application.properties`, every route that uses `kafka:` inherits them automatically. A new service joining the bus just needs to know the topic name and its consumer group — everything else is standardized.
+When Kafka component-level properties are set in `application.properties`, every route that uses `kafka:` inherits them automatically. A new service joining the bus just needs to know the topic name and its consumer group; everything else is standardized.
 
 ## Common pitfalls
 
@@ -226,21 +226,21 @@ When Kafka component-level properties are set in `application.properties`, every
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 4: "Messaging Channels"
-- [enterpriseintegrationpatterns.com — Channel Adapter](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ChannelAdapter.html)
-- [enterpriseintegrationpatterns.com — Messaging Bridge](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingBridge.html)
-- [enterpriseintegrationpatterns.com — Message Bus](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageBus.html)
-- [Apache Camel — REST DSL](https://camel.apache.org/manual/rest-dsl.html)
-- [Apache Camel — Component Configuration](https://camel.apache.org/manual/component.html)
+- [enterpriseintegrationpatterns.com: Channel Adapter](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ChannelAdapter.html)
+- [enterpriseintegrationpatterns.com: Messaging Bridge](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingBridge.html)
+- [enterpriseintegrationpatterns.com: Message Bus](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageBus.html)
+- [Apache Camel: REST DSL](https://camel.apache.org/manual/rest-dsl.html)
+- [Apache Camel: Component Configuration](https://camel.apache.org/manual/component.html)
 
 ## What you learned
 
-- **Channel Adapter** bridges non-messaging systems into the messaging architecture — Camel's 400+ components are all channel adapter factories.
-- **Messaging Bridge** connects two messaging systems transparently — a Camel route from one broker to another, with reliability managed by synchronous sends.
+- **Channel Adapter** bridges non-messaging systems into the messaging architecture: Camel's 400+ components are all channel adapter factories.
+- **Messaging Bridge** connects two messaging systems transparently: a Camel route from one broker to another, with reliability managed by synchronous sends.
 - **Message Bus** is the shared infrastructure plus conventions (naming, serialization, schema governance, configuration) that make integration plug-and-play.
 - Camel's component-level configuration in `application.properties` standardizes the bus so routes only need to name their channel and consumer group.
 
-This completes Part 3 — Messaging Channels. Next, we move inside the message itself: Part 4 covers Message Construction — command, document, and event messages, request-reply, correlation, sequencing, and expiration.
+This completes Part 3, Messaging Channels. Next, we move inside the message itself: Part 4 covers Message Construction, which includes command, document, and event messages, request-reply, correlation, sequencing, and expiration.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

@@ -6,7 +6,7 @@ description: "Topics, partitions, consumer groups, exactly-once semantics, and K
 duration: "25 minutes"
 ---
 
-Kafka is the backbone of the shipping domain's event-driven architecture. This appendix covers the Kafka concepts that integration architects need beyond the basics — partitioning strategy, consumer group mechanics, exactly-once delivery, and operational patterns.
+Kafka is the backbone of the shipping domain's event-driven architecture. This appendix covers the Kafka concepts that integration architects need beyond the basics: partitioning strategy, consumer group mechanics, exactly-once delivery, and operational patterns.
 
 The code is in `examples/20-kafka-deep-dive/`.
 
@@ -26,7 +26,7 @@ mvn spring-boot:run
 
 ## Architecture recap
 
-{% include excalidraw.html file="20-kafka-architecture" alt="Kafka cluster architecture" caption="Figure K.1 — Kafka cluster with KRaft, partitions, and consumer groups" %}
+{% include excalidraw.html file="20-kafka-architecture" alt="Kafka cluster architecture" caption="Figure K.1: Kafka cluster with KRaft, partitions, and consumer groups" %}
 
 In our compose stack, we run a single KRaft broker (no ZooKeeper). In production, you'd run 3+ brokers for fault tolerance.
 
@@ -58,7 +58,7 @@ In Camel:
 | **Consumer parallelism** | Max consumers = partition count. Plan for peak concurrency. |
 | **Throughput target** | Each partition handles ~10 MB/s write. 30 MB/s target → 3+ partitions. |
 | **Ordering scope** | More partitions = ordering only within each partition (per-key). |
-| **Future growth** | Adding partitions later redistributes keys — existing key→partition mappings change. |
+| **Future growth** | Adding partitions later redistributes keys: existing key→partition mappings change. |
 
 For our tutorial stack: 3 partitions per topic (matches the single-broker dev setup). For production: 6-12 partitions per high-volume topic.
 
@@ -68,9 +68,9 @@ For our tutorial stack: 3 partitions per topic (matches the single-broker dev se
 
 When a consumer joins or leaves a group, Kafka redistributes partitions:
 
-{% include excalidraw.html file="20-consumer-rebalancing" alt="Three rebalancing scenarios: initial 2-consumer assignment, after Consumer C joins (3-way split), and after Consumer B crashes (2-way redistribution)" caption="Figure B.1 — Consumer group rebalancing: partitions are redistributed when consumers join or leave the group." %}
+{% include excalidraw.html file="20-consumer-rebalancing" alt="Three rebalancing scenarios: initial 2-consumer assignment, after Consumer C joins (3-way split), and after Consumer B crashes (2-way redistribution)" caption="Figure B.1: Consumer group rebalancing: partitions are redistributed when consumers join or leave the group." %}
 
-During rebalance, consumers pause processing (~seconds). Camel's Kafka component handles rebalancing automatically — but your processing logic must be idempotent because messages may be re-delivered during rebalance.
+During rebalance, consumers pause processing (~seconds). Camel's Kafka component handles rebalancing automatically. But your processing logic must be idempotent because messages may be re-delivered during rebalance.
 
 ### Offset management
 
@@ -177,7 +177,7 @@ spring.kafka.ssl.trust-store-location=classpath:kafka.truststore.jks
 ```
 
 This matters more than it first appears. A Spring Boot application that already
-talks to Kafka — through Spring Kafka, or through Spring Cloud Stream — has all
+talks to Kafka (through Spring Kafka, or through Spring Cloud Stream) has all
 of this configured already, frequently including the fiddly parts: SASL
 mechanisms, TLS trust stores, client IDs. Bridging means Camel picks those up
 rather than making you restate them under a second prefix and keep the two in
@@ -191,7 +191,7 @@ bridge off entirely:
 camel.component.kafka.bridge-spring-kafka-properties=false
 ```
 
-There is no Quarkus equivalent, and there does not need to be — Quarkus
+There is no Quarkus equivalent, and there does not need to be: Quarkus
 applications configure the Camel component directly, which is what the examples
 here do.
 
@@ -214,10 +214,10 @@ from("timer:kafka-lag-check?period=60000")
 ```
 
 Key metrics to watch:
-- **Consumer lag** — Messages produced but not yet consumed. High lag = consumer falling behind.
-- **Under-replicated partitions** — Replicas out of sync. Indicates broker issues.
-- **Request latency** — Producer/consumer round-trip time. High latency = broker overload.
+- **Consumer lag**: Messages produced but not yet consumed. High lag = consumer falling behind.
+- **Under-replicated partitions**: Replicas out of sync. Indicates broker issues.
+- **Request latency**: Producer/consumer round-trip time. High latency = broker overload.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 4 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 4 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

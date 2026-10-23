@@ -2,7 +2,7 @@
 title: "Channel Reliability"
 order: 5
 part: messaging-channels
-description: "Handling failure gracefully — invalid message channels, dead letter channels, and guaranteed delivery."
+description: "Handling failure gracefully: invalid message channels, dead letter channels, and guaranteed delivery."
 duration: "35 minutes"
 ---
 
@@ -22,9 +22,9 @@ cd examples/05-reliability/spring-boot
 mvn spring-boot:run
 ```
 
-The previous chapter covered how messages are delivered — to one consumer or to all. This chapter covers what happens when delivery *fails*. Messages can be malformed, consumers can crash mid-processing, brokers can go down, and networks can partition. The three patterns here — Invalid Message Channel, Dead Letter Channel, and Guaranteed Delivery — are the safety nets that keep a messaging system reliable in the face of real-world failures.
+The previous chapter covered how messages are delivered, to one consumer or to all. This chapter covers what happens when delivery *fails*. Messages can be malformed, consumers can crash mid-processing, brokers can go down, and networks can partition. The three patterns here, Invalid Message Channel, Dead Letter Channel, and Guaranteed Delivery, are the safety nets that keep a messaging system reliable in the face of real-world failures.
 
-{% include excalidraw.html file="05-reliability-patterns" alt="Dead Letter Channel and Guaranteed Delivery flow" caption="Figure 5.1 — Guaranteed Delivery with Dead Letter Channel as the fallback for exhausted retries." %}
+{% include excalidraw.html file="05-reliability-patterns" alt="Dead Letter Channel and Guaranteed Delivery flow" caption="Figure 5.1: Guaranteed Delivery with Dead Letter Channel as the fallback for exhausted retries." %}
 
 These aren't optional patterns. Any production messaging system needs all three, and most of the operational pain in message-driven architectures comes from getting them wrong.
 
@@ -34,7 +34,7 @@ These aren't optional patterns. Any production messaging system needs all three,
 
 Inventory-service expects `OrderPlaced` events with an `item_sku`, a `quantity`, and an `amount`. But a bug in order-service sends a message with `quantity: -3`, or with `item_sku` set to `null`, or with a body that isn't valid JSON at all. What should inventory-service do?
 
-It can't process the message — the data is invalid. It shouldn't drop it silently — that loses information and makes debugging impossible. It shouldn't retry it — an invalid message will fail forever. It needs a place to put messages that it *cannot* process so that a human or automated system can inspect and remediate them.
+It can't process the message: the data is invalid. Dropping it silently isn't an option either, since that loses information and makes debugging impossible, and retrying it won't help: an invalid message will fail forever. It needs a place to put messages that it *cannot* process so that a human or automated system can inspect and remediate them.
 
 ### The solution
 
@@ -80,7 +80,7 @@ Notice the two-tier error handling: `IllegalArgumentException` (validation failu
 
 ### The problem
 
-Payment-service processes `InventoryReserved` events by calling an external payment gateway. Sometimes the gateway is slow, sometimes it's down, sometimes it returns a transient error. The first failure shouldn't lose the message — it should be retried. But after several retries, the message needs to go somewhere safe where it won't block other messages and where operations can investigate.
+Payment-service processes `InventoryReserved` events by calling an external payment gateway. Sometimes the gateway is slow, sometimes it's down, sometimes it returns a transient error. The first failure shouldn't lose the message; it should be retried. But after several retries, the message needs to go somewhere safe where it won't block other messages and where operations can investigate.
 
 ### The solution
 
@@ -88,17 +88,17 @@ A **Dead Letter Channel** (DLC, also called a dead letter queue or DLQ) is a cha
 
 Dead letter handling typically involves:
 
-1. **Retry** — Attempt to process the message N times with backoff between attempts.
-2. **Escalate** — After N failures, move the message to the dead letter channel.
-3. **Preserve context** — Include the original message, the exception, the retry count, and the timestamp in the dead letter so that remediation is possible.
-4. **Alert** — Notify operations when messages land in the DLC.
+1. **Retry**: Attempt to process the message N times with backoff between attempts.
+2. **Escalate**: After N failures, move the message to the dead letter channel.
+3. **Preserve context**: Include the original message, the exception, the retry count, and the timestamp in the dead letter so that remediation is possible.
+4. **Alert**: Notify operations when messages land in the DLC.
 
 ### How Kafka implements it
 
 Kafka itself doesn't have a built-in dead letter queue. It's a broker-level concept that consumer frameworks implement. In our stack:
 
 - **Camel's error handler** manages retries and dead-lettering at the route level.
-- The convention is to name the DLC topic `<original-topic>.dlq` — so `eip.orders.placed` has a dead letter at `eip.orders.placed.dlq`.
+- The convention is to name the DLC topic `<original-topic>.dlq`, so `eip.orders.placed` has a dead letter at `eip.orders.placed.dlq`.
 - Dead-lettered messages carry headers with the failure reason, retry count, and original topic.
 
 ### How Pulsar implements it
@@ -163,7 +163,7 @@ A dead letter topic should always be monitored. In practice, this means:
 
 ### The problem
 
-Order-service emits an `OrderPlaced` event to Kafka. Between the moment the event leaves order-service and the moment inventory-service processes it, several things could fail: the Kafka broker could crash, the network between order-service and Kafka could drop, or inventory-service could be down for deployment. If any of these happen, the event must not be lost — the customer placed an order and expects it to be fulfilled.
+Order-service emits an `OrderPlaced` event to Kafka. Between the moment the event leaves order-service and the moment inventory-service processes it, several things could fail: the Kafka broker could crash, the network between order-service and Kafka could drop, or inventory-service could be down for deployment. If any of these happen, the event must not be lost: the customer placed an order and expects it to be fulfilled.
 
 ### The solution
 
@@ -173,7 +173,7 @@ Guaranteed delivery is a spectrum, not a binary:
 
 | Level | Guarantee | Kafka Config | Trade-off |
 |-------|-----------|-------------|-----------|
-| **Fire and forget** | None — message may be lost | `acks=0` | Highest throughput, no durability |
+| **Fire and forget** | None, message may be lost | `acks=0` | Highest throughput, no durability |
 | **Leader acknowledged** | Survives leader crash if replicas caught up | `acks=1` | Good throughput, some risk |
 | **All replicas acknowledged** | Survives any single broker failure | `acks=all` + `min.insync.replicas=2` | Lower throughput, strongest guarantee |
 | **Exactly once** | No duplicates, no loss | Kafka transactions + idempotent producer | Lowest throughput, strongest guarantee |
@@ -182,11 +182,11 @@ Guaranteed delivery is a spectrum, not a binary:
 
 Kafka's durability guarantees come from three layers:
 
-1. **Producer acknowledgment** (`acks`) — How many brokers must confirm receipt before the producer considers the send successful.
-2. **Replication** (`replication.factor`, `min.insync.replicas`) — How many copies of each partition exist across brokers.
-3. **Consumer offset management** — Whether the consumer commits its position before or after processing.
+1. **Producer acknowledgment** (`acks`): How many brokers must confirm receipt before the producer considers the send successful.
+2. **Replication** (`replication.factor`, `min.insync.replicas`): How many copies of each partition exist across brokers.
+3. **Consumer offset management**: Whether the consumer commits its position before or after processing.
 
-In our local stack, we're running a single broker, so replication doesn't apply (replication factor is 1). In production, you'd configure `acks=all` with a replication factor of 3 and `min.insync.replicas=2` — meaning a write succeeds only after 2 of 3 replicas confirm it.
+In our local stack, we're running a single broker, so replication doesn't apply (replication factor is 1). In production, you'd configure `acks=all` with a replication factor of 3 and `min.insync.replicas=2`, meaning a write succeeds only after 2 of 3 replicas confirm it.
 
 ### How Camel models it
 
@@ -226,11 +226,11 @@ from("kafka:eip.orders.placed"
 
 **The producer side:** `requestRequiredAcks=all` means Kafka won't acknowledge the send until all in-sync replicas have written the message. `enableIdempotence=true` prevents duplicates if the producer retries a send that actually succeeded (the broker deduplicates by producer ID and sequence number). `retries=3` automatically retries transient failures.
 
-**The consumer side:** `autoCommitEnable=false` and `allowManualCommit=true` give the consumer explicit control over when to commit the offset. The offset is committed *after* successful processing — so if the consumer crashes before committing, the message will be redelivered on the next poll. This is **at-least-once** delivery: guaranteed not to lose messages, but may deliver duplicates. Handling duplicates is the Idempotent Receiver pattern (Part 7).
+**The consumer side:** `autoCommitEnable=false` and `allowManualCommit=true` give the consumer explicit control over when to commit the offset. The offset is committed *after* successful processing, so if the consumer crashes before committing, the message will be redelivered on the next poll. This is **at-least-once** delivery: guaranteed not to lose messages, but may deliver duplicates. Handling duplicates is the Idempotent Receiver pattern (Part 7).
 
 > **This requires Camel 4.22 or later.** Earlier versions accepted
 > `allowManualCommit=true` and then auto-committed offsets anyway, for every
-> record processed, whether or not your route called `commit()` — so a crash
+> record processed, whether or not your route called `commit()`, so a crash
 > between processing and commit could still lose the message, which is exactly
 > what this pattern exists to prevent. [Appendix
 > N]({% link _docs/32-appendix-kafka-consumer-tuning.md %}) covers what changed and how to spot it.
@@ -245,22 +245,22 @@ from("kafka:eip.orders.placed"
 
 **Ignoring the DLC.** A dead letter channel is only useful if someone watches it. Unmonitored DLCs accumulate messages silently until a customer notices their order was never fulfilled.
 
-**Retrying non-retryable errors.** A `NullPointerException` from a validation failure will never succeed on retry — it'll fail 3 times and dead-letter, wasting time and resources. Use the Invalid Message Channel for validation failures; reserve the DLC for transient errors.
+**Retrying non-retryable errors.** A `NullPointerException` from a validation failure will never succeed on retry; it'll fail 3 times and dead-letter, wasting time and resources. Use the Invalid Message Channel for validation failures; reserve the DLC for transient errors.
 
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 4: "Messaging Channels"
-- [enterpriseintegrationpatterns.com — Invalid Message Channel](https://www.enterpriseintegrationpatterns.com/patterns/messaging/InvalidMessageChannel.html)
-- [enterpriseintegrationpatterns.com — Dead Letter Channel](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DeadLetterChannel.html)
-- [enterpriseintegrationpatterns.com — Guaranteed Delivery](https://www.enterpriseintegrationpatterns.com/patterns/messaging/GuaranteedMessaging.html)
-- [Apache Camel — Error Handler](https://camel.apache.org/manual/error-handler.html)
-- [Apache Camel — Dead Letter Channel](https://camel.apache.org/components/4.22.x/eips/dead-letter-channel.html)
-- [Apache Kafka — Producer Configs](https://kafka.apache.org/documentation/#producerconfigs)
+- [enterpriseintegrationpatterns.com: Invalid Message Channel](https://www.enterpriseintegrationpatterns.com/patterns/messaging/InvalidMessageChannel.html)
+- [enterpriseintegrationpatterns.com: Dead Letter Channel](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DeadLetterChannel.html)
+- [enterpriseintegrationpatterns.com: Guaranteed Delivery](https://www.enterpriseintegrationpatterns.com/patterns/messaging/GuaranteedMessaging.html)
+- [Apache Camel: Error Handler](https://camel.apache.org/manual/error-handler.html)
+- [Apache Camel: Dead Letter Channel](https://camel.apache.org/components/4.22.x/eips/dead-letter-channel.html)
+- [Apache Kafka: Producer Configs](https://kafka.apache.org/documentation/#producerconfigs)
 
 ## What you learned
 
-- **Invalid Message Channel** is for messages the consumer *recognizes* as bad — route them to a dedicated channel for producer bug investigation.
-- **Dead Letter Channel** is the last-resort safety net for messages that fail after exhausting retries — never silently drop a message.
+- **Invalid Message Channel** is for messages the consumer *recognizes* as bad: route them to a dedicated channel for producer bug investigation.
+- **Dead Letter Channel** is the last-resort safety net for messages that fail after exhausting retries; never silently drop a message.
 - **Guaranteed Delivery** is a spectrum from fire-and-forget to exactly-once, configured through producer acks, broker replication, and consumer offset management.
 - Manual offset commit (`autoCommitEnable=false`) is essential for at-least-once processing in Kafka.
 
@@ -268,4 +268,4 @@ Next, we look at the infrastructure-level channel patterns: Channel Adapter, Mes
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 4 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 4 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

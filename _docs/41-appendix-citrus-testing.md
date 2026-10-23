@@ -2,15 +2,15 @@
 title: "Appendix W: Citrus Integration Testing"
 order: 41
 part: appendices
-description: "End-to-end integration testing with Citrus — testing Camel routes against real Kafka, HTTP, and database infrastructure using the Camel test plugin."
+description: "End-to-end integration testing with Citrus: testing Camel routes against real Kafka, HTTP, and database infrastructure using the Camel test plugin."
 duration: "35 minutes"
 ---
 
-Appendix S covered the Camel-native testing toolkit: MockEndpoint for unit testing route logic, AdviceWith for intercepting and rewiring endpoints, REST Assured for HTTP assertions, and Newman for external API contract testing. Those tools verify route behavior in isolation — they replace Kafka brokers with `direct:` and `mock:` endpoints, swap databases for in-memory substitutes, and short-circuit HTTP calls with stubs. The tests run fast, but they cannot catch the bugs that only surface when your route talks to the real thing: serialization mismatches, topic configuration errors, consumer group rebalancing quirks, or HTTP content negotiation failures.
+Appendix S covered the Camel-native testing toolkit: MockEndpoint for unit testing route logic, AdviceWith for intercepting and rewiring endpoints, REST Assured for HTTP assertions, and Newman for external API contract testing. Those tools verify route behavior in isolation; they replace Kafka brokers with `direct:` and `mock:` endpoints, swap databases for in-memory substitutes, and short-circuit HTTP calls with stubs. The tests run fast, but they cannot catch the bugs that only surface when your route talks to the real thing: serialization mismatches, topic configuration errors, consumer group rebalancing quirks, or HTTP content negotiation failures.
 
-Citrus takes a different approach. It tests integrations **end-to-end against real infrastructure**. A Citrus test spins up a Kafka broker via Testcontainers, launches your Camel route, sends messages to input topics, and verifies that the expected messages appear on output topics. No mocks, no stubs — the same components your route uses in production. When the test passes, you know the route works with real Kafka, real HTTP endpoints, and real serialization.
+Citrus takes a different approach. It tests integrations **end-to-end against real infrastructure**. A Citrus test spins up a Kafka broker via Testcontainers, launches your Camel route, sends messages to input topics, and verifies that the expected messages appear on output topics. No mocks, no stubs: the same components your route uses in production. When the test passes, you know the route works with real Kafka, real HTTP endpoints, and real serialization.
 
-Citrus integrates with the Camel CLI via the `camel test` plugin command, making it natural to test YAML DSL routes without a Maven project. Write a route in YAML, write a test in YAML, run `camel test run`, and Citrus executes it — starting the infrastructure and the route the test declares, sending and receiving messages, and reporting results. When you are ready for CI/CD, `camel export` generates a Maven project with JUnit 5 test classes and Citrus dependencies included.
+Citrus integrates with the Camel CLI via the `camel test` plugin command, making it natural to test YAML DSL routes without a Maven project. Write a route in YAML, write a test in YAML, run `camel test run`, and Citrus executes it: starting the infrastructure and the route the test declares, sending and receiving messages, and reporting results. When you are ready for CI/CD, `camel export` generates a Maven project with JUnit 5 test classes and Citrus dependencies included.
 
 The code is in `examples/41-citrus-testing/`.
 
@@ -18,11 +18,11 @@ The code is in `examples/41-citrus-testing/`.
 camel test run test/order-validation.citrus.it.yaml
 ```
 
-{% include excalidraw.html file="41-citrus-testing" alt="Citrus test execution flow" caption="Figure W.1 — Citrus test lifecycle: start infrastructure via Testcontainers, launch the Camel route, send test messages, and verify results on output topics." %}
+{% include excalidraw.html file="41-citrus-testing" alt="Citrus test execution flow" caption="Figure W.1: Citrus test lifecycle: start infrastructure via Testcontainers, launch the Camel route, send test messages, and verify results on output topics." %}
 
 ## Setup
 
-Citrus tests require the Camel CLI test plugin. If you followed the CLI installation in Appendix U, you already have the `camel` command — add the test plugin:
+Citrus tests require the Camel CLI test plugin. If you followed the CLI installation in Appendix U, you already have the `camel` command. Add the test plugin:
 
 ```bash
 camel plugin add test
@@ -39,7 +39,7 @@ You should see `test` in the list of installed plugins.
 ### Docker Engine for Testcontainers
 
 Citrus starts its infrastructure through **Testcontainers**, which talks to
-Docker Engine on `/var/run/docker.sock` (the `default` docker context) — the
+Docker Engine on `/var/run/docker.sock` (the `default` docker context), the
 same engine the development stack runs on. Nothing needs exporting; the daemon
 just has to be up and your user in the `docker` group:
 
@@ -70,9 +70,9 @@ Resolving Maven dependency: org.citrusframework:citrus-kafka:5.0.0
 
 | Module | Purpose |
 |--------|---------|
-| `citrus-camel` | `camel:` actions — start a Camel infra service, run and verify a route through the Camel CLI |
-| `citrus-kafka` | Kafka send and receive actions — publish to topics, consume from topics, assert content and headers |
-| `citrus-http` | HTTP client and server actions — send requests, assert responses |
+| `citrus-camel` | `camel:` actions: start a Camel infra service, run and verify a route through the Camel CLI |
+| `citrus-kafka` | Kafka send and receive actions: publish to topics, consume from topics, assert content and headers |
+| `citrus-http` | HTTP client and server actions: send requests, assert responses |
 
 Extra modules (`citrus-sql`, `citrus-jms`, `citrus-mail`, and so on) go on the command line when you need one the test does not reveal: `camel test run --dep=org.citrusframework:citrus-sql:5.0.2 ...`.
 
@@ -84,7 +84,7 @@ ERROR: No tests to run in current directory
 
 ### Infrastructure prerequisites
 
-Citrus uses Testcontainers to manage infrastructure on Docker Engine. The first test run pulls container images (Kafka, etc.) — subsequent runs reuse cached images.
+Citrus uses Testcontainers to manage infrastructure on Docker Engine. The first test run pulls container images (Kafka, etc.). Subsequent runs reuse cached images.
 
 To watch a run's infrastructure while it is in progress:
 
@@ -94,10 +94,10 @@ docker ps
 
 ### Stop the development stack first
 
-This appendix's Kafka test starts its broker with `fixedPort: true`, so it uses the default Kafka port 9092 — the same port the development stack binds. Stop the development stack before running the tests. The HTTP test also needs port 8088 free.
+This appendix's Kafka test starts its broker with `fixedPort: true`, so it uses the default Kafka port 9092, the same port the development stack binds. Stop the development stack before running the tests. The HTTP test also needs port 8088 free.
 The Maven examples in the other chapters are different. Each one's tests bring up their own infrastructure from
 `src/test/resources/_infra/compose.yaml`, on the same fixed host ports the
-development stack uses — 9092 for Kafka, 6379 for Redis, 5432 for PostgreSQL,
+development stack uses: 9092 for Kafka, 6379 for Redis, 5432 for PostgreSQL,
 6650 for Pulsar. The two cannot both be up.
 
 Leaving the development stack running gives you a failure that names the
@@ -108,7 +108,7 @@ ContainerLaunchException: Local Docker Compose exited abnormally with code 1
   whilst running command: compose up -d
 ```
 
-Further up the container engine's own output is the real reason —
+Further up the container engine's own output is the real reason:
 `failed to bind host port 0.0.0.0:9092/tcp: address already in use`. Take the
 development stack down before running the tests:
 
@@ -145,13 +145,13 @@ regardless and needs no equivalent setting.
 
 A Citrus test follows a four-step pattern that mirrors the Arrange-Act-Assert structure familiar from unit testing:
 
-1. **Start infrastructure** — a `camel: infra: run:` action starts a service (Kafka, PostgreSQL, Redis, ...) from Camel's own test infrastructure, the same containers `camel infra run` starts by hand. By default the port is random; set `fixedPort: true` to use the service's default port instead. The service stops again when the test ends.
+1. **Start infrastructure**: a `camel: infra: run:` action starts a service (Kafka, PostgreSQL, Redis, ...) from Camel's own test infrastructure, the same containers `camel infra run` starts by hand. By default the port is random; set `fixedPort: true` to use the service's default port instead. The service stops again when the test ends.
 
-2. **Launch the integration** — a `camel: jbang: run:` action runs the route under test through the Camel CLI, pointed at that infrastructure; `camel: jbang: verify:` waits until it has started.
+2. **Launch the integration**: a `camel: jbang: run:` action runs the route under test through the Camel CLI, pointed at that infrastructure; `camel: jbang: verify:` waits until it has started.
 
-3. **Send test messages** — the test produces messages to inputs: Kafka topics, REST endpoints, file directories, or any Camel-supported source.
+3. **Send test messages**: the test produces messages to inputs: Kafka topics, REST endpoints, file directories, or any Camel-supported source.
 
-4. **Verify outcomes** — the test consumes from output topics or endpoints and asserts that the expected messages arrived with the correct body, headers, and structure.
+4. **Verify outcomes**: the test consumes from output topics or endpoints and asserts that the expected messages arrived with the correct body, headers, and structure.
 
 All four steps are actions in the test YAML. Nothing is started for you: a test that only sends and receives finds no broker and no route.
 
@@ -215,15 +215,15 @@ A test file has three top-level fields:
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `name` | Yes | Test name — used in reports and logs |
+| `name` | Yes | Test name: used in reports and logs |
 | `description` | No | Human-readable description of what the test verifies |
-| `actions` | Yes | Ordered list of test steps — executed sequentially |
+| `actions` | Yes | Ordered list of test steps: executed sequentially |
 
 ### Action types
 
 Citrus supports several action types for different testing scenarios:
 
-**`send`** — publish a message to an endpoint. Headers are a list of name/value pairs; the body is `data` (inline) or `resource` (a file):
+**`send`**: publish a message to an endpoint. Headers are a list of name/value pairs; the body is `data` (inline) or `resource` (a file):
 
 ```yaml
 - send:
@@ -236,7 +236,7 @@ Citrus supports several action types for different testing scenarios:
         data: '{"orderId":"ORD-001","customerId":"C-101","item":"Shipping Container","quantity":2}'
 ```
 
-**`receive`** — consume a message from an endpoint and assert its headers and body:
+**`receive`**: consume a message from an endpoint and assert its headers and body:
 
 ```yaml
 - receive:
@@ -250,7 +250,7 @@ Citrus supports several action types for different testing scenarios:
         data: '{"orderId":"ORD-002","item":"Pallet Jack","quantity":1}'
 ```
 
-**`http`** — send an HTTP request, then assert the response:
+**`http`**: send an HTTP request, then assert the response:
 
 ```yaml
 - http:
@@ -271,14 +271,14 @@ Citrus supports several action types for different testing scenarios:
           data: '{"status":"accepted","orderId":"ORD-010"}'
 ```
 
-**`sleep`** — pause between actions (useful for eventual consistency scenarios):
+**`sleep`**: pause between actions (useful for eventual consistency scenarios):
 
 ```yaml
 - sleep:
     milliseconds: 2000
 ```
 
-**`echo`** — print a message to the test log (useful for debugging):
+**`echo`**: print a message to the test log (useful for debugging):
 
 ```yaml
 - echo:
@@ -287,7 +287,7 @@ Citrus supports several action types for different testing scenarios:
 
 ### Message matching
 
-By default, Citrus performs an exact match on the message body. For JSON bodies, Citrus compares the JSON structure — field order does not matter. You can also use partial matching with JSON path expressions:
+By default, Citrus performs an exact match on the message body. For JSON bodies, Citrus compares the JSON structure; field order does not matter. You can also use partial matching with JSON path expressions:
 
 ```yaml
 - receive:
@@ -322,7 +322,7 @@ Citrus uses the Camel CLI's infrastructure management to provision services for 
 camel infra list
 ```
 
-This shows all services that the CLI can provision — Kafka, PostgreSQL, Redis, ActiveMQ, and others. Each service maps to a Testcontainers image.
+This shows all services that the CLI can provision: Kafka, PostgreSQL, Redis, ActiveMQ, and others. Each service maps to a Testcontainers image.
 
 ### Starting services manually
 
@@ -358,9 +358,9 @@ Exposing service property CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS='localhost:
 Successfully started Camel infra service 'kafka'
 ```
 
-For Kafka the property is `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` (`CITRUS_CAMEL_INFRA_KAFKA_BROKERS` carries the same address). With `fixedPort: true` the broker listens on the default port 9092, so the route's own `application.properties` already points at the right address — no system property override is needed. The test's send and receive actions can use bare topic endpoints (`kafka:eip.orders.incoming`) without a `?server=` parameter.
+For Kafka the property is `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` (`CITRUS_CAMEL_INFRA_KAFKA_BROKERS` carries the same address). With `fixedPort: true` the broker listens on the default port 9092, so the route's own `application.properties` already points at the right address; no system property override is needed. The test's send and receive actions can use bare topic endpoints (`kafka:eip.orders.incoming`) without a `?server=` parameter.
 
-When using a random port (no `fixedPort`), these variables become essential: pass `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` as a system property on the route and as `?server=` on the test's own Kafka endpoints. The variables exist only once the infra action has run — reference them in actions, not in the test's top-level `variables:` block.
+When using a random port (no `fixedPort`), these variables become essential: pass `CITRUS_CAMEL_INFRA_KAFKA_BOOTSTRAP_SERVERS` as a system property on the route and as `?server=` on the test's own Kafka endpoints. The variables exist only once the infra action has run; reference them in actions, not in the test's top-level `variables:` block.
 
 ## Testing with Kafka
 
@@ -370,8 +370,8 @@ The core use case for Citrus in a Camel integration project is testing message-d
 
 The order validation route in `order-validation-route.camel.yaml` consumes from `kafka:eip.orders.incoming`, validates the order payload, and routes to one of two output topics:
 
-- **Valid orders** — enriched with a `validatedAt` header and published to `kafka:eip.orders.validated`
-- **Invalid orders** — tagged with a `rejectionReason` header and published to `kafka:eip.orders.rejected`
+- **Valid orders**: enriched with a `validatedAt` header and published to `kafka:eip.orders.validated`
+- **Invalid orders**: tagged with a `rejectionReason` header and published to `kafka:eip.orders.rejected`
 
 Validation checks four fields: `orderId` must not be null, `customerId` must not be null, `item` must not be null, and `quantity` must be greater than zero.
 
@@ -474,7 +474,7 @@ camel test run test/order-validation.citrus.it.yaml
 Citrus runs the actions in order:
 
 1. Starts Kafka from Camel's test infrastructure on the default fixed port (9092)
-2. Runs `order-validation-route.camel.yaml` through the Camel CLI — the route's default broker address (`localhost:9092`) matches the fixed port, so no system property override is needed — and waits for `Routes startup`
+2. Runs `order-validation-route.camel.yaml` through the Camel CLI and waits for `Routes startup`. The route's default broker address (`localhost:9092`) matches the fixed port, so no system property override is needed
 3. Sends each order and verifies the topic, body and header it arrives with
 4. Stops the route and the broker, and reports the result
 
@@ -504,15 +504,15 @@ The first run is slower: the CLI resolves the Citrus modules and pulls the Kafka
 
 ### Debugging test failures
 
-A failing action is marked `✘` and the run ends `✘ TEST FAILED`, followed by the cause — a validation difference, or a `receive` that timed out with nothing on the topic.
+A failing action is marked `✘` and the run ends `✘ TEST FAILED`, followed by the cause: a validation difference, or a `receive` that timed out with nothing on the topic.
 
 Common failure causes:
 
-- **No route running** — the test has no `camel: jbang: run:` action, or `verify` timed out because the route failed to start; the route's own output is in `.citrus-jbang/i-<name>-output.txt` when `citrus.camel.jbang.dump.integration.output=true`
-- **Route on the wrong broker** — if using a random port (no `fixedPort`), the `camel.component.kafka.brokers` system property must point the route at the test's Kafka; without it the route defaults to `localhost:9092`
-- **Topic name mismatch** — the test endpoint URI must match the route's topic exactly
-- **Serialization mismatch** — the route may produce a different JSON structure than expected (e.g., additional fields from enrichment)
-- **Timeout too short** — increase the `timeout` value if the route involves slow processors
+- **No route running**: the test has no `camel: jbang: run:` action, or `verify` timed out because the route failed to start; the route's own output is in `.citrus-jbang/i-<name>-output.txt` when `citrus.camel.jbang.dump.integration.output=true`
+- **Route on the wrong broker**: if using a random port (no `fixedPort`), the `camel.component.kafka.brokers` system property must point the route at the test's Kafka; without it the route defaults to `localhost:9092`
+- **Topic name mismatch**: the test endpoint URI must match the route's topic exactly
+- **Serialization mismatch**: the route may produce a different JSON structure than expected (e.g., additional fields from enrichment)
+- **Timeout too short**: increase the `timeout` value if the route involves slow processors
 
 Use `camel trace` alongside the test to see exchanges flowing through the route in real time:
 
@@ -527,7 +527,7 @@ Citrus also supports testing REST endpoints exposed by Camel routes. The HTTP te
 
 ### HTTP test walkthrough
 
-The route under test is `order-http-route.camel.yaml`: a REST endpoint, `POST /api/orders`, that applies the same four checks as the Kafka route and answers straight away — `200` with `{"status":"accepted",...}`, or `400` with the reason. It needs no broker, so the test starts only the route, on the CLI's embedded HTTP server (`--port 8088`; the port is a flag, not a property).
+The route under test is `order-http-route.camel.yaml`: a REST endpoint, `POST /api/orders`, that applies the same four checks as the Kafka route and answers straight away: `200` with `{"status":"accepted",...}`, or `400` with the reason. It needs no broker, so the test starts only the route, on the CLI's embedded HTTP server (`--port 8088`; the port is a flag, not a property).
 
 The test file `test/order-http.citrus.it.yaml`:
 
@@ -716,7 +716,7 @@ Failsafe runs the `*IT` classes; Citrus starts Kafka, runs the routes and report
 
 ## CI/CD integration
 
-Citrus tests fit naturally into CI/CD pipelines because they are self-contained — each test starts its own infrastructure. No pre-provisioned Kafka clusters or databases are needed. The pipeline only requires a Docker daemon for the containers, which GitHub's `ubuntu-latest` runners already have.
+Citrus tests fit naturally into CI/CD pipelines because they are self-contained: each test starts its own infrastructure. No pre-provisioned Kafka clusters or databases are needed. The pipeline only requires a Docker daemon for the containers, which GitHub's `ubuntu-latest` runners already have.
 
 ### Running the YAML tests in CI
 
@@ -738,7 +738,7 @@ For an exported project, the step is `mvn verify -DskipITs=false`.
 
 ### Parallel test execution
 
-Both tests bind fixed ports (Kafka on 9092, HTTP on 8088), so they cannot run in parallel with other tests that use the same ports. Keep tests that bind fixed ports in sequence. To allow parallel execution, remove `fixedPort: true` from the infra action — Citrus then picks a random port that never collides.
+Both tests bind fixed ports (Kafka on 9092, HTTP on 8088), so they cannot run in parallel with other tests that use the same ports. Keep tests that bind fixed ports in sequence. To allow parallel execution, remove `fixedPort: true` from the infra action; Citrus then picks a random port that never collides.
 
 ### Test reports
 
@@ -746,7 +746,7 @@ The exported project writes JUnit XML to `target/failsafe-reports/`, and Citrus 
 
 ## Citrus vs Camel-native testing
 
-Appendix S and this appendix cover complementary testing approaches. Neither replaces the other — they serve different purposes in the testing pyramid.
+Appendix S and this appendix cover complementary testing approaches. Neither replaces the other; they serve different purposes in the testing pyramid.
 
 | Criterion | Camel-Native (Appendix S) | Citrus (This Appendix) |
 |-----------|--------------------------|----------------------|
@@ -764,7 +764,7 @@ Appendix S and this appendix cover complementary testing approaches. Neither rep
 
 **Use Camel-native tests (Appendix S) when:**
 
-- You need fast feedback on route logic — content-based routing, filtering, transformation
+- You need fast feedback on route logic: content-based routing, filtering, transformation
 - You want to test individual route segments in isolation
 - You are developing in a tight code-compile-test loop
 - The integration points are well-understood and unlikely to cause surprises
@@ -779,7 +779,7 @@ Appendix S and this appendix cover complementary testing approaches. Neither rep
 
 **Use both when:**
 
-The testing pyramid recommends many fast unit tests at the base and fewer slow integration tests at the top. Write Camel-native tests for every route to cover logic and transformation. Write Citrus tests for critical paths — the order validation pipeline, the payment processing flow, the shipping notification chain — where a production failure would be costly.
+The testing pyramid recommends many fast unit tests at the base and fewer slow integration tests at the top. Write Camel-native tests for every route to cover logic and transformation. Write Citrus tests for critical paths where a production failure would be costly, such as the order validation pipeline, the payment processing flow, or the shipping notification chain.
 
 A practical split for a Camel project:
 
@@ -791,21 +791,21 @@ End-to-end smoke tests        —  5% of test suite  — run nightly or pre-rele
 
 ## Key takeaways
 
-- **Citrus tests integrations against real infrastructure** — no mocks, no stubs. When a Citrus test passes, the route works with real Kafka, real HTTP endpoints, and real serialization.
-- **The Camel CLI test plugin makes YAML-native testing practical** — write routes in YAML, write tests in YAML, run `camel test run`. No Maven project needed for development-time testing.
-- **The test declares its infrastructure** — `camel: infra: run:` starts Kafka (or another service), Citrus exposes its address as `CITRUS_CAMEL_INFRA_*` variables, and a system property on `camel: jbang: run:` points the unchanged route at it. Use `fixedPort: true` for a predictable port or omit it for a random one.
-- **`camel export` generates CI-ready Maven projects** — the same tests run locally with `camel test run` and in CI with `mvn verify`.
-- **Citrus complements Camel-native testing, not replaces it** — use Camel-native tests for fast route logic verification, Citrus tests for end-to-end integration confidence.
+- **Citrus tests integrations against real infrastructure**: no mocks, no stubs. When a Citrus test passes, the route works with real Kafka, real HTTP endpoints, and real serialization.
+- **The Camel CLI test plugin makes YAML-native testing practical**: write routes in YAML, write tests in YAML, run `camel test run`. No Maven project needed for development-time testing.
+- **The test declares its infrastructure**: `camel: infra: run:` starts Kafka (or another service), Citrus exposes its address as `CITRUS_CAMEL_INFRA_*` variables, and a system property on `camel: jbang: run:` points the unchanged route at it. Use `fixedPort: true` for a predictable port or omit it for a random one.
+- **`camel export` generates CI-ready Maven projects**: the same tests run locally with `camel test run` and in CI with `mvn verify`.
+- **Citrus complements Camel-native testing, not replaces it**: use Camel-native tests for fast route logic verification, Citrus tests for end-to-end integration confidence.
 
 ## Further reading
 
 - [Citrus Framework documentation](https://citrusframework.org/citrus/reference/5.0.1/html/index.html)
 - [Citrus Camel module](https://citrusframework.org/citrus/reference/5.0.1/html/index.html#camel)
-- [Apache Camel — Testing with the CLI](https://camel.apache.org/manual/camel-jbang.html)
+- [Apache Camel: Testing with the CLI](https://camel.apache.org/manual/camel-jbang.html)
 - [Testcontainers for Java](https://java.testcontainers.org/)
-- Appendix S — Testing Strategies for Camel Quarkus (Camel-native testing)
-- Appendix U — Camel CLI Deep Dive (CLI installation and commands)
+- Appendix S: Testing Strategies for Camel Quarkus (Camel-native testing)
+- Appendix U: Camel CLI Deep Dive (CLI installation and commands)
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — with Camel CLI 4.22.1 and the `test` plugin on Docker Engine, both tests pass through `camel test run` — the Kafka test (its own broker, the valid order and three rejections with their `rejectionReason` header) and the HTTP test (200 and 400 answers, extracted order id) — and pass again in the project `camel export` generates once the four fixes above are applied (`mvn verify -DskipITs=false`) (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: with Camel CLI 4.22.1 and the `test` plugin on Docker Engine, both tests pass through `camel test run` (the Kafka test with its own broker, the valid order and three rejections with their `rejectionReason` header, and the HTTP test with 200 and 400 answers, extracted order id), and pass again in the project `camel export` generates once the four fixes above are applied (`mvn verify -DskipITs=false`) (2026-10-09).*

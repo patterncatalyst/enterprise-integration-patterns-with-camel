@@ -2,14 +2,14 @@
 title: "Appendix A: Camel on Spring Boot vs Quarkus"
 order: 19
 part: appendices
-description: "Java DSL with Spring Boot (Camel Spring Boot) vs Quarkus (Camel Quarkus) — DI models, configuration, testing, deployment, and the Spring XML DSL."
+description: "Java DSL with Spring Boot (Camel Spring Boot) vs Quarkus (Camel Quarkus): DI models, configuration, testing, deployment, and the Spring XML DSL."
 duration: "25 minutes"
 ---
 
-This tutorial uses Camel Quarkus exclusively — but most Camel content in the wild targets Spring Boot. If you're coming from Camel Spring Boot, or evaluating which runtime to adopt, this appendix maps the differences: how routes are registered, how configuration works, how testing differs, and what Spring's XML DSL offers that the Java DSL doesn't (and vice versa).
+This tutorial uses Camel Quarkus exclusively, but most Camel content in the wild targets Spring Boot. If you're coming from Camel Spring Boot, or evaluating which runtime to adopt, this appendix maps the differences: how routes are registered, how configuration works, how testing differs, and what Spring's XML DSL offers that the Java DSL doesn't (and vice versa).
 
 The code is in `examples/19-dsl-comparison/`, which runs the *same* route three
-ways — Quarkus, Spring Boot, and the YAML DSL with no Maven project at all:
+ways: Quarkus, Spring Boot, and the YAML DSL with no Maven project at all:
 
 ```bash
 cd examples/19-dsl-comparison/quarkus      && mvn quarkus:dev
@@ -17,13 +17,13 @@ cd examples/19-dsl-comparison/spring-boot  && mvn spring-boot:run
 cd examples/19-dsl-comparison/yaml-dsl     && camel run order-classifier.camel.yaml
 ```
 
-Diff the two Java classes before reading further. They differ by four lines —
-an import and an annotation — and that is the entire argument of this appendix
+Diff the two Java classes before reading further. They differ by four lines,
+an import and an annotation, and that is the entire argument of this appendix
 made checkable.
 
 ## Two runtimes, one Camel
 
-Apache Camel's core — the route engine, EIP processors, components, and Java DSL — is runtime-agnostic. `RouteBuilder`, `from()`, `to()`, `choice()`, `split()`, `aggregate()` all work identically on both runtimes. What differs is the integration layer: how Camel discovers routes, injects dependencies, manages configuration, and starts up.
+Apache Camel's core (the route engine, EIP processors, components, and Java DSL) is runtime-agnostic. `RouteBuilder`, `from()`, `to()`, `choice()`, `split()`, `aggregate()` all work identically on both runtimes. What differs is the integration layer: how Camel discovers routes, injects dependencies, manages configuration, and starts up.
 
 | Aspect | Camel Spring Boot | Camel Quarkus |
 |--------|-------------------|---------------|
@@ -195,7 +195,7 @@ int maxRetries;
 long timeoutMs;
 ```
 
-Both support type-safe configuration classes — Spring's `@ConfigurationProperties` maps to Quarkus's `@ConfigMapping`.
+Both support type-safe configuration classes: Spring's `@ConfigurationProperties` maps to Quarkus's `@ConfigMapping`.
 
 ## The Spring XML DSL
 
@@ -236,13 +236,13 @@ Spring Boot has a unique DSL that Quarkus does not: routes defined as Spring XML
 
 ### What Spring XML DSL offers
 
-**XSD validation** — The `camel-spring.xsd` schema validates route structure at edit time. IDEs with XML support (IntelliJ, Eclipse) highlight invalid elements, missing attributes, and structural errors before you run anything.
+**XSD validation**: The `camel-spring.xsd` schema validates route structure at edit time. IDEs with XML support (IntelliJ, Eclipse) highlight invalid elements, missing attributes, and structural errors before you run anything.
 
-**Visual tooling** — Route editors like Kaoto and the legacy Fuse Tooling generate and consume Spring XML. If your organization uses visual modeling tools, Spring XML is their interchange format.
+**Visual tooling**: Route editors like Kaoto and the legacy Fuse Tooling generate and consume Spring XML. If your organization uses visual modeling tools, Spring XML is their interchange format.
 
-**Bean wiring in the same file** — Spring XML co-locates route definitions and bean definitions. The `<bean>` element defines a processor; `<bean ref="..."/>` in the route references it. Everything in one place, no scanning or annotation discovery.
+**Bean wiring in the same file**: Spring XML co-locates route definitions and bean definitions. The `<bean>` element defines a processor; `<bean ref="..."/>` in the route references it. Everything in one place, no scanning or annotation discovery.
 
-**Runtime route loading** — Spring Boot can load XML routes from the classpath or filesystem at runtime. Change the XML, restart, and routes update without recompilation.
+**Runtime route loading**: Spring Boot can load XML routes from the classpath or filesystem at runtime. Change the XML, restart, and routes update without recompilation.
 
 ### Why this tutorial doesn't use it
 
@@ -252,13 +252,13 @@ Spring XML carries baggage that makes it a poor fit for a modern tutorial:
 
 **No inline logic.** In Java DSL, you write `process(exchange -> { ... })` and inline the logic. In Spring XML, every processor must be a separate `<bean>` class, wired by reference. Simple operations balloon into multi-file gymnastics.
 
-**Compilation still required.** Your beans — the processors, validators, aggregation strategies — are Java. You still compile them. The XML just adds a separate route definition layer on top, without removing the Java compilation step.
+**Compilation still required.** Your beans (the processors, validators, aggregation strategies) are Java. You still compile them. The XML just adds a separate route definition layer on top, without removing the Java compilation step.
 
 **Falling community adoption.** The Camel community has moved firmly toward Java DSL (for applications) and YAML DSL (for JBang/GitOps). Spring XML DSL receives maintenance but little new investment. New Camel features occasionally ship without XML DSL support.
 
 ### When Spring XML DSL still makes sense
 
-- **Legacy migration.** Migrating from Camel 2.x / Spring Boot 2.x where all routes are already XML. Convert incrementally — Camel Spring Boot loads both XML routes and Java DSL routes simultaneously.
+- **Legacy migration.** Migrating from Camel 2.x / Spring Boot 2.x where all routes are already XML. Convert incrementally: Camel Spring Boot loads both XML routes and Java DSL routes simultaneously.
 - **Visual modeling.** If the team uses Kaoto or another visual designer, XML is the import/export format.
 - **Non-developer route management.** When operations teams manage route topology (endpoints, routing decisions) but developers write the processing logic in Java.
 
@@ -328,9 +328,9 @@ public class OrderRouteTest {
 }
 ```
 
-Quarkus uses `@QuarkusTest` (from `quarkus-junit5`) with CDI injection. No special Camel test annotation is needed — the Camel Quarkus extension hooks into the Quarkus test framework automatically. `MockEndpoint` is retrieved from the `CamelContext` directly rather than injected via `@EndpointInject`.
+Quarkus uses `@QuarkusTest` (from `quarkus-junit5`) with CDI injection. No special Camel test annotation is needed: the Camel Quarkus extension hooks into the Quarkus test framework automatically. `MockEndpoint` is retrieved from the `CamelContext` directly rather than injected via `@EndpointInject`.
 
-### Dev Services — Quarkus's testing advantage
+### Dev Services: Quarkus's testing advantage
 
 Quarkus Dev Services automatically starts test containers for infrastructure dependencies:
 
@@ -376,7 +376,7 @@ mvn spring-boot:build-image
 mvn -Pnative native:compile
 ```
 
-Spring Boot produces a fat JAR (~50-100MB) by default. Native compilation via Spring AOT + GraalVM is available but less mature than Quarkus — some Camel components have incomplete reflection metadata for native builds.
+Spring Boot produces a fat JAR (~50-100MB) by default. Native compilation via Spring AOT + GraalVM is available but less mature than Quarkus: some Camel components have incomplete reflection metadata for native builds.
 
 ### Quarkus
 
@@ -420,7 +420,7 @@ The same Camel component has different Maven coordinates on each runtime:
 | SQL | `camel-sql-starter` | `camel-quarkus-sql` |
 | Testing | `camel-test-spring-junit5` | `camel-quarkus-junit5` |
 
-The naming pattern: Spring Boot uses `-starter` suffix; Quarkus uses `camel-quarkus-` prefix. The underlying Camel component code is identical — only the runtime integration layer differs.
+The naming pattern: Spring Boot uses `-starter` suffix; Quarkus uses `camel-quarkus-` prefix. The underlying Camel component code is identical; only the runtime integration layer differs.
 
 ## Migration path: Spring Boot → Quarkus
 
@@ -432,7 +432,7 @@ If you're moving an existing Camel Spring Boot application to Quarkus:
 
 3. **Move configuration.** Spring `application.yml` → Quarkus `application.properties`. Property keys for Camel components are identical (`camel.component.kafka.brokers`). Framework-specific keys differ (`spring.datasource.url` → `quarkus.datasource.jdbc.url`).
 
-4. **Update tests.** `@SpringBootTest` → `@QuarkusTest`. `@Autowired` → `@Inject`. Remove `@CamelSpringBootTest` — not needed. `@EndpointInject` → `camelContext.getEndpoint()`.
+4. **Update tests.** `@SpringBootTest` → `@QuarkusTest`. `@Autowired` → `@Inject`. Remove `@CamelSpringBootTest` (not needed). `@EndpointInject` → `camelContext.getEndpoint()`.
 
 5. **Drop Spring XML routes.** If you have Spring XML route definitions, convert them to Java DSL. Quarkus does not support Spring XML `<camelContext>`.
 
@@ -440,15 +440,15 @@ If you're moving an existing Camel Spring Boot application to Quarkus:
 
 ## Why this tutorial chose Quarkus
 
-- **Dev Services** — infrastructure starts automatically in dev and test modes.
-- **Native builds** — production-ready for all Camel components used here.
-- **Startup time** — fast restarts in dev mode, fast scaling in production.
-- **CDI simplicity** — fewer annotations, less framework magic.
-- **JBang integration** — `camel run --dev` for prototyping, `camel export --runtime=quarkus` for promotion.
-- **Camel-first** — the Camel Quarkus project is an official Apache Camel subproject, ensuring tight integration.
+- **Dev Services**: infrastructure starts automatically in dev and test modes.
+- **Native builds**: production-ready for all Camel components used here.
+- **Startup time**: fast restarts in dev mode, fast scaling in production.
+- **CDI simplicity**: fewer annotations, less framework magic.
+- **JBang integration**: `camel run --dev` for prototyping, `camel export --runtime=quarkus` for promotion.
+- **Camel-first**: the Camel Quarkus project is an official Apache Camel subproject, ensuring tight integration.
 
-Spring Boot is a perfectly valid choice for Camel. If your organization standardizes on Spring, Camel Spring Boot is mature and well-supported. The patterns in this tutorial — every `RouteBuilder`, every EIP call, every Kafka/Pulsar/Redis integration — work identically on both runtimes. Only the surrounding framework glue changes.
+Spring Boot is a perfectly valid choice for Camel. If your organization standardizes on Spring, Camel Spring Boot is mature and well-supported. The patterns in this tutorial (every `RouteBuilder`, every EIP call, every Kafka/Pulsar/Redis integration) work identically on both runtimes. Only the surrounding framework glue changes.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — all three variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: given orders on `eip.orders.placed`, Quarkus, Spring Boot and the YAML DSL route each classify `DSL-1` (amount 640) as `HIGH_VALUE` and `DSL-2` as `STANDARD`, with no errors (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>, all three variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: given orders on `eip.orders.placed`, Quarkus, Spring Boot and the YAML DSL route each classify `DSL-1` (amount 640) as `HIGH_VALUE` and `DSL-2` as `STANDARD`, with no errors (2026-10-09).*

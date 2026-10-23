@@ -2,13 +2,13 @@
 title: "Appendix K: Bond Trading Case Study"
 order: 29
 part: appendices
-description: "A second EIP case study — real-time bond pricing, market data distribution, and trade execution with Camel and Kafka."
+description: "A second EIP case study: real-time bond pricing, market data distribution, and trade execution with Camel and Kafka."
 duration: "40 minutes"
 ---
 
-The Loan Broker (Appendix J) showed how Scatter-Gather solves comparison shopping. This case study tackles a different integration challenge: real-time data distribution. A bond trading platform must ingest market data from multiple feeds, normalize it into a canonical format, route it to interested subscribers, and execute trades — all with low latency and guaranteed delivery.
+The Loan Broker (Appendix J) showed how Scatter-Gather solves comparison shopping. This case study tackles a different integration challenge: real-time data distribution. A bond trading platform must ingest market data from multiple feeds, normalize it into a canonical format, route it to interested subscribers, and execute trades, all with low latency and guaranteed delivery.
 
-{% include excalidraw.html file="29-bond-trading" alt="Bond Trading market data distribution" caption="Figure K.1 — Bond Trading: multiple feeds normalized, filtered per desk, traded, and audited." %}
+{% include excalidraw.html file="29-bond-trading" alt="Bond Trading market data distribution" caption="Figure K.1: Bond Trading: multiple feeds normalized, filtered per desk, traded, and audited." %}
 
 The code is in `examples/bond-trading/`.
 
@@ -29,11 +29,11 @@ mvn spring-boot:run
 ## The bond trading problem
 
 A trading desk needs:
-1. **Market data ingestion** — receive bond prices from multiple feeds (Bloomberg, Reuters, exchange feeds) in different formats.
-2. **Normalization** — translate all feeds into a single canonical price format.
-3. **Distribution** — route prices to subscribers based on their interest profiles (bond type, issuer, maturity range).
-4. **Trade execution** — accept trade orders, validate against current prices, route to the appropriate execution venue, and confirm.
-5. **Position tracking** — maintain real-time portfolio positions as trades execute.
+1. **Market data ingestion**: receive bond prices from multiple feeds (Bloomberg, Reuters, exchange feeds) in different formats.
+2. **Normalization**: translate all feeds into a single canonical price format.
+3. **Distribution**: route prices to subscribers based on their interest profiles (bond type, issuer, maturity range).
+4. **Trade execution**: accept trade orders, validate against current prices, route to the appropriate execution venue, and confirm.
+5. **Position tracking**: maintain real-time portfolio positions as trades execute.
 
 ## Architecture
 
@@ -107,7 +107,7 @@ public record TradeExecution(
 ) {}
 ```
 
-## Pattern 1: Channel Adapter — Market data ingestion
+## Pattern 1: Channel Adapter: Market data ingestion
 
 Each market data source has its own format. Channel Adapters normalize them:
 
@@ -184,7 +184,7 @@ public class BloombergNormalizer {
 }
 ```
 
-## Pattern 2: Normalizer — Best-price selection
+## Pattern 2: Normalizer: Best-price selection
 
 When the same bond arrives from multiple feeds, select the best bid/ask:
 
@@ -226,9 +226,9 @@ public class BestPriceStrategy implements AggregationStrategy {
 }
 ```
 
-**Pattern: Normalizer + Aggregator.** The Normalizer pattern selects the best composite price from multiple sources within a time window. This is different from the Loan Broker's aggregator (which waits for all replies) — here we aggregate by time window because market data is continuous.
+**Pattern: Normalizer + Aggregator.** The Normalizer pattern selects the best composite price from multiple sources within a time window. This is different from the Loan Broker's aggregator, which waits for all replies; here we aggregate by time window because market data is continuous.
 
-## Pattern 3: Content-Based Router — Desk distribution
+## Pattern 3: Content-Based Router: Desk distribution
 
 Route prices to trading desks based on their subscription profiles:
 
@@ -267,7 +267,7 @@ from("direct:filter-desk-c")
 
 **Patterns: Publish-Subscribe (Multicast) + Message Filter.** The multicast sends every price update to all desk filters. Each filter applies its subscription criteria and publishes only matching prices to the desk's topic. This is the Publish-Subscribe Channel pattern combined with Selective Consumer.
 
-## Pattern 4: Message Filter + Validator — Trade order validation
+## Pattern 4: Message Filter + Validator: Trade order validation
 
 Validate incoming trade orders before execution:
 
@@ -304,7 +304,7 @@ from("kafka:bond.orders.new?brokers=localhost:9092&groupId=order-validator")
 
 **Patterns: Idempotent Receiver + Content Enricher + Content-Based Router.** The order pipeline deduplicates, enriches with current market data, and routes based on validation rules.
 
-## Pattern 5: Routing Slip — Trade execution
+## Pattern 5: Routing Slip: Trade execution
 
 Different bonds execute on different venues. The execution path is determined at runtime:
 
@@ -325,7 +325,7 @@ from("kafka:bond.orders.validated?brokers=localhost:9092&groupId=trade-executor"
 
 **Pattern: Routing Slip.** The execution route is assembled dynamically: compliance check → venue-specific execution → reporting. Each step in the slip can short-circuit the rest (compliance failure stops execution).
 
-## Pattern 6: Event-Driven Consumer — Position updates
+## Pattern 6: Event-Driven Consumer: Position updates
 
 Maintain real-time portfolio positions from trade executions:
 
@@ -353,9 +353,9 @@ from("kafka:bond.trades.executed?brokers=localhost:9092&groupId=position-tracker
     .to("kafka:bond.positions.updates?brokers=localhost:9092");
 ```
 
-**Pattern: Event-Driven Consumer.** The position tracker reacts to trade execution events. Kafka's partition-by-portfolio-ID guarantees that all trades for a portfolio are processed in order by the same consumer — critical for accurate position calculation.
+**Pattern: Event-Driven Consumer.** The position tracker reacts to trade execution events. Kafka's partition-by-portfolio-ID guarantees that all trades for a portfolio are processed in order by the same consumer, which is critical for accurate position calculation.
 
-## Pattern 7: Wire Tap — Audit trail
+## Pattern 7: Wire Tap: Audit trail
 
 Every trade order and execution gets Wire Tapped to an audit log:
 
@@ -381,7 +381,7 @@ from("direct:audit-log")
     .to("kafka:bond.audit.log?brokers=localhost:9092");
 ```
 
-**Pattern: Wire Tap.** The Wire Tap sends a copy of every validated trade to the audit topic without affecting the main processing flow. This is non-negotiable in financial systems — every order must be logged for regulatory compliance.
+**Pattern: Wire Tap.** The Wire Tap sends a copy of every validated trade to the audit topic without affecting the main processing flow. This is non-negotiable in financial systems: every order must be logged for regulatory compliance.
 
 ## What the runnable example covers
 
@@ -389,15 +389,15 @@ The five capabilities at the top of this chapter are what a trading desk needs, 
 
 | Pattern | In the example? |
 |---------|-----------------|
-| 1. Channel Adapter — market data ingestion | Yes — `adapter-bloomberg`, `adapter-reuters`, `adapter-exchange` |
-| 2. Normalizer — best-price selection | Yes — `price-normalizer` |
-| 3. Content-Based Router — desk distribution | Yes — `desk-distributor`, `filter-desk-a/b/c` |
-| 4. Message Filter + Validator — order validation | Yes — `trade-validator` |
-| 5. Routing Slip — trade execution | No — illustrative only |
-| 6. Event-Driven Consumer — position updates | No — illustrative only |
-| 7. Wire Tap — audit trail | No — illustrative only |
+| 1. Channel Adapter: market data ingestion | Yes: `adapter-bloomberg`, `adapter-reuters`, `adapter-exchange` |
+| 2. Normalizer: best-price selection | Yes: `price-normalizer` |
+| 3. Content-Based Router: desk distribution | Yes: `desk-distributor`, `filter-desk-a/b/c` |
+| 4. Message Filter + Validator: order validation | Yes: `trade-validator` |
+| 5. Routing Slip: trade execution | No, illustrative only |
+| 6. Event-Driven Consumer: position updates | No, illustrative only |
+| 7. Wire Tap: audit trail | No, illustrative only |
 
-Patterns 5 to 7 need an execution venue and a position store that the local stack does not provide, so they are shown as code rather than run. Start the example and you will see market data flow through ingestion, normalization and desk distribution, and trade orders reach validation — nothing past that point.
+Patterns 5 to 7 need an execution venue and a position store that the local stack does not provide, so they are shown as code rather than run. Start the example and you will see market data flow through ingestion, normalization and desk distribution, and trade orders reach validation, nothing past that point.
 
 ## Pattern inventory
 
@@ -432,7 +432,7 @@ Patterns 5 to 7 need an execution venue and a position store that the local stac
 | Position updates from trades | Inventory updates from shipments |
 | Audit trail (regulatory) | Audit trail (customs / compliance) |
 
-The core lesson: **the patterns are the same regardless of domain.** A bond trading platform and a shipping platform face identical integration challenges — multiple data sources, normalization, routing, enrichment, validation, execution, and audit. The patterns provide the vocabulary; Camel provides the implementation.
+The core lesson: **the patterns are the same regardless of domain.** A bond trading platform and a shipping platform face identical integration challenges: multiple data sources, normalization, routing, enrichment, validation, execution, and audit. The patterns provide the vocabulary; Camel provides the implementation.
 
 ## Comparison: Loan Broker vs. Bond Trading
 
@@ -446,10 +446,10 @@ The core lesson: **the patterns are the same regardless of domain.** A bond trad
 | **Error handling** | Partial results OK | Stale data rejection |
 | **Key challenge** | Fan-out + collect | Normalize + distribute |
 
-Two case studies, two different shapes of the same patterns — proving that EIP is a universal integration language.
+Two case studies, two different shapes of the same patterns: proof that EIP is a universal integration language.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: all three feeds, the normalizer, distributor, three desks and the validator log traffic, with no errors (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: all three feeds, the normalizer, distributor, three desks and the validator log traffic, with no errors (2026-10-09).*
 
-*The example's rejected trade orders used to be logged and dropped, which the README described as a Dead Letter Channel. It was neither pattern — the order vanished. Per the distinction this tutorial draws in [Chapter 5]({% link _docs/05-channel-reliability.md %}), a consumer that understands a message and rejects it on business grounds wants an **Invalid Message Channel**, so rejected orders now go to `bond.orders.invalid`. Verified by injecting a negative quantity and a negative limit price and seeing both arrive.*
+*The example's rejected trade orders used to be logged and dropped, which the README described as a Dead Letter Channel. It was neither pattern; the order vanished. Per the distinction this tutorial draws in [Chapter 5]({% link _docs/05-channel-reliability.md %}), a consumer that understands a message and rejects it on business grounds wants an **Invalid Message Channel**, so rejected orders now go to `bond.orders.invalid`. Verified by injecting a negative quantity and a negative limit price and seeing both arrive.*

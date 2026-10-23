@@ -2,17 +2,17 @@
 title: "Appendix P: Kafka Share Groups"
 order: 34
 part: appendices
-description: "KIP-932 share groups bring queue semantics to Kafka — per-message acknowledgment, competing consumers without partition coupling, and the KafkaShareConsumer API."
+description: "KIP-932 share groups bring queue semantics to Kafka: per-message acknowledgment, competing consumers without partition coupling, and the KafkaShareConsumer API."
 duration: "20 minutes"
 ---
 
-Traditional Kafka consumer groups tie each partition to exactly one consumer. This works well when per-key ordering matters, but creates friction when you want simple work distribution — the "queue" pattern where any available consumer picks up the next message. KIP-932 introduces **share groups**, a new consumer group type that decouples consumption from partition assignment and adds per-message acknowledgment.
+Traditional Kafka consumer groups tie each partition to exactly one consumer. This works well when per-key ordering matters, but creates friction when you want simple work distribution: the "queue" pattern where any available consumer picks up the next message. KIP-932 introduces **share groups**, a new consumer group type that decouples consumption from partition assignment and adds per-message acknowledgment.
 
-{% include excalidraw.html file="34-share-groups" alt="Comparison of traditional consumer groups with partition-bound assignment versus share groups with round-robin distribution" caption="Figure P.1 — Consumer groups (left) assign each partition to exactly one consumer — Consumer D is idle. Share groups (right) distribute messages round-robin across all consumers regardless of partition count." %}
+{% include excalidraw.html file="34-share-groups" alt="Comparison of traditional consumer groups with partition-bound assignment versus share groups with round-robin distribution" caption="Figure P.1: Consumer groups (left) assign each partition to exactly one consumer; Consumer D is idle. Share groups (right) distribute messages round-robin across all consumers regardless of partition count." %}
 
 ## The problem with consumer groups for queues
 
-In a standard consumer group, partition assignment is exclusive — each partition is consumed by exactly one consumer. This creates three constraints:
+In a standard consumer group, partition assignment is exclusive: each partition is consumed by exactly one consumer. This creates three constraints:
 
 1. **Consumer count is capped by partition count.** A fourth consumer is idle if there are only 3 partitions. Scaling consumers requires repartitioning the topic.
 
@@ -20,7 +20,7 @@ In a standard consumer group, partition assignment is exclusive — each partiti
 
 3. **Rebalances are disruptive.** Adding or removing consumers triggers a rebalance that pauses all consumers in the group, even those whose partitions don't change.
 
-For workloads that don't require per-key ordering — like dispatching notification emails, running fraud checks, or processing independent payments — these constraints are artificial. What you want is a message queue: any available consumer takes the next message.
+For workloads that don't require per-key ordering (like dispatching notification emails, running fraud checks, or processing independent payments), these constraints are artificial. What you want is a message queue: any available consumer takes the next message.
 
 ## What share groups provide
 
@@ -54,7 +54,7 @@ The message cannot be processed (bad data, validation failure). The broker moves
 The consumer cannot process the message right now (downstream service unavailable, temporary resource constraint). The broker returns the message to the pool for another consumer to pick up.
 
 > **Camel cannot do this yet.** As of Camel 4.22 the Kafka component has no
-> share-group support — there is no `groupType` option and no share consumer.
+> share-group support: there is no `groupType` option and no share consumer.
 > Earlier drafts of this appendix showed a route with `&groupType=share`; that
 > parameter does not exist and the route would fail to start. The client-side
 > API is `KafkaShareConsumer` in `kafka-clients`, which Camel does not wrap.
@@ -85,7 +85,7 @@ cd examples/34-kafka-share-groups && ./share-groups-demo.sh
 ```
 
 It walks all three acknowledgment modes and shows a share group spreading nine
-orders across three workers on a three-partition topic — the thing a consumer
+orders across three workers on a three-partition topic: the thing a consumer
 group cannot do.
 
 ## Share group configuration
@@ -137,7 +137,7 @@ Share groups are not a replacement for consumer groups. They serve different wor
 
 ### Use share groups when
 
-- **Work distribution without ordering**: sending notification emails, running independent fraud checks, processing images — any workload where messages are independent.
+- **Work distribution without ordering**: sending notification emails, running independent fraud checks, processing images; any workload where messages are independent.
 - **Elastic scaling**: you need to scale consumers up and down without repartitioning topics or waiting through rebalances.
 - **Uneven partition load**: your key distribution creates hot partitions, and you'd rather distribute work evenly than repartition.
 
@@ -147,14 +147,14 @@ Share groups are not a replacement for consumer groups. They serve different wor
 |----------|-----------|--------|
 | Order event processing | Consumer group | Per-order ordering required |
 | Inventory reservation | Consumer group | Must process reserve/release in order per SKU |
-| Notification dispatch | Share group | Emails are independent — any consumer can send any email |
-| Fraud scoring | Share group | Each order scored independently — no ordering needed |
-| Label generation | Share group | Printing labels is independent — distribute evenly |
+| Notification dispatch | Share group | Emails are independent: any consumer can send any email |
+| Fraud scoring | Share group | Each order scored independently: no ordering needed |
+| Label generation | Share group | Printing labels is independent: distribute evenly |
 | Payment processing | Consumer group | Payment state transitions require ordering |
 
 ## Share groups and the Competing Consumers pattern
 
-Chapter 14 covered the Competing Consumers pattern using Kafka consumer groups. Share groups are a more natural fit for this pattern because they provide actual competing consumption — consumers compete for individual messages rather than competing for partition assignments.
+Chapter 14 covered the Competing Consumers pattern using Kafka consumer groups. Share groups are a more natural fit for this pattern because they provide actual competing consumption: consumers compete for individual messages rather than competing for partition assignments.
 
 With consumer groups, "competing consumers" is a misnomer: consumers don't compete for messages, they each own a fixed set of partitions. The competition happens only during rebalancing. Share groups make the competition continuous and per-message.
 
@@ -172,11 +172,11 @@ from("kafka:eip.notifications.outbound"
 ```
 {% endraw %}
 
-Scale by adding more instances of this route — each instance automatically receives a share of the messages without partition assignment or rebalancing.
+Scale by adding more instances of this route: each instance automatically receives a share of the messages without partition assignment or rebalancing.
 
 ## Availability
 
-Share groups were introduced in KIP-932 and are available as an early access feature in Apache Kafka 4.0. They require broker-side configuration to enable. At the time of writing, the feature is not yet stable — expect API changes before it reaches GA.
+Share groups were introduced in KIP-932 and are available as an early access feature in Apache Kafka 4.0. They require broker-side configuration to enable. At the time of writing, the feature is not yet stable: expect API changes before it reaches GA.
 
 When share groups stabilize, they will be a significant addition to Kafka's messaging model, bridging the gap between Kafka's log-based architecture and traditional message queue semantics. Until then, the consumer group approach from Chapter 14 remains the production-ready path for competing consumers on Kafka.
 
@@ -184,4 +184,4 @@ For workloads that need queue semantics today, Pulsar's Shared subscription (App
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `share-groups-demo.sh` runs to completion against Kafka 4.3.1 in the compose stack on Docker Engine: nine orders split across the three consumers, accepted and rejected records do not reappear, released ones do (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>; `share-groups-demo.sh` runs to completion against Kafka 4.3.1 in the compose stack on Docker Engine: nine orders split across the three consumers, accepted and rejected records do not reappear, released ones do (2026-10-09).*

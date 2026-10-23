@@ -10,7 +10,7 @@ The Process Manager pattern (Chapter 10) showed how Camel's Saga EIP handles mul
 
 The code is in `examples/25-quarkus-flow/`. The `README.md` there covers how to run it.
 
-{% include excalidraw.html file="25-appendix-quarkus-flow" alt="Quarkus Flow order fulfillment workflow with state transitions and Camel integration" caption="Figure G.1 — The order fulfillment workflow as a Serverless Workflow state machine: operation states call CDI beans that invoke Camel routes for external system integration." %}
+{% include excalidraw.html file="25-appendix-quarkus-flow" alt="Quarkus Flow order fulfillment workflow with state transitions and Camel integration" caption="Figure G.1: The order fulfillment workflow as a Serverless Workflow state machine: operation states call CDI beans that invoke Camel routes for external system integration." %}
 
 ## What Quarkus Flow adds
 
@@ -158,7 +158,7 @@ The order fulfillment workflow as a Serverless Workflow definition:
 
 ## Connecting Quarkus Flow to Camel
 
-The workflow functions call CDI beans — which can use Camel's `ProducerTemplate` to send messages:
+The workflow functions call CDI beans, which can use Camel's `ProducerTemplate` to send messages:
 
 ```java
 @ApplicationScoped
@@ -205,5 +205,5 @@ public class InventoryChecker {
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 3 integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 3 integration tests pass against live containers on Docker Engine (2026-10-09).*
 Example `25-quarkus-flow` compiles and runs against the compose stack.*

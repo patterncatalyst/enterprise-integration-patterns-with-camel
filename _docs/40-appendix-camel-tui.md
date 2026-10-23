@@ -2,11 +2,11 @@
 title: "Appendix V: Camel TUI"
 order: 40
 part: appendices
-description: "The Camel TUI terminal dashboard — monitoring routes, tracing exchanges, inspecting message flow, and debugging integration issues without leaving the terminal."
+description: "The Camel TUI terminal dashboard: monitoring routes, tracing exchanges, inspecting message flow, and debugging integration issues without leaving the terminal."
 duration: "25 minutes"
 ---
 
-The Camel CLI command set covered in Appendix U gives you single-shot commands for inspecting routes, dumping exchanges, and managing integrations. But when you need a continuous view — watching exchanges flow through routes, spotting latency spikes, tracing a failed message step-by-step — you need something richer than repeated `camel get` calls.
+The Camel CLI command set covered in Appendix U gives you single-shot commands for inspecting routes, dumping exchanges, and managing integrations. But when you need a continuous view (watching exchanges flow through routes, spotting latency spikes, tracing a failed message step-by-step), you need something richer than repeated `camel get` calls.
 
 The Camel TUI (Terminal User Interface) is a full-featured dashboard that runs entirely in your terminal. Available since Camel 4.14, it provides real-time monitoring of running Camel integrations with tabbed views for routes, exchanges, diagrams, metrics, and debugging. It works over SSH, inside containers, and in any environment where a browser is unavailable or impractical. Think of it as a terminal-native alternative to Hawtio or Jolokia-based monitoring.
 
@@ -20,7 +20,7 @@ The TUI is part of the Camel CLI. If you followed the installation in Appendix U
 camel tui
 ```
 
-That single command auto-discovers all running Camel integrations on the local machine and opens the dashboard. If multiple integrations are running, the TUI shows all of them in the Overview tab — select one to drill into its routes and exchanges.
+That single command auto-discovers all running Camel integrations on the local machine and opens the dashboard. If multiple integrations are running, the TUI shows all of them in the Overview tab; select one to drill into its routes and exchanges.
 
 To target a specific integration by name or PID:
 
@@ -33,23 +33,23 @@ camel tui 12345
 
 To explore the TUI with live data, start the demo routes in one terminal and open the TUI in another.
 
-**Terminal 1 — start the routes:**
+**Terminal 1: start the routes:**
 
 ```bash
 cd examples/40-camel-tui
 camel run *.yaml --port=8088
 ```
 
-The `--port` flag matters: the embedded HTTP server defaults to 8080, which the Pulsar admin console in the local stack already holds. It is a CLI flag rather than a property — setting `camel.server.port` in `application.properties` has no effect.
+The `--port` flag matters: the embedded HTTP server defaults to 8080, which the Pulsar admin console in the local stack already holds. It is a CLI flag rather than a property: setting `camel.server.port` in `application.properties` has no effect.
 
 This starts two YAML DSL route files:
 
-1. **monitored-route.yaml** — a REST API that accepts orders, validates them, and publishes to Kafka topics
-2. **data-generator.yaml** — a timer-based route that generates sample orders every 3 seconds
+1. **monitored-route.yaml**: a REST API that accepts orders, validates them, and publishes to Kafka topics
+2. **data-generator.yaml**: a timer-based route that generates sample orders every 3 seconds
 
 The data generator feeds the REST API with one of five orders (shipping containers, pallet jacks, cargo nets, dock bumpers, and freight scales) picked at random each tick, giving you a steady stream of exchanges to monitor in the TUI.
 
-**Terminal 2 — open the dashboard:**
+**Terminal 2: open the dashboard:**
 
 ```bash
 camel tui
@@ -59,7 +59,7 @@ The TUI discovers the running integration and populates all tabs with live data.
 
 ### The monitored route
 
-The REST API in `monitored-route.yaml` accepts JSON orders and validates that the required fields — `orderId`, `customerId`, and `item` — are present:
+The REST API in `monitored-route.yaml` accepts JSON orders and validates that the required fields (`orderId`, `customerId`, and `item`) are present:
 
 {% raw %}
 ```yaml
@@ -217,7 +217,7 @@ The rotating orders ensure that the TUI's Activity and Inspect tabs show varied 
 
 ## Dashboard layout
 
-{% include excalidraw.html file="40-camel-tui-dashboard" alt="Camel TUI dashboard layout" caption="Figure V.1 — The Camel TUI dashboard layout: tab bar, main content panel, and status bar." %}
+{% include excalidraw.html file="40-camel-tui-dashboard" alt="Camel TUI dashboard layout" caption="Figure V.1: The Camel TUI dashboard layout: tab bar, main content panel, and status bar." %}
 
 The TUI occupies the full terminal window and divides it into three regions:
 
@@ -267,7 +267,7 @@ INFO  Order accepted: ORD-002 — customer C-102, item: Pallet Jack
 
 Press `/` to open the search filter. Type a search term and the log view filters to matching lines only. This is invaluable when a noisy route produces hundreds of log lines and you need to find a specific order or error.
 
-You can also filter by log level. The TUI supports adjusting the log level in real time — raise it to `WARN` to see only warnings and errors, or lower it to `DEBUG` to capture detailed routing decisions. The level change affects only the TUI display; it does not modify the running integration's logger configuration.
+You can also filter by log level. The TUI supports adjusting the log level in real time: raise it to `WARN` to see only warnings and errors, or lower it to `DEBUG` to capture detailed routing decisions. The level change affects only the TUI display; it does not modify the running integration's logger configuration.
 
 ### Log buffer
 
@@ -285,26 +285,26 @@ The Activity tab is a live exchange feed. Each exchange that flows through the i
 | **Duration** | Total processing time for the exchange |
 | **Timestamp** | When the exchange was created |
 
-With the demo routes running, you will see exchanges appearing every 3 seconds — one from the data generator's HTTP call and the downstream exchanges through the validation and processing routes.
+With the demo routes running, you will see exchanges appearing every 3 seconds: one from the data generator's HTTP call and the downstream exchanges through the validation and processing routes.
 
 ### Throughput and latency statistics
 
 The Activity tab header shows aggregate statistics:
 
-- **Total exchanges** — cumulative count since the integration started
-- **Completed / Failed** — counts and percentages
-- **Throughput** — messages per second, averaged over a rolling window
-- **Latency percentiles** — p50, p95, and max processing times
+- **Total exchanges**: cumulative count since the integration started
+- **Completed / Failed**: counts and percentages
+- **Throughput**: messages per second, averaged over a rolling window
+- **Latency percentiles**: p50, p95, and max processing times
 
 For the demo routes, expect p50 latency around 100-120ms (dominated by the deliberate 100ms delay in the processing route) and throughput around 0.3 messages per second (one order every 3 seconds).
 
 ### Identifying bottlenecks
 
-The latency percentiles immediately reveal performance characteristics. If your p95 is significantly higher than your p50, you have occasional slow exchanges — likely caused by garbage collection pauses, Kafka producer batching delays, or downstream service latency. The Activity tab lets you spot these patterns without setting up a full metrics pipeline.
+The latency percentiles immediately reveal performance characteristics. If your p95 is significantly higher than your p50, you have occasional slow exchanges: likely caused by garbage collection pauses, Kafka producer batching delays, or downstream service latency. The Activity tab lets you spot these patterns without setting up a full metrics pipeline.
 
 ## Diagram tab
 
-The Diagram tab renders an ASCII route topology — a directed acyclic graph (DAG) showing how routes, processors, and endpoints connect. For the demo routes, the diagram shows:
+The Diagram tab renders an ASCII route topology: a directed acyclic graph (DAG) showing how routes, processors, and endpoints connect. For the demo routes, the diagram shows:
 
 ```
                  ┌──────────────────┐
@@ -345,23 +345,23 @@ The Diagram tab renders an ASCII route topology — a directed acyclic graph (DA
           └──────────────┘
 ```
 
-The actual TUI rendering is richer than this static approximation — it uses box-drawing characters, color coding (green for active routes, red for failed), and dynamic layout based on your terminal width.
+The actual TUI rendering is richer than this static approximation: it uses box-drawing characters, color coding (green for active routes, red for failed), and dynamic layout based on your terminal width.
 
 ### Features
 
 The Diagram tab supports several interaction modes:
 
-**Drill-down** — Select a route node and press `Enter` to zoom into its processors. For the `validate-order` route, drilling down shows the unmarshal, log, choice, setHeader, marshal, and Kafka producer steps individually.
+**Drill-down**: Select a route node and press `Enter` to zoom into its processors. For the `validate-order` route, drilling down shows the unmarshal, log, choice, setHeader, marshal, and Kafka producer steps individually.
 
-**External endpoints overlay** — Kafka topics, REST services, and other external endpoints appear with connection lines showing which routes produce to and consume from each endpoint. This is especially useful for understanding message flow across multiple routes that share a topic.
+**External endpoints overlay**: Kafka topics, REST services, and other external endpoints appear with connection lines showing which routes produce to and consume from each endpoint. This is especially useful for understanding message flow across multiple routes that share a topic.
 
-**Metrics overlay** — Each node in the diagram can display its exchange count and average processing time. This turns the static topology into a live performance map. Nodes with high latency or failure rates stand out visually.
+**Metrics overlay**: Each node in the diagram can display its exchange count and average processing time. This turns the static topology into a live performance map. Nodes with high latency or failure rates stand out visually.
 
-**Source code view** — Press `s` on a selected route to see its YAML or Java DSL source alongside the diagram. This is useful when the diagram shows a processor you do not recognize and you want to see the exact route definition.
+**Source code view**: Press `s` on a selected route to see its YAML or Java DSL source alongside the diagram. This is useful when the diagram shows a processor you do not recognize and you want to see the exact route definition.
 
 ## Inspect tab
 
-The Inspect tab provides a step-by-step view of how a single exchange was processed — every processor it visited, what changed at each step, and how long each step took.
+The Inspect tab provides a step-by-step view of how a single exchange was processed: every processor it visited, what changed at each step, and how long each step took.
 
 ### Selecting an exchange
 
@@ -378,10 +378,10 @@ The Inspect tab shows a list of recent exchanges. Select one and press `Enter` t
 
 The BHPV column is the key insight. Each letter is highlighted when the corresponding part of the exchange changed at that step:
 
-- **B** (Body) — The message body was modified (e.g., by `unmarshal`, `setBody`, `transform`)
-- **H** (Headers) — A header was added, modified, or removed (e.g., by `setHeader`, `removeHeader`)
-- **P** (Properties) — An exchange property changed
-- **V** (Variables) — An exchange variable changed
+- **B** (Body): The message body was modified (e.g., by `unmarshal`, `setBody`, `transform`)
+- **H** (Headers): A header was added, modified, or removed (e.g., by `setHeader`, `removeHeader`)
+- **P** (Properties): An exchange property changed
+- **V** (Variables): An exchange variable changed
 
 For the demo routes, when inspecting a validated order exchange you will see:
 
@@ -400,7 +400,7 @@ The `B` indicator lights up at steps 1 and 7 (unmarshal and marshal change the b
 
 ### Viewing changes
 
-Select any step and press `Enter` to see the full exchange state at that point — the complete body, all headers, properties, and variables. A diff view highlights exactly what changed compared to the previous step. This is invaluable for debugging transformation issues where you need to see precisely when and how a field was modified.
+Select any step and press `Enter` to see the full exchange state at that point: the complete body, all headers, properties, and variables. A diff view highlights exactly what changed compared to the previous step. This is invaluable for debugging transformation issues where you need to see precisely when and how a field was modified.
 
 ### Waterfall timing view
 
@@ -418,11 +418,11 @@ The Errors tab aggregates information about failed exchanges:
 
 Each failed exchange is listed with:
 
-- **Exchange ID** — click to inspect the exchange step-by-step (jumps to the Inspect tab)
-- **Route** — the route where the failure occurred
-- **Processor** — the specific processor that threw the exception
-- **Exception** — the exception class and message
-- **Timestamp** — when the failure occurred
+- **Exchange ID**: click to inspect the exchange step-by-step (jumps to the Inspect tab)
+- **Route**: the route where the failure occurred
+- **Processor**: the specific processor that threw the exception
+- **Exception**: the exception class and message
+- **Timestamp**: when the failure occurred
 
 ### Stack traces
 
@@ -430,7 +430,7 @@ Select a failed exchange and the full Java stack trace is displayed in the conte
 
 ### Exchange context at failure
 
-Below the stack trace, the Errors tab shows the exchange state at the point of failure — the message body, all headers, and properties. This context is often the difference between understanding a failure from the stack trace alone and needing to reproduce it: you can see exactly what data was being processed when the error occurred.
+Below the stack trace, the Errors tab shows the exchange state at the point of failure: the message body, all headers, and properties. This context is often the difference between understanding a failure from the stack trace alone and needing to reproduce it: you can see exactly what data was being processed when the error occurred.
 
 ### Error patterns
 
@@ -444,7 +444,7 @@ Press `F2` from any tab to open the Actions menu. This menu provides interactive
 
 The Actions menu can send test messages to REST endpoints defined in your routes. For the demo routes, it detects the `POST /api/orders` endpoint and lets you compose and send a test order directly from the TUI. The response appears inline, and the resulting exchange shows up in the Activity and Inspect tabs.
 
-This is useful for ad-hoc testing — send a malformed order to verify the validation logic, or send a specific order to trace its path through the route.
+This is useful for ad-hoc testing: send a malformed order to verify the validation logic, or send a specific order to trace its path through the route.
 
 ### Run example routes
 
@@ -475,7 +475,7 @@ Beyond the core tabs, the TUI includes specialized views for deeper inspection. 
 
 ### Beans
 
-The Beans tab lists all beans registered in the Camel context — CDI beans in Quarkus, Spring beans in Spring Boot, or manually registered beans in standalone Camel. For each bean, it shows the bean name, type, scope, and whether it is a Camel component, data format, or language. This is useful for verifying that dependency injection is wired correctly.
+The Beans tab lists all beans registered in the Camel context: CDI beans in Quarkus, Spring beans in Spring Boot, or manually registered beans in standalone Camel. For each bean, it shows the bean name, type, scope, and whether it is a Camel component, data format, or language. This is useful for verifying that dependency injection is wired correctly.
 
 ### Circuit Breaker
 
@@ -489,7 +489,7 @@ If your routes use the Circuit Breaker EIP (backed by Resilience4j or MicroProfi
 | **Slow call rate** | Percentage of calls exceeding the slow-call threshold |
 | **Calls** | Total, successful, and failed counts |
 
-This tab lets you monitor circuit breaker behavior in real time — watch a breaker trip when a downstream service goes down, then recover when it comes back.
+This tab lets you monitor circuit breaker behavior in real time: watch a breaker trip when a downstream service goes down, then recover when it comes back.
 
 ### CVE Audit
 
@@ -503,23 +503,23 @@ This is a quick security health check that does not require a separate scanning 
 
 ### Health
 
-The Health tab shows Camel health check results — both liveness and readiness checks. Each check is listed with its status (`UP` or `DOWN`), the check group (e.g., `camel`, `kafka`, `context`), and details about what was checked.
+The Health tab shows Camel health check results: both liveness and readiness checks. Each check is listed with its status (`UP` or `DOWN`), the check group (e.g., `camel`, `kafka`, `context`), and details about what was checked.
 
 For the demo routes, expect to see:
 
-- `context` — UP (the CamelContext is running)
-- `routes` — UP (all routes are started)
-- `consumers` — UP (Kafka consumers are connected)
+- `context`: UP (the CamelContext is running)
+- `routes`: UP (all routes are started)
+- `consumers`: UP (Kafka consumers are connected)
 
-When a health check fails, the details column explains why — for example, "Kafka consumer not connected: broker localhost:9092 unreachable."
+When a health check fails, the details column explains why, for example, "Kafka consumer not connected: broker localhost:9092 unreachable."
 
 ### Memory
 
 The Memory tab displays JVM memory usage:
 
-- **Heap** — used, committed, and maximum heap size
-- **Non-heap** — metaspace and code cache usage
-- **GC** — garbage collector type, collection count, and total pause time
+- **Heap**: used, committed, and maximum heap size
+- **Non-heap**: metaspace and code cache usage
+- **GC**: garbage collector type, collection count, and total pause time
 
 A simple bar chart visualizes heap usage over time. Sudden increases in GC pause time or steady heap growth suggest a memory leak or undersized heap.
 
@@ -552,7 +552,7 @@ The TUI includes an AI panel, reachable with `F8` and activated with:
 camel tui --mcp
 ```
 
-This starts an embedded MCP (Model Context Protocol) server that exposes the running integration's state — routes, exchanges, errors, configuration — to an AI assistant. The AI panel appears as an additional tab where you can interact using natural language and slash commands.
+This starts an embedded MCP (Model Context Protocol) server that exposes the running integration's state (routes, exchanges, errors, configuration) to an AI assistant. The AI panel appears as an additional tab where you can interact using natural language and slash commands.
 
 Camel 4.22 promoted the embedded MCP Server from Preview to **Stable**, alongside the CLI and the TUI themselves.
 
@@ -562,7 +562,7 @@ Camel 4.22 promoted the embedded MCP Server from Preview to **Stable**, alongsid
 |---------|--------|
 | `/explain` | Explain the currently selected route in plain language |
 | `/suggest` | Suggest improvements to route design, error handling, or performance |
-| `/debug` | Help debug a failed exchange — analyze the stack trace, exchange context, and route configuration |
+| `/debug` | Help debug a failed exchange: analyze the stack trace, exchange context, and route configuration |
 
 The AI panel connects to Claude, GPT, Gemini, or local models via MCP. The MCP server provides the model with structured context about the running integration, so the AI's responses are grounded in the actual route definitions and runtime state rather than generic advice.
 
@@ -580,7 +580,7 @@ Azure and Gemini detection are both new in Camel 4.22.
 
 ### Example interaction
 
-Select a failed exchange in the Errors tab, switch to the AI panel, and type `/debug`. The AI receives the full exchange context — body, headers, stack trace, route definition — and produces a targeted analysis explaining why the failure occurred and how to fix it.
+Select a failed exchange in the Errors tab, switch to the AI panel, and type `/debug`. The AI receives the full exchange context (body, headers, stack trace, route definition) and produces a targeted analysis explaining why the failure occurred and how to fix it.
 
 ## Themes and recording
 
@@ -607,7 +607,7 @@ The Actions menu (`F2`) has a **Settings…** entry for the three preferences wo
 | `camel.tui.startTab` | Which tab the TUI opens on |
 | `camel.tui.defaultFolder` | The folder the TUI runs routes from |
 
-These live in the Camel CLI configuration file, which Camel 4.22 renamed from `camel-jbang-user.properties` to `camel-cli.properties` — globally at `~/.camel-cli.properties`, or locally at `./camel-cli.properties` for a per-project override. The CLI renames a pre-existing file for you on first run and never overwrites an existing one.
+These live in the Camel CLI configuration file, which Camel 4.22 renamed from `camel-jbang-user.properties` to `camel-cli.properties`: globally at `~/.camel-cli.properties`, or locally at `./camel-cli.properties` for a per-project override. The CLI renames a pre-existing file for you on first run and never overwrites an existing one.
 
 Each key is written back to whichever file it currently lives in, so a key you set locally stays a project override while everything else falls back to the global file.
 
@@ -619,7 +619,7 @@ Tape recording captures a TUI session for demos and documentation:
 camel tui --record
 ```
 
-The recording is saved as a tape file that can be replayed or exported. This is useful for creating reproducible demonstrations of integration behavior — start the demo routes, interact with the TUI, and share the recording with your team.
+The recording is saved as a tape file that can be replayed or exported. This is useful for creating reproducible demonstrations of integration behavior: start the demo routes, interact with the TUI, and share the recording with your team.
 
 Screenshot export captures the current TUI state as a static file:
 
@@ -653,12 +653,12 @@ The TUI fits specific scenarios better than other monitoring approaches:
 | Scenario | Why the TUI works |
 |----------|-------------------|
 | **Local development** | Watch exchanges flow through routes as you develop, without configuring a metrics stack |
-| **SSH debugging** | Connect to a production server and inspect a running integration — no browser, no port forwarding |
+| **SSH debugging** | Connect to a production server and inspect a running integration: no browser, no port forwarding |
 | **Container troubleshooting** | `kubectl exec` into a pod and run `camel tui` to inspect the integration in place |
 | **Demo and training** | Show integration behavior in real time during presentations and pair programming |
 | **Quick health checks** | Faster than opening Grafana or Jaeger for a quick "is it working?" check |
 
-For production monitoring with alerting, dashboards, and historical data, you still need a proper observability stack (see Chapter 17 and Appendix I). The TUI is a complement, not a replacement — it excels at interactive, real-time inspection where the observability stack excels at aggregate, historical analysis.
+For production monitoring with alerting, dashboards, and historical data, you still need a proper observability stack (see Chapter 17 and Appendix I). The TUI is a complement, not a replacement: it excels at interactive, real-time inspection where the observability stack excels at aggregate, historical analysis.
 
 ## References
 
@@ -667,4 +667,4 @@ For production monitoring with alerting, dashboards, and historical data, you st
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — the demo routes run clean on Camel CLI 4.22.1 against the stack on Docker Engine (2026-10-09). The TUI screens themselves are described from use, not captured by an automated check.*
+*Verification status: <span class="status status--verified">verified</span>: the demo routes run clean on Camel CLI 4.22.1 against the stack on Docker Engine (2026-10-09). The TUI screens themselves are described from use, not captured by an automated check.*

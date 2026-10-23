@@ -6,7 +6,7 @@ description: "Listing, altering, and resetting connector offsets via the Kafka C
 duration: "20 minutes"
 ---
 
-Kafka Connect tracks its position in source and sink data streams using **connector offsets**: metadata stored in an internal Kafka topic (`connect-offsets` by default) that tells each connector where it left off. When a connector restarts, it resumes from its last committed offset. Managing these offsets — listing, resetting, and altering them — is essential for reprocessing data, recovering from failures, and migrating connectors between clusters.
+Kafka Connect tracks its position in source and sink data streams using **connector offsets**: metadata stored in an internal Kafka topic (`connect-offsets` by default) that tells each connector where it left off. When a connector restarts, it resumes from its last committed offset. Managing these offsets (listing, resetting, and altering them) is essential for reprocessing data, recovering from failures, and migrating connectors between clusters.
 
 ## How connector offsets differ from consumer offsets
 
@@ -26,7 +26,7 @@ Each source connector defines its own offset format. The offset key identifies t
 
 ### Sink connector offsets
 
-A sink connector reads from Kafka topics and writes to an external system. Its offsets are standard Kafka consumer offsets — identical to what `kafka-consumer-groups.sh` shows:
+A sink connector reads from Kafka topics and writes to an external system. Its offsets are standard Kafka consumer offsets: identical to what `kafka-consumer-groups.sh` shows.
 
 ```json
 {"topic": "eip.orders.placed", "partition": 0} → {"offset": 1042}
@@ -45,7 +45,7 @@ docker compose -p eip -f ../_infra/compose.yaml -f compose.connect.yaml up -d co
 ```
 
 It uses the REST API rather than the Strimzi CRDs, because the REST API is the
-same mechanism underneath and runs on the compose stack — the CRD annotations
+same mechanism underneath and runs on the compose stack: the CRD annotations
 below map onto these endpoints one to one. The script proves the rewind rather
 than asserting it: the topic goes from 10 records to 20 after the `PATCH`.
 
@@ -224,11 +224,11 @@ Each record in this topic is a key-value pair where the key identifies the conne
 | **Standalone** | Local file (`offset.storage.file.filename`) | Manual file editing |
 | **Distributed** | Kafka topic (`offset.storage.topic`) | REST API (preferred) |
 
-The REST API offset management endpoints only work in distributed mode. In standalone mode, you'd need to edit the offset file directly — another reason to prefer distributed mode for anything beyond local development.
+The REST API offset management endpoints only work in distributed mode. In standalone mode, you'd need to edit the offset file directly, another reason to prefer distributed mode for anything beyond local development.
 
 ## Camel and Kafka Connect
 
-While this tutorial focuses on Camel routes for integration logic, Kafka Connect is valuable for the data pipeline layer — moving data between databases, file systems, and Kafka topics with minimal code. The two complement each other:
+While this tutorial focuses on Camel routes for integration logic, Kafka Connect is valuable for the data pipeline layer: moving data between databases, file systems, and Kafka topics with minimal code. The two complement each other:
 
 | Responsibility | Tool |
 |---------------|------|
@@ -238,10 +238,10 @@ While this tutorial focuses on Camel routes for integration logic, Kafka Connect
 
 A typical shipping domain pipeline combines all three:
 
-{% include excalidraw.html file="36-connect-pipeline" alt="Data pipeline showing PostgreSQL flowing through Debezium source connector, Kafka, Camel route processing, and JDBC sink connector to analytics database" caption="Figure R.1 — A shipping domain pipeline: Debezium captures CDC events from PostgreSQL, Camel routes apply EIP logic (validate, enrich, route), and a JDBC sink connector writes processed orders to the analytics database. Each component manages its own offsets." %}
+{% include excalidraw.html file="36-connect-pipeline" alt="Data pipeline showing PostgreSQL flowing through Debezium source connector, Kafka, Camel route processing, and JDBC sink connector to analytics database" caption="Figure R.1: A shipping domain pipeline: Debezium captures CDC events from PostgreSQL, Camel routes apply EIP logic (validate, enrich, route), and a JDBC sink connector writes processed orders to the analytics database. Each component manages its own offsets." %}
 
 When the Camel route has a bug and you need to reprocess, you reset the Camel consumer group offsets (Appendix N). When the source connector misses rows, you alter the connector offset. When the sink connector writes to the wrong table, you fix the config and reset its offset. Each component has its own offset management surface.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — `connect-offsets-demo.sh` runs to completion against Kafka Connect on the compose stack on Docker Engine: the PATCH rewind takes the topic from 10 to 20 records and DELETE leaves no offsets. The script now waits for Connect to answer before starting (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>; `connect-offsets-demo.sh` runs to completion against Kafka Connect on the compose stack on Docker Engine: the PATCH rewind takes the topic from 10 to 20 records and DELETE leaves no offsets. The script now waits for Connect to answer before starting (2026-10-09).*

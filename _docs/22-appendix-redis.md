@@ -24,7 +24,7 @@ cd examples/22-redis-integration/spring-boot
 mvn spring-boot:run
 ```
 
-{% include excalidraw.html file="22-appendix-redis" alt="Redis four integration roles: caching, idempotent store, pub/sub, and distributed locking" caption="Figure D.1 — Redis serves four distinct roles in integration: cache-aside enrichment, idempotent message deduplication, pub/sub notifications, and distributed locking." %}
+{% include excalidraw.html file="22-appendix-redis" alt="Redis four integration roles: caching, idempotent store, pub/sub, and distributed locking" caption="Figure D.1: Redis serves four distinct roles in integration: cache-aside enrichment, idempotent message deduplication, pub/sub notifications, and distributed locking." %}
 
 ## Redis in the shipping domain
 
@@ -103,11 +103,11 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=enricher")
 ### Cache invalidation
 
 The hardest problem in computer science. Options:
-- **TTL-based** (shown above) — Simple, eventual consistency. Set TTL to match your staleness tolerance.
-- **Event-driven invalidation** — Subscribe to customer update events and invalidate the cache. More complex but more consistent.
-- **Write-through** — Update cache and DB together. Requires careful coordination.
+- **TTL-based** (shown above): Simple, eventual consistency. Set TTL to match your staleness tolerance.
+- **Event-driven invalidation**: Subscribe to customer update events and invalidate the cache. More complex but more consistent.
+- **Write-through**: Update cache and DB together. Requires careful coordination.
 
-For our domain, TTL-based caching with a 10-minute window is sufficient — customer data doesn't change frequently enough to matter.
+For our domain, TTL-based caching with a 10-minute window is sufficient: customer data doesn't change frequently enough to matter.
 
 ## Idempotent message store
 
@@ -143,7 +143,7 @@ The idempotent repository grows over time. Set a TTL on keys to bound memory usa
 repo.setExpiry(Duration.ofDays(7).toSeconds());
 ```
 
-Messages older than 7 days won't be deduplicated — but they also won't be replayed (Kafka's retention is also 7 days), so duplicates from that far back aren't a concern.
+Messages older than 7 days won't be deduplicated, but they also won't be replayed (Kafka's retention is also 7 days), so duplicates from that far back aren't a concern.
 
 ## Pub/Sub for lightweight messaging
 
@@ -166,7 +166,7 @@ from("spring-redis://localhost:6379?command=SUBSCRIBE&channels=cache-invalidatio
     });
 ```
 
-Redis pub/sub is fire-and-forget — if the subscriber is offline when the message is published, the message is lost. Use Kafka for durable messaging; use Redis pub/sub for ephemeral notifications.
+Redis pub/sub is fire-and-forget: if the subscriber is offline when the message is published, the message is lost. Use Kafka for durable messaging; use Redis pub/sub for ephemeral notifications.
 
 ## Distributed locking
 
@@ -208,4 +208,4 @@ quarkus.redis.max-pool-waiting=50
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

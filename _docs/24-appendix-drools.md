@@ -6,7 +6,7 @@ description: "Rule units, decision tables, and integrating Drools 10 with Camel 
 duration: "25 minutes"
 ---
 
-Several EIP patterns — Content-Based Router, Message Filter, Dynamic Router — make decisions based on business rules. When those rules change frequently (pricing tiers, fraud thresholds, routing logic), embedding them in Java code means redeploying for every rule change. Drools externalizes rules so business analysts can modify them without developer intervention.
+Several EIP patterns (Content-Based Router, Message Filter, Dynamic Router) make decisions based on business rules. When those rules change frequently (pricing tiers, fraud thresholds, routing logic), embedding them in Java code means redeploying for every rule change. Drools externalizes rules so business analysts can modify them without developer intervention.
 
 The code is in `examples/24-drools-rules/`.
 
@@ -24,7 +24,7 @@ cd examples/24-drools-rules/spring-boot
 mvn spring-boot:run
 ```
 
-{% include excalidraw.html file="24-appendix-drools" alt="Drools rule-based content router: Kafka consumer to rule engine to routing destinations" caption="Figure F.1 — A Drools Rule Unit evaluates orders against DRL rules and decision tables, setting a routing decision that Camel's toD() uses to dispatch to the correct handler." %}
+{% include excalidraw.html file="24-appendix-drools" alt="Drools rule-based content router: Kafka consumer to rule engine to routing destinations" caption="Figure F.1: A Drools Rule Unit evaluates orders against DRL rules and decision tables, setting a routing decision that Camel's toD() uses to dispatch to the correct handler." %}
 
 ## Why Drools for integration
 
@@ -37,7 +37,7 @@ mvn spring-boot:run
 
 ## Drools 10 with Camel Quarkus
 
-Drools 10 uses the classic **KIE Session** API — create a `KieContainer` from the classpath, insert facts, fire rules:
+Drools 10 uses the classic **KIE Session** API: create a `KieContainer` from the classpath, insert facts, fire rules.
 
 ### Define the data model
 
@@ -153,10 +153,10 @@ For rules that business analysts manage, decision tables in spreadsheets are mor
 
 | Rule Name | Amount Min | Amount Max | Country | Hazmat | Routing Decision |
 |-----------|-----------|-----------|---------|--------|-----------------|
-| Hazmat | — | — | — | true | hazmat |
-| High-value intl | 10000 | — | != US | — | fraud-review |
-| Express | 500 | — | — | — | express |
-| Standard | — | — | — | — | standard |
+| Hazmat | any | any | any | true | hazmat |
+| High-value intl | 10000 | any | != US | any | fraud-review |
+| Express | 500 | any | any | any | express |
+| Standard | any | any | any | any | standard |
 
 Export as a `.xls` or `.csv` decision table and Drools compiles it into rules. Business analysts update the spreadsheet; the application picks up changes on reload.
 
@@ -184,4 +184,4 @@ The `drools-engine` artifact provides the core KIE API without requiring the Dro
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

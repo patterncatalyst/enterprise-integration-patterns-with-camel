@@ -2,7 +2,7 @@
 title: "Advanced Routing"
 order: 11
 part: message-routing
-description: "Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, and Load Balancer — patterns for runtime-adaptive, observable, and resilient routing."
+description: "Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, and Load Balancer: patterns for runtime-adaptive, observable, and resilient routing."
 duration: "40 minutes"
 ---
 
@@ -30,13 +30,13 @@ camel run *
 
 The previous two chapters covered the most common routing patterns. This chapter rounds out the routing catalog with five patterns that address specific challenges: routing decisions that change at runtime, observability without disrupting the flow, reordering out-of-sequence messages, processing composite messages efficiently, and distributing load across multiple processing nodes.
 
-{% include excalidraw.html file="11-wire-tap" alt="Wire Tap pattern" caption="Figure 11.1 — Wire Tap sends a copy of the message to a monitoring channel without affecting the main flow." %}
+{% include excalidraw.html file="11-wire-tap" alt="Wire Tap pattern" caption="Figure 11.1: Wire Tap sends a copy of the message to a monitoring channel without affecting the main flow." %}
 
 ## Pattern: Dynamic Router
 
 ### The problem
 
-The routing slip pattern determines the full sequence of steps upfront. But some workflows can't be planned in advance — the next step depends on the result of the current step, and the decision logic changes frequently. For example:
+The routing slip pattern determines the full sequence of steps upfront. But some workflows can't be planned in advance: the next step depends on the result of the current step, and the decision logic changes frequently. For example:
 
 - A/B testing routes: 10% of orders go through a new experimental fulfillment path, 90% through the standard path. The split changes weekly.
 - Rule-engine routing: a business rules engine decides the next step based on the current order state, customer profile, and external data. New rules are deployed without code changes.
@@ -60,7 +60,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=dynamic-routing")
 ```
 
 Everything the Dynamic Router routes to is an endpoint URI computed at runtime,
-which makes it the same injection surface as `toD` — see [safety with
+which makes it the same injection surface as `toD`. See [safety with
 `toD()`]({% link _docs/14-consumer-patterns.md %}#safety-with-tod) in Chapter 14. Camel 4.22 added
 the same `allowedSchemes` allow-list to the dynamic-router endpoint, and it is
 worth setting whenever the routing bean's return value is influenced by message
@@ -148,23 +148,23 @@ public class OrderRoutingBean {
 | Dimension | Dynamic Router | Routing Slip |
 |-----------|---------------|-------------|
 | **Decision timing** | At each step, based on current state | Upfront, before processing starts |
-| **Adaptability** | Fully adaptive — can change course mid-flow | Fixed — the slip is set at the start |
-| **Complexity** | Higher — routing logic runs repeatedly | Lower — just follow the list |
+| **Adaptability** | Fully adaptive: can change course mid-flow | Fixed: the slip is set at the start |
+| **Complexity** | Higher: routing logic runs repeatedly | Lower: just follow the list |
 | **Use case** | Conditional workflows, A/B testing, rule engines | Known multi-step pipelines |
 
 ### The "return null to stop" contract
 
-The dynamic router method **must** return `null` to stop routing. If it always returns an endpoint, the router loops forever. This is the most common mistake with dynamic routers — forgetting to terminate. Always include a default case that returns `null`.
+The dynamic router method **must** return `null` to stop routing. If it always returns an endpoint, the router loops forever. This is the most common mistake with dynamic routers: forgetting to terminate. Always include a default case that returns `null`.
 
 ## Pattern: Wire Tap
 
 ### The problem
 
-You want to log, audit, or monitor every order that passes through the system — but you don't want to slow down the main processing flow. Adding a synchronous `.to("kafka:eip.audit.orders")` in the middle of the route means the main flow waits for Kafka to acknowledge the audit message. If the audit system is slow or down, it blocks order processing.
+You want to log, audit, or monitor every order that passes through the system, but you don't want to slow down the main processing flow. Adding a synchronous `.to("kafka:eip.audit.orders")` in the middle of the route means the main flow waits for Kafka to acknowledge the audit message. If the audit system is slow or down, it blocks order processing.
 
 ### The solution
 
-A **Wire Tap** sends a copy of the message to a secondary channel without affecting the main flow. The main route continues immediately; the tap processes asynchronously. Think of it as a network packet capture — it observes the traffic without interfering.
+A **Wire Tap** sends a copy of the message to a secondary channel without affecting the main flow. The main route continues immediately; the tap processes asynchronously. Think of it as a network packet capture: it observes the traffic without interfering.
 
 ### How Camel models it
 
@@ -198,7 +198,7 @@ from("direct:analytics-enrichment")
 
 | Dimension | Wire Tap | Multicast |
 |-----------|----------|-----------|
-| **Blocking** | No — async, fire-and-forget | Yes — waits for all recipients |
+| **Blocking** | No: async, fire-and-forget | Yes: waits for all recipients |
 | **Copy** | Shallow copy of the exchange | Full copy |
 | **Failure impact** | Tap failure doesn't affect main flow | Recipient failure can affect the flow |
 | **Use case** | Auditing, logging, analytics, monitoring | Sending to multiple recipients that matter |
@@ -236,8 +236,8 @@ A status dashboard that shows these updates needs them in chronological order. A
 A **Resequencer** collects messages from a stream and re-emits them in the correct order based on a sequence key (timestamp, sequence number, etc.). It acts as a buffer that absorbs out-of-order arrivals and releases them in order.
 
 Camel offers two resequencer modes:
-- **Batch** — Collect N messages, sort them, emit in order. Simple but introduces latency.
-- **Stream** — Emit messages as soon as the next expected sequence number arrives. Lower latency but more complex.
+- **Batch**: Collect N messages, sort them, emit in order. Simple but introduces latency.
+- **Stream**: Emit messages as soon as the next expected sequence number arrives. Lower latency but more complex.
 
 ### How Camel models it
 
@@ -268,11 +268,11 @@ from("kafka:eip.orders.sequenced-updates?brokers=localhost:9092&groupId=stream-r
 ### When ordering already works
 
 Before adding a resequencer, check if you can fix the ordering upstream:
-- **Same Kafka partition** — If all events for an order use the same key (order ID), they're guaranteed to arrive in order within a partition. Use `key=${header.orderId}` on the producer.
-- **Single partition** — If total ordering matters more than throughput, use a single-partition topic. But this limits throughput to one consumer.
-- **Pulsar exclusive subscription** — With an exclusive subscription on a single-partition topic, ordering is guaranteed.
+- **Same Kafka partition**: If all events for an order use the same key (order ID), they're guaranteed to arrive in order within a partition. Use `key=${header.orderId}` on the producer.
+- **Single partition**: If total ordering matters more than throughput, use a single-partition topic. But this limits throughput to one consumer.
+- **Pulsar exclusive subscription**: With an exclusive subscription on a single-partition topic, ordering is guaranteed.
 
-Only add a resequencer when you can't control the upstream ordering — for example, when aggregating events from multiple independent producers or bridging between different messaging systems.
+Only add a resequencer when you can't control the upstream ordering: for example, when aggregating events from multiple independent producers or bridging between different messaging systems.
 
 ## Pattern: Composed Message Processor
 
@@ -337,18 +337,18 @@ public class OrderItemAggregation implements AggregationStrategy {
 
 ### The problem
 
-Payment-service runs on three instances. When processing payments, you want to distribute the load evenly across instances — and if one instance is unhealthy, stop sending it traffic until it recovers.
+Payment-service runs on three instances. When processing payments, you want to distribute the load evenly across instances, and if one instance is unhealthy, stop sending it traffic until it recovers.
 
 In a Kafka architecture, load balancing happens naturally through consumer group partition assignment. But for synchronous processing (HTTP endpoints, direct calls), you need explicit load balancing.
 
 ### The solution
 
 A **Load Balancer** distributes messages across multiple processing nodes using a strategy:
-- **Round-robin** — Cycle through endpoints in order.
-- **Random** — Pick a random endpoint.
-- **Sticky** — Route by a key (like customer ID) so the same customer always hits the same instance.
-- **Failover** — Try the first endpoint; if it fails, try the next.
-- **Circuit breaker** — Track failures per endpoint and temporarily disable unhealthy ones.
+- **Round-robin**: Cycle through endpoints in order.
+- **Random**: Pick a random endpoint.
+- **Sticky**: Route by a key (like customer ID) so the same customer always hits the same instance.
+- **Failover**: Try the first endpoint; if it fails, try the next.
+- **Circuit breaker**: Track failures per endpoint and temporarily disable unhealthy ones.
 
 ### How Camel models it
 
@@ -385,7 +385,7 @@ from("direct:process-payment-sticky")
 
 ### Load balancer vs. Kafka consumer groups
 
-In our Kafka-centric architecture, Kafka's consumer group protocol provides load balancing for Kafka messages automatically — no Camel `loadBalance()` needed. Use Camel's load balancer for:
+In our Kafka-centric architecture, Kafka's consumer group protocol provides load balancing for Kafka messages automatically: no Camel `loadBalance()` needed. Use Camel's load balancer for:
 - **HTTP calls** to services without a load balancer (no Kubernetes service, no Nginx).
 - **Direct calls** within a single application where you want to distribute across internal processors.
 - **Failover** across multiple instances of an external API.
@@ -405,25 +405,25 @@ For Kafka-based workloads, let Kafka handle the distribution through consumer gr
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 7: "Message Routing"
-- [enterpriseintegrationpatterns.com — Dynamic Router](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DynamicRouter.html)
-- [enterpriseintegrationpatterns.com — Wire Tap](https://www.enterpriseintegrationpatterns.com/patterns/messaging/WireTap.html)
-- [enterpriseintegrationpatterns.com — Resequencer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Resequencer.html)
-- [enterpriseintegrationpatterns.com — Composed Message Processor](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DistributionAggregate.html)
-- [Apache Camel — Dynamic Router EIP](https://camel.apache.org/components/4.22.x/eips/dynamicRouter-eip.html)
-- [Apache Camel — Wire Tap EIP](https://camel.apache.org/components/4.22.x/eips/wireTap-eip.html)
-- [Apache Camel — Resequencer EIP](https://camel.apache.org/components/4.22.x/eips/resequence-eip.html)
-- [Apache Camel — Load Balance EIP](https://camel.apache.org/components/4.22.x/eips/loadBalance-eip.html)
+- [enterpriseintegrationpatterns.com: Dynamic Router](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DynamicRouter.html)
+- [enterpriseintegrationpatterns.com: Wire Tap](https://www.enterpriseintegrationpatterns.com/patterns/messaging/WireTap.html)
+- [enterpriseintegrationpatterns.com: Resequencer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Resequencer.html)
+- [enterpriseintegrationpatterns.com: Composed Message Processor](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DistributionAggregate.html)
+- [Apache Camel: Dynamic Router EIP](https://camel.apache.org/components/4.22.x/eips/dynamicRouter-eip.html)
+- [Apache Camel: Wire Tap EIP](https://camel.apache.org/components/4.22.x/eips/wireTap-eip.html)
+- [Apache Camel: Resequencer EIP](https://camel.apache.org/components/4.22.x/eips/resequence-eip.html)
+- [Apache Camel: Load Balance EIP](https://camel.apache.org/components/4.22.x/eips/loadBalance-eip.html)
 
 ## What you learned
 
-- **Dynamic Router** makes routing decisions at each step based on current state — for workflows that can't be planned upfront.
-- **Wire Tap** sends a copy to a secondary channel without blocking the main flow — essential for auditing, analytics, and observability.
-- **Resequencer** reorders out-of-sequence messages by a key — batch mode for simple reordering, stream mode for low-latency flows.
-- **Composed Message Processor** splits, processes independently, and reassembles — the Splitter-Aggregator combo for composite messages.
-- **Load Balancer** distributes messages across processing nodes — round-robin, failover, sticky, and more.
+- **Dynamic Router** makes routing decisions at each step based on current state: for workflows that can't be planned upfront.
+- **Wire Tap** sends a copy to a secondary channel without blocking the main flow: essential for auditing, analytics, and observability.
+- **Resequencer** reorders out-of-sequence messages by a key: batch mode for simple reordering, stream mode for low-latency flows.
+- **Composed Message Processor** splits, processes independently, and reassembles: the Splitter-Aggregator combo for composite messages.
+- **Load Balancer** distributes messages across processing nodes: round-robin, failover, sticky, and more.
 
-This completes Part 5 — Message Routing (12 patterns across 3 chapters). Next: Part 6 — Message Transformation, where we explore how messages change shape as they flow through the system.
+This completes Part 5: Message Routing (12 patterns across 3 chapters). Next: Part 6: Message Transformation, where we explore how messages change shape as they flow through the system.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

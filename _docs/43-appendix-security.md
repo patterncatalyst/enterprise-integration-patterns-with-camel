@@ -2,7 +2,7 @@
 title: "Appendix Y: Secure by Default"
 order: 43
 part: appendices
-description: "What Camel 4.21 and 4.22 started doing for you — deserialization filters, header boundaries, dynamic URI allow-lists, path containment — and the three places you still have to decide."
+description: "What Camel 4.21 and 4.22 started doing for you (deserialization filters, header boundaries, dynamic URI allow-lists, path containment) and the three places you still have to decide."
 duration: "20 minutes"
 ---
 
@@ -16,8 +16,8 @@ is the wrong way round. The useful version is this: an integration framework is
 a machine for moving untrusted bytes between systems that trust each other, and
 Camel has stopped assuming you have thought about that.
 
-The practical consequence for you is twofold. Most of this you now get for
-free, which is worth knowing so you stop writing the workarounds. And a few
+The practical consequence for you is twofold. Most of this you now get by
+default, which is worth knowing so you stop writing the workarounds. And a few
 things you still have to decide, which is worth knowing because nothing will
 prompt you.
 
@@ -36,11 +36,11 @@ decided to try.
 
 Three specific shapes recur, and Camel now defends all three by default:
 
-1. **Deserialization** — turning bytes into objects is arbitrary code execution
+1. **Deserialization**: turning bytes into objects is arbitrary code execution
    if the type is attacker-controlled.
-2. **Boundary crossing** — a header set inside your system means something; the
+2. **Boundary crossing**: a header set inside your system means something; the
    same header arriving from outside means something else entirely.
-3. **Dynamic destinations** — a URI computed from a message is a request to
+3. **Dynamic destinations**: a URI computed from a message is a request to
    talk to whatever the message says.
 
 ## What you now get without asking
@@ -48,7 +48,7 @@ Three specific shapes recur, and Camel now defends all three by default:
 **Deserialization is filtered.** Camel applies a JEP-290 `ObjectInputFilter` at
 every deserialization site, with a default pattern that denies `java.net.**`,
 allows the `java`, `javax` and `org.apache.camel` trees, and rejects everything
-else — plus graph-shape limits (depth 20, 10,000 references, 10 MB) so a small
+else, plus graph-shape limits (depth 20, 10,000 references, 10 MB) so a small
 payload cannot expand into a large one. The Java serialization type converters
 are gone from `camel-core` entirely, and JMS `ObjectMessage` is disabled unless
 you turn it on. Jackson refuses unsafe polymorphic base types.
@@ -60,7 +60,7 @@ you can probably delete it.
 lowercases by default and blocks `Camel`- and `camel`-prefixed headers in both
 directions. More quietly, header constants across more than thirty components
 were renamed to the `Camel*` convention *specifically so that this filter
-catches them* — a fix that looks like churn in a changelog but is the whole
+catches them*: a fix that looks like churn in a changelog but is the whole
 point.
 
 This matters for [Chapter 8]({% link _docs/08-message-metadata.md %}). Headers
@@ -79,7 +79,7 @@ passwords in URIs and PEM private-key blocks. Your logs leak less than they did.
 
 **The embedded HTTP server got stricter.** JWT handling is hardened, and the
 `prod` profile now refuses to start on misconfigured authentication rather than
-starting insecurely — which is the right failure, and will be an unwelcome
+starting insecurely, which is the right failure, and will be an unwelcome
 surprise exactly once.
 
 ## The three things you still have to decide
@@ -89,7 +89,7 @@ Defaults cannot make these calls for you.
 ### 1. Dynamic URIs need an allow-list
 
 `toD`, `enrich` and the Dynamic Router all resolve a destination from an
-expression. Camel 4.22 added `allowedSchemes`, but it is **off by default** —
+expression. Camel 4.22 added `allowedSchemes`, but it is **off by default**,
 because Camel cannot know which schemes your route legitimately needs.
 
 ```java
@@ -119,9 +119,9 @@ Camel route exposed over HTTP has no authentication until you give it some.
 ### 3. The header filter has a default, not an answer
 
 Blocking `Camel*` headers at the boundary is a sensible default. It is not a
-policy. If your integration deliberately propagates a correlation header across
-a transport — which is a perfectly normal thing to do, and something
-[Chapter 8]({% link _docs/08-message-metadata.md %}) shows — you need to say so
+policy. If your integration propagates a correlation header across
+a transport to preserve end-to-end correlation (which is a perfectly normal thing to do, and something
+[Chapter 8]({% link _docs/08-message-metadata.md %}) shows), you need to say so
 explicitly with a `HeaderFilterStrategy` that permits it. The default will
 otherwise silently drop it, and "the correlation ID disappears when it crosses
 JMS" is an annoying afternoon.
@@ -138,9 +138,9 @@ If you are upgrading an existing application:
 
 If you are writing something new, the defaults are
 now good enough that the three decisions above are most of your remaining
-security surface at the framework level — a meaningful change from two
+security surface at the framework level: a meaningful change from two
 releases ago.
 
 ---
 
-*Verification status: <span class="status status--unverified">unverified</span> — a prose chapter with no runnable example, written from the [4.21](https://camel.apache.org/manual/camel-4x-upgrade-guide-4_21.html) and [4.22](https://camel.apache.org/manual/camel-4x-upgrade-guide-4_22.html) upgrade guides. The one item here that is exercised by code is `allowedSchemes`, in `examples/14-consumer-patterns/` on both runtimes. The rest describes framework behaviour this tutorial does not have a test for; treat the specifics as a map to the upgrade guides rather than as independently confirmed.*
+*Verification status: <span class="status status--unverified">unverified</span>: a prose chapter with no runnable example, written from the [4.21](https://camel.apache.org/manual/camel-4x-upgrade-guide-4_21.html) and [4.22](https://camel.apache.org/manual/camel-4x-upgrade-guide-4_22.html) upgrade guides. The one item here that is exercised by code is `allowedSchemes`, in `examples/14-consumer-patterns/` on both runtimes. The rest describes framework behaviour this tutorial does not have a test for; treat the specifics as a map to the upgrade guides rather than as independently confirmed.*

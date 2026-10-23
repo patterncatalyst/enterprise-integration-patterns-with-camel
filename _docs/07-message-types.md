@@ -2,7 +2,7 @@
 title: "Message Types"
 order: 7
 part: message-construction
-description: "Command, document, and event messages — the three semantic types that determine what a message means and how the receiver should handle it."
+description: "Command, document, and event messages: the three semantic types that determine what a message means and how the receiver should handle it."
 duration: "30 minutes"
 ---
 
@@ -28,11 +28,11 @@ cd examples/07-message-types/yaml-dsl
 camel run *
 ```
 
-So far, we've treated messages as generic packets of data. But messages carry intent — they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types — command, document, and event — shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
+So far, we've treated messages as generic packets of data. But messages carry intent: they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types (command, document, and event) shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
 
-{% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1 — The three message types and their channel/consumer affinities." %}
+{% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1: The three message types and their channel/consumer affinities." %}
 
-This chapter and the next cover Message Construction: what goes *inside* a message and what metadata accompanies it. We start here with the three message types, then move to metadata patterns — request-reply, correlation, sequencing, and expiration — in the next chapter.
+This chapter and the next cover Message Construction: what goes *inside* a message and what metadata accompanies it. We start here with the three message types, then move to metadata patterns (request-reply, correlation, sequencing, and expiration) in the next chapter.
 
 ## Pattern: Command Message
 
@@ -41,9 +41,9 @@ This chapter and the next cover Message Construction: what goes *inside* a messa
 A **Command Message** tells the receiver to do something: "reserve inventory for this order," "process this payment," "schedule this shipment." The sender has a specific action in mind and expects the receiver to carry it out.
 
 Commands are:
-- **Directed** — Sent to a specific receiver (or a pool of receivers that compete for work). You wouldn't broadcast a "charge this credit card" command to every service.
-- **Imperative** — Named as verbs: `ReserveInventory`, `ProcessPayment`, `ScheduleShipment`.
-- **Expecting a result** — The sender usually cares whether the command succeeded. This often implies a request-reply pattern (next chapter).
+- **Directed**: Sent to a specific receiver (or a pool of receivers that compete for work). You wouldn't broadcast a "charge this credit card" command to every service.
+- **Imperative**: Named as verbs: `ReserveInventory`, `ProcessPayment`, `ScheduleShipment`.
+- **Expecting a result**: The sender usually cares whether the command succeeded. This often implies a request-reply pattern (next chapter).
 
 ### Shipping domain example
 
@@ -59,7 +59,7 @@ When inventory-service confirms that stock is available, it could send a `Proces
 }
 ```
 
-This tells payment-service exactly what to do. Payment-service doesn't decide *whether* to process the payment — that decision was made upstream. It just executes.
+This tells payment-service exactly what to do. Payment-service doesn't decide *whether* to process the payment; that decision was made upstream. It just executes.
 
 ### How Camel models it
 
@@ -86,7 +86,7 @@ from("kafka:eip.payments.commands?brokers=localhost:9092&groupId=payment-service
 
 ### Trade-offs of command messages
 
-Commands create **behavioral coupling**: the sender knows *what the receiver does* and depends on that behavior. If payment-service changes how it processes payments, the sender may need to adjust (different fields, different error codes, different semantics). This coupling is tighter than event messages but sometimes necessary — when you need to guarantee a specific action was taken.
+Commands create **behavioral coupling**: the sender knows *what the receiver does* and depends on that behavior. If payment-service changes how it processes payments, the sender may need to adjust (different fields, different error codes, different semantics). This coupling is tighter than event messages, but it's sometimes necessary: you need it when you must guarantee a specific action was taken.
 
 ## Pattern: Document Message
 
@@ -95,13 +95,13 @@ Commands create **behavioral coupling**: the sender knows *what the receiver doe
 A **Document Message** carries data from the sender to the receiver without prescribing any action. It says "here is the information" and lets the receiver decide what to do with it. The sender transfers data, not intent.
 
 Documents are:
-- **Data-centric** — Named as nouns: `OrderRecord`, `CustomerProfile`, `InventorySnapshot`.
-- **No implied action** — The receiver might display it, store it, analyze it, or ignore it.
-- **Often batch-oriented** — Exporting a set of records, synchronizing a data snapshot, populating a report.
+- **Data-centric**: Named as nouns: `OrderRecord`, `CustomerProfile`, `InventorySnapshot`.
+- **No implied action**: The receiver might display it, store it, analyze it, or ignore it.
+- **Often batch-oriented**: Exporting a set of records, synchronizing a data snapshot, populating a report.
 
 ### Shipping domain example
 
-The nightly accounting export from Part 1 (Integration Styles) is a document message. Order-service sends order records to the accounting system — not as commands ("process these orders") but as data ("here are the orders"):
+The nightly accounting export from Part 1 (Integration Styles) is a document message. Order-service sends order records to the accounting system, not as commands ("process these orders") but as data ("here are the orders"):
 
 ```json
 {
@@ -122,7 +122,7 @@ The accounting system decides what to do: reconcile revenue, update the ledger, 
 
 ### How Camel models it
 
-Document messages often involve data format transformation — the sender's internal format rarely matches what the receiver needs:
+Document messages often involve data format transformation, since the sender's internal format rarely matches what the receiver needs:
 
 ```java
 // Send a batch of order documents to the accounting channel
@@ -144,13 +144,13 @@ from("timer:accounting-export?period=86400000")
 
 ### What it is
 
-An **Event Message** announces that something happened: "an order was placed," "payment was processed," "a shipment was delivered." It's a statement of fact — an immutable record of a past occurrence. The sender doesn't tell the receiver what to do; it just says what happened and lets any interested party react as they see fit.
+An **Event Message** announces that something happened: "an order was placed," "payment was processed," "a shipment was delivered." It's a statement of fact: an immutable record of a past occurrence. The sender doesn't tell the receiver what to do; it just says what happened and lets any interested party react as they see fit.
 
 Events are:
-- **Past tense** — Named as past participles: `OrderPlaced`, `PaymentProcessed`, `ShipmentDelivered`.
-- **Immutable** — Once emitted, an event doesn't change. You can emit a new event that corrects or supersedes it, but the original stands.
-- **Publish-subscribe** — Events are broadcast to all interested subscribers. The sender doesn't know who's listening.
-- **No expected response** — The sender fires and forgets. It doesn't wait for a result, doesn't expect acknowledgment, and doesn't care if zero or a hundred consumers process the event.
+- **Past tense**: Named as past participles: `OrderPlaced`, `PaymentProcessed`, `ShipmentDelivered`.
+- **Immutable**: Once emitted, an event doesn't change. You can emit a new event that corrects or supersedes it, but the original stands.
+- **Publish-subscribe**: Events are broadcast to all interested subscribers. The sender doesn't know who's listening.
+- **No expected response**: The sender fires and forgets. It doesn't wait for a result, doesn't expect acknowledgment, and doesn't care if zero or a hundred consumers process the event.
 
 ### Why our domain uses events
 
@@ -191,11 +191,11 @@ from("direct:emit-order-placed")
 ```
 
 The event envelope includes metadata that helps consumers process and debug:
-- `event_type` — What happened.
-- `event_id` — Unique identifier for deduplication (used by the Idempotent Receiver in Part 7).
-- `event_time` — When it happened (the business time, not the Kafka append time).
-- `source` — Which service emitted it.
-- `data` — The event payload.
+- `event_type`: What happened.
+- `event_id`: Unique identifier for deduplication (used by the Idempotent Receiver in Part 7).
+- `event_time`: When it happened (the business time, not the Kafka append time).
+- `source`: Which service emitted it.
+- `data`: The event payload.
 
 ## Choosing between the three types
 
@@ -210,11 +210,11 @@ The event envelope includes metadata that helps consumers process and debug:
 
 ### When to use each
 
-**Commands** when you need to guarantee a specific action is taken and you want the result back. Use sparingly — they create behavioral coupling.
+**Commands** when you need to guarantee a specific action is taken and you want the result back. Use sparingly; they create behavioral coupling.
 
 **Documents** when you're transferring data without prescribing action. Reports, exports, data synchronization, reference data distribution.
 
-**Events** when you want loose coupling and don't care who reacts or how. This is the default in event-driven microservices — and the default in our shipping domain.
+**Events** when you want loose coupling and don't care who reacts or how. This is the default in event-driven microservices and the default in our shipping domain.
 
 ### Hybrid patterns
 
@@ -224,26 +224,26 @@ Real systems often mix types. Our shipping domain is mostly events, but the chec
 
 **Commands disguised as events.** If `OrderPlaced` is only consumed by inventory-service, and inventory-service is the *only* thing that should react, you've built a command with event naming. This isn't necessarily wrong, but the coupling is real. If you later add a second consumer and it causes problems, the event naming misled you.
 
-**Events with command semantics.** If inventory-service emits `InventoryReserved` and payment-service treats it as "I must now charge the customer" — that's fine, that's choreography. But if payment-service would break if it *didn't* process the event, you've created an implicit command. Make sure the dependency is understood and documented.
+**Events with command semantics.** If inventory-service emits `InventoryReserved` and payment-service treats it as "I must now charge the customer," that's fine; that's choreography. But if payment-service would break if it *didn't* process the event, you've created an implicit command. Make sure the dependency is understood and documented.
 
-**Missing event metadata.** Events without `event_id`, `event_time`, and `source` are harder to debug, deduplicate, and replay. Include these fields from the start — adding them later means migrating all consumers.
+**Missing event metadata.** Events without `event_id`, `event_time`, and `source` are harder to debug, deduplicate, and replay. Include these fields from the start: adding them later means migrating all consumers.
 
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 5: "Message Construction"
-- [enterpriseintegrationpatterns.com — Command Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CommandMessage.html)
-- [enterpriseintegrationpatterns.com — Document Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DocumentMessage.html)
-- [enterpriseintegrationpatterns.com — Event Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/EventMessage.html)
+- [enterpriseintegrationpatterns.com: Command Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CommandMessage.html)
+- [enterpriseintegrationpatterns.com: Document Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/DocumentMessage.html)
+- [enterpriseintegrationpatterns.com: Event Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/EventMessage.html)
 
 ## What you learned
 
-- **Command Messages** direct the receiver to perform a specific action — highest coupling, used for orchestrated workflows.
-- **Document Messages** transfer data without implying action — used for batch exports, data sync, and reference data.
-- **Event Messages** announce facts about what happened — lowest coupling, the foundation of event-driven architecture and the default in our shipping domain.
+- **Command Messages** direct the receiver to perform a specific action: highest coupling, used for orchestrated workflows.
+- **Document Messages** transfer data without implying action: used for batch exports, data sync, and reference data.
+- **Event Messages** announce facts about what happened: lowest coupling, the foundation of event-driven architecture and the default in our shipping domain.
 - The choice between types determines coupling, error handling, and how the system evolves as you add new services.
 
 Next, we look at the metadata that accompanies messages: request-reply, correlation identifiers, message sequences, expiration, and format indicators.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

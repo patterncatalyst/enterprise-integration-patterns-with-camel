@@ -2,7 +2,7 @@
 title: "Endpoint Management"
 order: 16
 part: messaging-endpoints
-description: "Messaging Gateway, Selective Consumer, Channel Purger, and Messaging Mapper — patterns for managing the boundary between application code and the messaging system."
+description: "Messaging Gateway, Selective Consumer, Channel Purger, and Messaging Mapper: patterns for managing the boundary between application code and the messaging system."
 duration: "35 minutes"
 ---
 
@@ -30,13 +30,13 @@ camel run *
 
 The previous two chapters covered how consumers receive and producers send messages. This chapter completes the Messaging Endpoints catalog with four patterns that manage the boundary layer itself: abstracting messaging behind a gateway, selectively consuming from shared channels, purging stale messages, and mapping between domain objects and messages.
 
-{% include excalidraw.html file="16-messaging-gateway" alt="Messaging Gateway pattern" caption="Figure 16.1 — Messaging Gateway hides the messaging system from application code" %}
+{% include excalidraw.html file="16-messaging-gateway" alt="Messaging Gateway pattern" caption="Figure 16.1: Messaging Gateway hides the messaging system from application code" %}
 
 ## Pattern: Messaging Gateway
 
 ### The problem
 
-Throughout the previous chapters, Camel routes directly reference messaging infrastructure: Kafka topic names, broker addresses, serialization details. If the business logic in a CDI bean needs to publish an event, it would have to inject a `ProducerTemplate` and construct the correct endpoint URI — coupling the bean to Camel's API and the infrastructure topology.
+Throughout the previous chapters, Camel routes directly reference messaging infrastructure: Kafka topic names, broker addresses, serialization details. If the business logic in a CDI bean needs to publish an event, it would have to inject a `ProducerTemplate` and construct the correct endpoint URI, coupling the bean to Camel's API and the infrastructure topology.
 
 ### The solution
 
@@ -110,10 +110,10 @@ from("direct:publish-payment-processed")
 
 ### Benefits
 
-- **Testability** — Mock `OrderMessagingGateway` in unit tests. No need to start Kafka.
-- **Encapsulation** — Topic names, serialization, and header conventions are in one place.
-- **Refactoring** — Switch from Kafka to Pulsar by changing the gateway's routes, not every caller.
-- **Type safety** — The gateway can accept domain objects instead of generic maps.
+- **Testability**: Mock `OrderMessagingGateway` in unit tests. No need to start Kafka.
+- **Encapsulation**: Topic names, serialization, and header conventions are in one place.
+- **Refactoring**: Switch from Kafka to Pulsar by changing the gateway's routes, not every caller.
+- **Type safety**: The gateway can accept domain objects instead of generic maps.
 
 ## Pattern: Selective Consumer
 
@@ -125,11 +125,11 @@ A message filter (Chapter 09) works, but it deserializes every message just to c
 
 ### The solution
 
-A **Selective Consumer** filters messages *at the transport level* — before deserialization, before the message enters the application's processing pipeline. In Kafka, this can mean:
+A **Selective Consumer** filters messages *at the transport level*: before deserialization, before the message enters the application's processing pipeline. In Kafka, this can mean:
 
-1. **Separate topics** (Datatype Channel) — Put hazmat orders on `eip.orders.hazmat`. The consumer only subscribes to what it needs.
-2. **Kafka headers** — Filter by header value without deserializing the body.
-3. **Partition assignment** — Route hazmat orders to a specific partition and consume only that partition.
+1. **Separate topics** (Datatype Channel): Put hazmat orders on `eip.orders.hazmat`. The consumer only subscribes to what it needs.
+2. **Kafka headers**: Filter by header value without deserializing the body.
+3. **Partition assignment**: Route hazmat orders to a specific partition and consume only that partition.
 
 ### How Camel models it
 
@@ -182,16 +182,16 @@ Consumers can filter on these headers cheaply. Only messages that pass the filte
 
 During development and testing, Kafka topics accumulate stale messages from previous test runs. When you restart a consumer with `autoOffsetReset=earliest`, it replays hundreds of old messages, polluting logs and triggering unintended side effects.
 
-In production, after a deployment rollback, you may need to discard messages that were produced by the buggy version — they contain malformed data that would crash consumers.
+In production, after a deployment rollback, you may need to discard messages that were produced by the buggy version; they contain malformed data that would crash consumers.
 
 ### The solution
 
-A **Channel Purger** removes unwanted messages from a channel. In Kafka, there's no "delete message" API — but you can achieve the same effect through:
+A **Channel Purger** removes unwanted messages from a channel. In Kafka, there's no "delete message" API, but you can achieve the same effect through:
 
-1. **Offset manipulation** — Reset the consumer group's offset to skip past the unwanted messages.
-2. **Topic deletion and recreation** — Nuclear option for development environments.
-3. **Record deletion** — Kafka supports deleting records before a given offset (`deleteRecords`).
-4. **Purge route** — A Camel route that consumes and discards messages matching a criteria.
+1. **Offset manipulation**: Reset the consumer group's offset to skip past the unwanted messages.
+2. **Topic deletion and recreation**: Nuclear option for development environments.
+3. **Record deletion**: Kafka supports deleting records before a given offset (`deleteRecords`).
+4. **Purge route**: A Camel route that consumes and discards messages matching a criteria.
 
 ### How Camel and Kafka CLI model it
 
@@ -238,9 +238,9 @@ The domain model uses Java objects (`Order`, `Customer`, `Payment`), but messagi
 
 A **Messaging Mapper** handles the conversion between domain objects and messages. In Camel, this is typically handled by:
 
-1. **Data formats** — `marshal().json()` and `unmarshal().json(Order.class)`.
-2. **Type converters** — Camel's built-in type conversion system.
-3. **Bean binding** — Camel automatically converts message bodies to method parameter types.
+1. **Data formats**: `marshal().json()` and `unmarshal().json(Order.class)`.
+2. **Type converters**: Camel's built-in type conversion system.
+3. **Bean binding**: Camel automatically converts message bodies to method parameter types.
 
 ### How Camel models it
 
@@ -315,11 +315,11 @@ public class Order {
 }
 ```
 
-This is the messaging mapper in action — the annotations define the mapping between the domain representation and the message representation, keeping the two cleanly separated.
+This is the messaging mapper in action: the annotations define the mapping between the domain representation and the message representation, keeping the two cleanly separated.
 
 ## Common pitfalls
 
-**Gateways that leak abstraction.** If the gateway method signature includes `Exchange` or `ProducerTemplate`, it's not a gateway — it's a thin wrapper. The gateway should accept and return domain objects, not messaging primitives.
+**Gateways that leak abstraction.** If the gateway method signature includes `Exchange` or `ProducerTemplate`, it's not a gateway; it's a thin wrapper. The gateway should accept and return domain objects, not messaging primitives.
 
 **Selective consumers that still deserialize everything.** If you filter on body fields, you've already paid the deserialization cost. Promote filter-worthy fields to Kafka headers at production time.
 
@@ -330,22 +330,22 @@ This is the messaging mapper in action — the annotations define the mapping be
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 9: "Messaging Endpoints"
-- [enterpriseintegrationpatterns.com — Messaging Gateway](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingGateway.html)
-- [enterpriseintegrationpatterns.com — Selective Consumer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageSelector.html)
-- [enterpriseintegrationpatterns.com — Channel Purger](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ChannelPurger.html)
-- [enterpriseintegrationpatterns.com — Messaging Mapper](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingMapper.html)
-- [Apache Camel — ProducerTemplate](https://camel.apache.org/manual/producertemplate.html)
-- [Apache Camel — Type Converters](https://camel.apache.org/manual/type-converter.html)
+- [enterpriseintegrationpatterns.com: Messaging Gateway](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingGateway.html)
+- [enterpriseintegrationpatterns.com: Selective Consumer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessageSelector.html)
+- [enterpriseintegrationpatterns.com: Channel Purger](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ChannelPurger.html)
+- [enterpriseintegrationpatterns.com: Messaging Mapper](https://www.enterpriseintegrationpatterns.com/patterns/messaging/MessagingMapper.html)
+- [Apache Camel: ProducerTemplate](https://camel.apache.org/manual/producertemplate.html)
+- [Apache Camel: Type Converters](https://camel.apache.org/manual/type-converter.html)
 
 ## What you learned
 
-- **Messaging Gateway** wraps messaging behind a domain-specific interface — use `FluentProducerTemplate` in a CDI bean for clean separation.
-- **Selective Consumer** filters messages before full deserialization — promote filter fields to Kafka headers for efficiency.
-- **Channel Purger** removes stale messages — use offset resets for broad purges, filter routes for selective purges.
-- **Messaging Mapper** converts between domain objects and messages — Camel's `unmarshal()` with typed classes and bean binding handle most cases.
+- **Messaging Gateway** wraps messaging behind a domain-specific interface: use `FluentProducerTemplate` in a CDI bean for clean separation.
+- **Selective Consumer** filters messages before full deserialization: promote filter fields to Kafka headers for efficiency.
+- **Channel Purger** removes stale messages: use offset resets for broad purges, filter routes for selective purges.
+- **Messaging Mapper** converts between domain objects and messages: Camel's `unmarshal()` with typed classes and bean binding handle most cases.
 
-This completes Part 7 — Messaging Endpoints (12 patterns across 3 chapters). Next: Part 8 — System Management, where we explore the patterns that keep a running integration system observable and maintainable.
+This completes Part 7: Messaging Endpoints (12 patterns across 3 chapters). Next: Part 8: System Management, where we explore the patterns that keep a running integration system observable and maintainable.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean and their Citrus test passes (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean and their Citrus test passes (2026-10-09).*

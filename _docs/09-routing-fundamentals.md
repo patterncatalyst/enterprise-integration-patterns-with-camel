@@ -2,7 +2,7 @@
 title: "Routing Fundamentals"
 order: 9
 part: message-routing
-description: "Content-Based Router, Message Filter, Recipient List, and Splitter — the four patterns that determine where a message goes based on its content."
+description: "Content-Based Router, Message Filter, Recipient List, and Splitter: the four patterns that determine where a message goes based on its content."
 duration: "45 minutes"
 ---
 
@@ -28,9 +28,9 @@ cd examples/09-routing-fundamentals/yaml-dsl
 camel run *
 ```
 
-Message Routing is where integration gets interesting. So far, messages flow in straight lines — from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
+Message Routing is where integration gets interesting. So far, messages flow in straight lines: from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
 
-{% include excalidraw.html file="09-routing-patterns" alt="Content-Based Router, Splitter, and Recipient List" caption="Figure 9.1 — Three fundamental routing patterns: route by content, split into parts, fan out to a dynamic list." %}
+{% include excalidraw.html file="09-routing-patterns" alt="Content-Based Router, Splitter, and Recipient List" caption="Figure 9.1: Three fundamental routing patterns: route by content, split into parts, fan out to a dynamic list." %}
 
 This chapter covers four foundational routing patterns that make these decisions. The next two chapters cover composed routers (routing slip, process manager) and advanced patterns (load balancer, dynamic router, resequencer).
 
@@ -45,17 +45,17 @@ When an `OrderPlaced` event arrives, the shipping-service needs to route it diff
 - **Express orders** go to the priority queue, regardless of destination.
 - **Hazardous materials** go to the specialized hazmat handler.
 
-The message content determines the route. The routing logic needs to be clean, maintainable, and extensible — adding a new category shouldn't require rewriting the existing logic.
+The message content determines the route. The routing logic needs to stay clean and maintainable: adding a new category shouldn't require rewriting the existing logic.
 
 ### The solution
 
-A **Content-Based Router** inspects the message body or headers and routes the message to the appropriate channel based on the content. It's a message-level `if-else` or `switch` statement — but it separates the routing decision from the processing logic.
+A **Content-Based Router** inspects the message body or headers and routes the message to the appropriate channel based on the content. It's a message-level `if-else` or `switch` statement, but it separates the routing decision from the processing logic.
 
 Camel implements this with the `choice()` EIP, one of the most-used patterns in any Camel application.
 
 ### How Camel models it
 
-The route logic is identical across runtimes — only the class annotations differ:
+The route logic is identical across runtimes; only the class annotations differ:
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
 
@@ -89,7 +89,7 @@ public class ContentBasedRouterRoute extends RouteBuilder {
 ```
 {% endraw %}
 
-The `choice()` DSL inside `configure()` is pure Camel — identical on both runtimes:
+The `choice()` DSL inside `configure()` is pure Camel: identical on both runtimes.
 
 ```java
 from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=shipping-router")
@@ -116,7 +116,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=shipping-router")
 ### Evaluation order matters
 
 `choice()` evaluates predicates top-to-bottom and takes the **first match**. This means:
-- Hazmat is checked first because it overrides everything else — a hazmat express international order goes to hazmat, not express.
+- Hazmat is checked first because it overrides everything else: a hazmat express international order goes to hazmat, not express.
 - Express is checked before international because express priority overrides destination-based routing.
 - `otherwise()` is the catch-all. Without it, messages that don't match any predicate are silently dropped.
 
@@ -139,15 +139,15 @@ camel trace shipping-router
 ### When the CBR grows too large
 
 A content-based router with more than 5-7 branches becomes hard to maintain. At that point, consider:
-- **Recipient List** (below) — if the routing logic determines *multiple* destinations.
-- **Dynamic Router** (Chapter 11) — if the routing logic changes frequently or is externalized.
-- **Routing Slip** (Chapter 10) — if the message needs to visit a *sequence* of destinations determined at runtime.
+- **Recipient List** (below): if the routing logic determines *multiple* destinations.
+- **Dynamic Router** (Chapter 11): if the routing logic changes frequently or is externalized.
+- **Routing Slip** (Chapter 10): if the message needs to visit a *sequence* of destinations determined at runtime.
 
 ## Pattern: Message Filter
 
 ### The problem
 
-Notification-service subscribes to the `eip.orders.placed` topic to send order confirmations. But it only sends confirmations for orders above $50 (small orders get a batch digest email at the end of the day). Rather than processing every message and discarding the ones below $50 inside the handler, it's cleaner to filter them out before they reach the handler.
+Notification-service subscribes to the `eip.orders.placed` topic to send order confirmations. But it only sends confirmations for orders above $50 (small orders get a batch digest email at day's end). Rather than processing every message and discarding the ones below $50 inside the handler, it's cleaner to filter them out before they reach the handler.
 
 ### The solution
 
@@ -185,7 +185,7 @@ A filter is syntactic sugar for a choice with one branch:
 .end()
 ```
 
-Use `filter()` when you have a single pass/drop decision. Use `choice()` when you have multiple branches. The semantic difference matters for readability — a `filter` communicates intent better than a one-branch `choice`.
+Use `filter()` when you have a single pass/drop decision. Use `choice()` when you have multiple branches. The semantic difference matters for readability: a `filter` communicates intent better than a one-branch `choice`.
 
 ### Tracking filtered messages
 
@@ -264,9 +264,9 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=dynamic-router")
 
 ### Key options
 
-- **`parallelProcessing()`** — Sends to all recipients concurrently. Without this, recipients are called sequentially (each waits for the previous to complete).
-- **`stopOnException()`** — If one recipient fails, stop sending to remaining recipients. Without this, all recipients are attempted regardless of failures.
-- **`ignoreInvalidEndpoints()`** — Skip endpoints that can't be resolved instead of failing the entire exchange.
+- **`parallelProcessing()`**: Sends to all recipients concurrently. Without this, recipients are called sequentially (each waits for the previous to complete).
+- **`stopOnException()`**: If one recipient fails, stop sending to remaining recipients. Without this, all recipients are attempted regardless of failures.
+- **`ignoreInvalidEndpoints()`**: Skip endpoints that can't be resolved instead of failing the entire exchange.
 
 ### Recipient list vs. publish-subscribe
 
@@ -274,7 +274,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092&groupId=dynamic-router")
 |-----------|---------------|-------------------|
 | **Decision point** | The router decides per message | The subscriber decides by subscribing |
 | **Who controls routing** | The sender (or a router service) | The receiver |
-| **Dynamic** | Fully — recipients change per message | Semi — subscribers are relatively static |
+| **Dynamic** | Fully: recipients change per message | Semi: subscribers are relatively static |
 | **Coupling** | Sender knows the recipient list logic | Sender doesn't know who's listening |
 
 Use publish-subscribe (Kafka consumer groups) when subscribers manage themselves. Use a recipient list when a central router needs to determine per-message routing.
@@ -283,7 +283,7 @@ Use publish-subscribe (Kafka consumer groups) when subscribers manage themselves
 
 ### The problem
 
-A bulk order arrives with 50 line items. Each line item needs independent processing: different SKUs go to different warehouses, different quantities trigger different procurement rules, some items are in stock and some aren't. Processing the entire order as a unit forces you to handle all 50 items in one transaction — and a failure on item 47 affects the other 49.
+A bulk order arrives with 50 line items. Each line item needs independent processing: different SKUs go to different warehouses, different quantities trigger different procurement rules, some items are in stock and some aren't. Processing the entire order as a unit forces you to handle all 50 items in one transaction; a failure on item 47 affects the other 49.
 
 ### The solution
 
@@ -293,7 +293,7 @@ We saw the Splitter briefly in Chapter 08 (Message Sequence). Here, we explore i
 
 ### How Camel models it
 
-Camel's `split()` EIP breaks a message based on an expression — a JSONPath, XPath, tokenizer, or custom logic:
+Camel's `split()` EIP breaks a message based on an expression (a JSONPath, XPath, tokenizer, or custom logic):
 
 ```java
 // Split a bulk order into individual line items
@@ -320,10 +320,10 @@ from("kafka:eip.orders.bulk?brokers=localhost:9092&groupId=order-splitter")
 
 ### Split options
 
-- **`streaming()`** — Process items as they're parsed, without loading the entire collection into memory. Essential for large payloads.
-- **`parallelProcessing()`** — Process split items concurrently. Uses a thread pool to parallelize item processing.
-- **`stopOnException()`** — Stop splitting on the first error. Without this, all items are attempted.
-- **`aggregationStrategy()`** — Collect the results of all split items and reassemble them. This is the Splitter-Aggregator pattern, covered in Chapter 12 (Message Transformation).
+- **`streaming()`**: Process items as they're parsed, without loading the entire collection into memory. Essential for large payloads.
+- **`parallelProcessing()`**: Process split items concurrently. Uses a thread pool to parallelize item processing.
+- **`stopOnException()`**: Stop splitting on the first error. Without this, all items are attempted.
+- **`aggregationStrategy()`**: Collect the results of all split items and reassemble them. This is the Splitter-Aggregator pattern, covered in Chapter 12 (Message Transformation).
 
 ### Partial failure: what happens when 3 of 500 items are bad
 
@@ -331,7 +331,7 @@ This is the question every real Splitter runs into, and until Camel 4.22 the DSL
 had only a blunt answer for it. `stopOnException()` aborts on the first bad
 item; leaving it off processes everything and tells you nothing about how much
 failed. Neither is what a bulk order wants. One malformed line item in fifty
-should not abandon the other forty-nine — but twenty-five bad items means the
+should not abandon the other forty-nine, but twenty-five bad items means the
 upstream system is broken and you should stop rather than half-fulfil an order.
 
 4.22 added two options that express exactly that threshold:
@@ -342,7 +342,7 @@ upstream system is broken and you should stop rather than half-fulfil an order.
 | `maxFailedRecords` | Abort when the *absolute count* of failed items exceeds this |
 
 Either one throws `CamelExchangeException` when tripped. Both are mutually
-exclusive with `stopOnException` — you are choosing a tolerance instead of a
+exclusive with `stopOnException`: you are choosing a tolerance instead of a
 hair trigger. They can be combined with each other, in which case whichever
 trips first wins.
 
@@ -354,7 +354,7 @@ trips first wins.
 .end()
 ```
 
-With `maxFailedRecords(5)`, the split aborts **on** the fifth failing item — a
+With `maxFailedRecords(5)`, the split aborts **on** the fifth failing item: a
 batch of ten with three bad items runs to completion, one with eight bad items
 stops at the fifth and throws.
 
@@ -364,8 +364,8 @@ failure *ratio* differs between runs and `errorThreshold` can trip at different
 points on identical input. An absolute count does not have that problem.
 
 > **A caught exception is not a failure.** This is the trap, and it is quiet.
-> Wrapping the per-item work in `doTry`/`doCatch` — which is the natural thing
-> to reach for when you want to divert bad items to a rejects topic — makes the
+> Wrapping the per-item work in `doTry`/`doCatch` (which is the natural thing
+> to reach for when you want to divert bad items to a rejects topic) makes the
 > sub-exchange *succeed*. The splitter then counts zero failures and
 > `maxFailedRecords` never fires, no matter how many items were bad. The same
 > applies to an `onException(...).handled(true)` covering the split body.
@@ -386,8 +386,8 @@ points on identical input. An absolute count does not have that problem.
 .end()
 ```
 
-This is the right shape when the per-item cost is dominated by a round trip —
-a database write or an HTTP call — and the downstream accepts batches. Splitting
+This is the right shape when the per-item cost is dominated by a round trip
+(a database write or an HTTP call) and the downstream accepts batches. Splitting
 500 items into 500 inserts is slow for reasons that have nothing to do with
 Camel; 20 batches of 25 is the same work with a fraction of the overhead.
 
@@ -407,7 +407,7 @@ is a correctness problem. 4.22 added watermarking to address it:
 | `watermarkKey` | The key that progress is stored under |
 | `watermarkExpression` | A Simple expression evaluated per completed sub-exchange, for value-based rather than index-based resumption |
 
-Index-based resumption is the simpler model — remember you reached item 400 and
+Index-based resumption is the simpler model: remember you reached item 400 and
 start there. `watermarkExpression` covers the case where the index is not stable
 across runs, letting you record a business value instead, such as
 `${body[line_number]}`.
@@ -430,11 +430,11 @@ These headers are essential for logging, monitoring, and (on the receiving side)
 
 ### Composing patterns: CBR inside a Splitter
 
-The example above shows a common composition: split the message, then route each part with a content-based router. This is powerful because each item is independently routed — item 1 might go to EAST, item 2 to WEST, item 3 to the default warehouse. Without splitting, you'd need to route the entire order to a single destination.
+The example above shows a common composition: split the message, then route each part with a content-based router. This composition lets each item be routed independently: item 1 might go to EAST, item 2 to WEST, item 3 to the default warehouse. Without splitting, you'd need to route the entire order to a single destination.
 
 ## Common pitfalls
 
-**Content-based routers with no `otherwise()`.** If a message doesn't match any `when` predicate and there's no `otherwise`, it's silently dropped. Always include an `otherwise()` — even if it just logs a warning and sends to a dead letter channel.
+**Content-based routers with no `otherwise()`.** If a message doesn't match any `when` predicate and there's no `otherwise`, it's silently dropped. Always include an `otherwise()`, even if it just logs a warning and sends to a dead letter channel.
 
 **Filters that drop too much.** A filter with no logging is a black hole. If the filter predicate is wrong, you won't know messages are being dropped. Add metrics or logging for filtered messages.
 
@@ -465,29 +465,29 @@ server.port=8082
 logging.level.org.apache.camel=INFO
 ```
 
-The `kafka.brokers` property placeholder is shared — both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key.
+The `kafka.brokers` property placeholder is shared: both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key.
 
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 7: "Message Routing"
-- [enterpriseintegrationpatterns.com — Content-Based Router](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html)
-- [enterpriseintegrationpatterns.com — Message Filter](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Filter.html)
-- [enterpriseintegrationpatterns.com — Recipient List](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RecipientList.html)
-- [enterpriseintegrationpatterns.com — Splitter](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html)
-- [Apache Camel — Choice EIP](https://camel.apache.org/components/4.22.x/eips/choice-eip.html)
-- [Apache Camel — Filter EIP](https://camel.apache.org/components/4.22.x/eips/filter-eip.html)
-- [Apache Camel — Recipient List EIP](https://camel.apache.org/components/4.22.x/eips/recipientList-eip.html)
-- [Apache Camel — Splitter EIP](https://camel.apache.org/components/4.22.x/eips/split-eip.html)
+- [enterpriseintegrationpatterns.com: Content-Based Router](https://www.enterpriseintegrationpatterns.com/patterns/messaging/ContentBasedRouter.html)
+- [enterpriseintegrationpatterns.com: Message Filter](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Filter.html)
+- [enterpriseintegrationpatterns.com: Recipient List](https://www.enterpriseintegrationpatterns.com/patterns/messaging/RecipientList.html)
+- [enterpriseintegrationpatterns.com: Splitter](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Sequencer.html)
+- [Apache Camel: Choice EIP](https://camel.apache.org/components/4.22.x/eips/choice-eip.html)
+- [Apache Camel: Filter EIP](https://camel.apache.org/components/4.22.x/eips/filter-eip.html)
+- [Apache Camel: Recipient List EIP](https://camel.apache.org/components/4.22.x/eips/recipientList-eip.html)
+- [Apache Camel: Splitter EIP](https://camel.apache.org/components/4.22.x/eips/split-eip.html)
 
 ## What you learned
 
-- **Content-Based Router** (`choice()`) inspects message content and routes to the matching channel — the most-used routing pattern.
-- **Message Filter** (`filter()`) passes matching messages and discards the rest — a one-branch router optimized for pass/drop decisions.
-- **Recipient List** (`recipientList()`) sends copies to multiple destinations determined per message — for when one message needs to reach several handlers.
-- **Splitter** (`split()`) breaks a composite message into parts for independent processing — essential for bulk operations and per-item routing.
+- **Content-Based Router** (`choice()`) inspects message content and routes to the matching channel: the most-used routing pattern.
+- **Message Filter** (`filter()`) passes matching messages and discards the rest: a one-branch router optimized for pass/drop decisions.
+- **Recipient List** (`recipientList()`) sends copies to multiple destinations determined per message, for when one message needs to reach several handlers.
+- **Splitter** (`split()`) breaks a composite message into parts for independent processing, essential for bulk operations and per-item routing.
 
 Next, we compose these primitives into multi-step routing patterns: the Routing Slip, Process Manager, and Scatter-Gather.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine (2026-10-09). The 4.22 splitter options added here were run against the live stack on 2026-09-15: `maxFailedRecords(5)` completes a 10-item batch with 3 bad items and aborts one with 8 bad items at the fifth failure, and `group(25)` splits 60 items into batches of 25, 25 and 10.*
+*Verification status: <span class="status status--verified">verified</span>; both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine (2026-10-09). The 4.22 splitter options added here were run against the live stack on 2026-09-15: `maxFailedRecords(5)` completes a 10-item batch with 3 bad items and aborts one with 8 bad items at the fifth failure, and `group(25)` splits 60 items into batches of 25, 25 and 10.*

@@ -2,7 +2,7 @@
 title: "Appendix X: AI and MCP with Camel"
 order: 42
 part: appendices
-description: "Integrating AI into Camel routes — the LangChain4j Chat component for classification, ai-tool and LangChain4j Agent for tool calling, the embedded and catalog MCP servers, and Wanaku for exposing Camel routes as AI tools."
+description: "Integrating AI into Camel routes: the LangChain4j Chat component for classification, ai-tool and LangChain4j Agent for tool calling, the embedded and catalog MCP servers, and Wanaku for exposing Camel routes as AI tools."
 duration: "40 minutes"
 ---
 
@@ -56,7 +56,7 @@ docker exec ollama ollama pull qwen2.5:3b
 > reliably; `llama3.1:8b` and the hosted OpenAI and Azure models below work too.
 > The route definitions do not change between them.
 
-{% include excalidraw.html file="42-ai-mcp-architecture" alt="Camel AI/MCP architecture" caption="Figure X.1 — Camel AI integration architecture: routes produce to LangChain4j agents, which call back to Camel route tools and external MCP servers." %}
+{% include excalidraw.html file="42-ai-mcp-architecture" alt="Camel AI/MCP architecture" caption="Figure X.1: Camel AI integration architecture: routes produce to LangChain4j agents, which call back to Camel route tools and external MCP servers." %}
 
 ## The LangChain4j Chat component
 
@@ -284,18 +284,18 @@ The key parameters:
 | `toolName` | The name the LLM sees and uses to invoke the tool |
 | `tags` | Comma-separated tags that connect tools to agents. Omit them and the tool lands in a default pool available to every producer |
 | `description` | Natural-language description that the LLM uses to decide when to call this tool |
-| `parameter.NAME` | A typed input parameter — `string`, `integer`, `number` or `boolean`. Add `.description`, `.required` and `.enum` to refine it |
+| `parameter.NAME` | A typed input parameter: `string`, `integer`, `number` or `boolean`. Add `.description`, `.required` and `.enum` to refine it |
 | `argSchema` | A raw JSON Schema, for nested objects, arrays and `oneOf`. Mutually exclusive with `parameter.*` |
 
 The description is critical -- it is the tool's documentation for the AI agent. A vague description like "looks up data" will lead to incorrect tool selection. A precise description like "Look up the status of a shipping order by order ID" tells the agent exactly when and how to use it.
 
 Declaring parameters matters nearly as much. Without them the model has to smuggle its argument inside free text and the route has to parse it back out; with them, the model is told exactly what to supply and Camel delivers each value as an exchange header of the same name.
 
-`ai-tool` also accepts four advisory hints — `readOnlyHint`, `destructiveHint`, `idempotentHint` and `openWorldHint` — which are passed through to MCP clients as metadata. They describe intent to a client that cares to look; they are **not** authorization, and Camel does not enforce them.
+`ai-tool` also accepts four advisory hints (`readOnlyHint`, `destructiveHint`, `idempotentHint` and `openWorldHint`) which are passed through to MCP clients as metadata. They describe intent to a client that cares to look; they are **not** authorization, and Camel does not enforce them.
 
 > **Replacing `langchain4j-tools`.** Earlier versions of this appendix used the
 > `langchain4j-tools:` consumer, which is deprecated as of Camel 4.22. The
-> replacement is deliberately framework-neutral: `ai-tool` publishes into a
+> replacement is framework-neutral by design: `ai-tool` publishes into a
 > shared `AiToolRegistry` that LangChain4j, Spring AI and the embedded MCP
 > server all read from, so one route definition serves every consumer instead
 > of being tied to LangChain4j.
@@ -313,9 +313,9 @@ Three 4.22 changes govern what happens when tool calling goes wrong, and the
 first will change the behaviour of routes you have already written.
 
 **Tool errors now go back to the model, not to your route.** When a tool
-invocation throws, the failure is returned to the LLM so it can react —
-retrying with different arguments, or explaining itself — rather than
-propagating as an exception onto the calling exchange. If you wrapped an agent
+invocation throws, the failure is returned to the LLM so it can react (retrying
+with different arguments, or explaining itself) rather than propagating as an
+exception onto the calling exchange. If you wrapped an agent
 call in `onException(...)` expecting to catch tool failures there, that handler
 no longer fires. Two options control it:
 
@@ -335,7 +335,7 @@ it.
 
 **Each tool call gets its own exchange.** Tool invocations run on an independent
 exchange copy, and the arguments the model supplies are filtered against the
-tool's declared parameter schema — so an LLM cannot inject an undeclared header
+tool's declared parameter schema, so an LLM cannot inject an undeclared header
 into your route by hallucinating an extra argument. This is why declaring typed
 parameters, as `OrderLookupToolRoute` does below, is worth the small effort:
 undeclared arguments are silently dropped.
@@ -345,7 +345,7 @@ Camel's built-in one, `Agent.chat()` now returns `Result<String>` instead of
 `String`, and exposes token usage and finish reason as exchange headers, plus
 `CamelLangChain4jAgentSources` and `CamelLangChain4jAgentToolExecutions` when
 RAG or tools are in play. The examples here use the built-in
-`AgentWithoutMemory`, so they are unaffected — but those headers are the hook
+`AgentWithoutMemory`, so they are unaffected, but those headers are the hook
 for tracking token cost, which is the operational concern that tends to arrive
 shortly after the first thing works.
 
@@ -636,7 +636,7 @@ public class AgentConfig {
 
 On Quarkus the `@Identifier` value is the lookup name; on Spring Boot it is the bean name, which defaults to the method name. Either way `#assistantAgent` finds it.
 
-`AgentWithoutMemory` treats each exchange as an independent conversation. Swap it for `AgentWithMemory`, with a `ChatMemoryProvider` set on the `AgentConfiguration`, to carry context across turns — see [Conversation memory](#conversation-memory) below.
+`AgentWithoutMemory` treats each exchange as an independent conversation. Swap it for `AgentWithMemory`, with a `ChatMemoryProvider` set on the `AgentConfiguration`, to carry context across turns; see [Conversation memory](#conversation-memory) below.
 
 As an alternative to producing the bean yourself, set `agentConfiguration` on the endpoint and let Camel construct the agent inline; Camel then picks `AgentWithMemory` or `AgentWithoutMemory` depending on whether a `ChatMemoryProvider` is configured.
 
@@ -1032,7 +1032,7 @@ from("file:incoming/package-photos?noop=true")
 ```
 
 There is no conversion code here because the agent does it. When the body is a
-file — as it is coming from the `file:` consumer — `langchain4j-agent` builds
+file (as it is coming from the `file:` consumer), `langchain4j-agent` builds
 the multimodal message itself, pairing the file content with the text in
 `CamelLangChain4jAgentUserMessage`. Before Camel 4.22 this route needed a
 processor to read the bytes, wrap them in an `ImageContent`, wrap the prompt in
@@ -1041,7 +1041,7 @@ you.
 
 `CamelLangChain4jAgentMediaType` is optional. Camel infers the MIME type from
 the file extension, so it is only needed when the extension is missing or
-misleading — it is set here to keep this JPEG-specific example explicit.
+misleading: it is set here to keep this JPEG-specific example explicit.
 
 The model behind the agent must be vision-capable. A text-only model will
 either reject the request or silently ignore the image, which is the more
@@ -1093,11 +1093,11 @@ Keep this distinct from the catalog server in the next section. They share a nam
 | Runs | Inside your application | As a standalone JBang process |
 | Artifact | `camel-mcp-server` | `org.apache.camel:camel-jbang-mcp:4.22.1:runner` via JBang |
 
-The embedded server does not implement a transport of its own. It bridges the tool registry to whatever MCP server the hosting runtime provides — Quarkus' MCP extension, Spring AI's MCP server, or the Vert.x engine bundled with Camel Main.
+The embedded server does not implement a transport of its own. It bridges the tool registry to whatever MCP server the hosting runtime provides: Quarkus' MCP extension, Spring AI's MCP server, or the Vert.x engine bundled with Camel Main.
 
 ### Exposure is opt-in, by tag
 
-Nothing is published unless you name a tag. The untagged default pool — the one an `ai-tool` route lands in when you omit `tags` — is *never* exposed, so a tool cannot become externally reachable just because someone forgot to tag it.
+Nothing is published unless you name a tag. The untagged default pool (the one an `ai-tool` route lands in when you omit `tags`) is *never* exposed, so a tool cannot become externally reachable just because someone forgot to tag it.
 
 The order-status tool defined earlier is already tagged `shipping`, so it needs no change to be published:
 
@@ -1139,7 +1139,7 @@ camel.server.mcp-tags=shipping
 camel.server.mcp-server-name=shipping-tools
 ```
 
-`tool-timeout` bounds a single tool call at 20 seconds by default. On expiry the MCP client receives an error result, but the underlying Camel route is not cancelled — it keeps running until it finishes on its own.
+`tool-timeout` bounds a single tool call at 20 seconds by default. On expiry the MCP client receives an error result, but the underlying Camel route is not cancelled; it keeps running until it finishes on its own.
 
 ### Transports
 
@@ -1151,7 +1151,7 @@ With an HTTP transport the client discovers and invokes tools through the runtim
 | Spring Boot (Spring AI Web MVC) | SSE | `GET /sse` returns the message endpoint, `POST /mcp/message?sessionId=...` |
 | Camel Main and JBang (Vert.x) | Streamable HTTP | `/mcp` |
 
-Point an MCP client at the one your runtime serves. Against the Quarkus application, plain `curl` is enough to see the tool from the outside — `initialize`, then `tools/call`, carrying the session id the first response returns:
+Point an MCP client at the one your runtime serves. Against the Quarkus application, plain `curl` is enough to see the tool from the outside: `initialize`, then `tools/call`, carrying the session id the first response returns.
 
 ```bash
 curl -s -D headers.txt -X POST localhost:8088/mcp \
@@ -1172,7 +1172,7 @@ curl -s -X POST localhost:8088/mcp -H "Mcp-Session-Id: $SID" \
 
 The same `ai-tool` route answers, and logs `Tool call — looking up order: ORD-002`, exactly as when the in-process agent calls it.
 
-With stdio there is no HTTP endpoint at all: the client launches your application as a subprocess and speaks MCP over stdin and stdout. On Spring Boot that means swapping the Web MVC transport for Spring AI's plain MCP server starter, setting `spring.ai.mcp.server.stdio=true`, and disabling both the web application and console logging — anything written to stdout other than protocol traffic corrupts the stream.
+With stdio there is no HTTP endpoint at all: the client launches your application as a subprocess and speaks MCP over stdin and stdout. On Spring Boot that means swapping the Web MVC transport for Spring AI's plain MCP server starter, setting `spring.ai.mcp.server.stdio=true`, and disabling both the web application and console logging: anything written to stdout other than protocol traffic corrupts the stream.
 
 ### Hints are not authorization
 
@@ -1185,7 +1185,7 @@ With stdio there is no HTTP endpoint at all: the client launches your applicatio
 | `idempotentHint` | Repeating the call with the same arguments changes nothing further |
 | `openWorldHint` | The tool reaches systems outside the application's control |
 
-These are descriptions of intent for clients that choose to read them. Camel does not enforce any of them, and an MCP client is free to ignore them entirely. Publishing a tool over MCP makes it callable by whoever can reach the endpoint, so authentication and authorization remain your application's job — exactly as they would be for a REST endpoint exposing the same logic.
+These are descriptions of intent for clients that choose to read them. Camel does not enforce any of them, and an MCP client is free to ignore them entirely. Publishing a tool over MCP makes it callable by whoever can reach the endpoint, so authentication and authorization remain your application's job, exactly as they would be for a REST endpoint exposing the same logic.
 
 ## The Camel Catalog MCP Server
 
@@ -1330,7 +1330,7 @@ A response from `qwen2.5:3b`:
 {"category":"HAZARDOUS","priority":"CRITICAL","fulfillmentType":"SAME_DAY"}
 ```
 
-The model identifies lithium batteries as hazardous. The priority and fulfillment type vary between runs and models — the category is the stable part.
+The model identifies lithium batteries as hazardous. The priority and fulfillment type vary between runs and models: the category is the stable part.
 
 ### Step 2: Ask the assistant about an order
 
@@ -1418,7 +1418,7 @@ The Camel LangChain4j integration transforms the way integration routes interact
 
 The shipping domain example demonstrates the practical application: an AI agent classifies orders using natural-language understanding and answers customer questions by calling Camel route tools. The route logic is identical across Quarkus and Spring Boot -- only annotations and configuration differ.
 
-As AI agents become standard components in enterprise architectures, the integration layer becomes more important, not less. Every tool an agent calls, every document it retrieves, every system it updates goes through an integration. Camel's LangChain4j components ensure that integration is built on the same battle-tested patterns and components that have connected enterprise systems for over fifteen years.
+As AI agents become standard components in enterprise architectures, the integration layer becomes more important, not less. Every tool call and every system update an agent makes goes through an integration. Camel's LangChain4j components ensure that integration is built on the same battle-tested patterns and components that have connected enterprise systems for over fifteen years.
 
 ## References
 
@@ -1433,4 +1433,4 @@ As AI agents become standard components in enterprise architectures, the integra
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against Ollama 0.40.2 with `qwen2.5:3b` on Docker Engine: the classifier returns JSON (lithium batteries `HAZARDOUS`, salmon `PERISHABLE`, glasses `FRAGILE`, t-shirts `STANDARD`); the assistant calls the `ai-tool` route for ORD-001, ORD-002, ORD-003 and ORD-999 (`Tool call — looking up order: …` for each) and answers from its data, with no route errors; and an external MCP client lists `order-status` and calls it — over streamable HTTP at `/mcp` on Quarkus and over SSE (`/sse`, `/mcp/message`) on Spring Boot — reaching the same route (2026-10-09). This run found and fixed the classifier: its instructions went in a header the chat component never reads.*
+*Verification status: <span class="status status--verified">verified</span>; both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against Ollama 0.40.2 with `qwen2.5:3b` on Docker Engine: the classifier returns JSON (lithium batteries `HAZARDOUS`, salmon `PERISHABLE`, glasses `FRAGILE`, t-shirts `STANDARD`); the assistant calls the `ai-tool` route for ORD-001, ORD-002, ORD-003 and ORD-999 (`Tool call — looking up order: …` for each) and answers from its data, with no route errors; and an external MCP client lists `order-status` and calls it, reaching the same route over streamable HTTP at `/mcp` on Quarkus and over SSE (`/sse`, `/mcp/message`) on Spring Boot (2026-10-09). This run found and fixed the classifier: its instructions went in a header the chat component never reads.*

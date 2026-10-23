@@ -2,7 +2,7 @@
 title: "Structural Transformation"
 order: 13
 part: message-transformation
-description: "Aggregator, Normalizer, and Canonical Data Model — patterns that reshape, unify, and standardize messages across system boundaries."
+description: "Aggregator, Normalizer, and Canonical Data Model: patterns that reshape, unify, and standardize messages across system boundaries."
 duration: "40 minutes"
 ---
 
@@ -10,7 +10,7 @@ duration: "40 minutes"
 >
 > **Aggregator** is `order-aggregator`, with `persistent-order-aggregator`
 > showing the JDBC-backed variant, and **Normalizer** is `normalizer-partner-a`
-> through `normalizer-partner-c` — the chapter calls these `normalizer-xml` and
+> through `normalizer-partner-c`; the chapter calls these `normalizer-xml` and
 > `normalizer-mobile` after the format each one handles.
 >
 > **Canonical Data Model** has no routes of its own by design: it is the
@@ -31,15 +31,15 @@ cd examples/13-aggregator/spring-boot
 mvn spring-boot:run
 ```
 
-The previous chapter transformed individual messages — translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
+The previous chapter transformed individual messages: translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
 
-{% include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1 — The Aggregator collects correlated messages and emits a single combined result." %}
+{% include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1: The Aggregator collects correlated messages and emits a single combined result." %}
 
 ## Pattern: Aggregator
 
 ### The problem
 
-In Chapter 09, the Splitter broke a bulk order into individual line items. Each item was processed independently — inventory checked, price calculated, warehouse assigned. Now the results need to be reassembled into a single order response. Customer-service can't send 50 separate "your item shipped" emails — it needs one email with all 50 items.
+In Chapter 09, the Splitter broke a bulk order into individual line items. Each item was processed independently: inventory checked, price calculated, warehouse assigned. Now the results need to be reassembled into a single order response. Customer-service can't send 50 separate "your item shipped" emails; it needs one email with all 50 items.
 
 More broadly: events from different services about the same order need to be correlated and combined. `InventoryReserved`, `PaymentProcessed`, and `ShipmentScheduled` are three separate events that together represent a complete order lifecycle. An order status dashboard needs all three to show the full picture.
 
@@ -47,9 +47,9 @@ More broadly: events from different services about the same order need to be cor
 
 An **Aggregator** collects related messages (by a correlation key) and combines them into a single message. It needs to answer three questions:
 
-1. **Which messages belong together?** — The correlation expression (e.g., order ID).
-2. **How are they combined?** — The aggregation strategy (merge, collect, compute).
-3. **When is the aggregation complete?** — The completion condition (count, timeout, predicate).
+1. **Which messages belong together?** The correlation expression (e.g., order ID).
+2. **How are they combined?** The aggregation strategy (merge, collect, compute).
+3. **When is the aggregation complete?** The completion condition (count, timeout, predicate).
 
 ### How Camel models it
 
@@ -109,7 +109,7 @@ The aggregator must know when to emit the aggregated result. Camel supports mult
 | `completionPredicate(expr)` | Emit when a condition is true | All required stages complete |
 | `forceCompletionOnStop()` | Emit incomplete aggregations when the route stops | Graceful shutdown |
 
-Conditions can be combined with OR semantics — whichever fires first triggers emission. The order lifecycle aggregator above uses both a predicate (all stages present) and a timeout (5 minutes) as a safety net.
+Conditions can be combined with OR semantics; whichever fires first triggers emission. The order lifecycle aggregator above uses both a predicate (all stages present) and a timeout (5 minutes) as a safety net.
 
 ### Persistent aggregation
 
@@ -149,7 +149,7 @@ concurrent updates to the same correlation key. Three things changed in 4.22:
   silently doing nothing
 
 Camel 4.21 separately fixed `RedisAggregationRepository` to take per-key locks
-instead of a single global `"aggregationLock"` — worth knowing if you followed
+instead of a single global `"aggregationLock"`, worth knowing if you followed
 [Appendix D]({% link _docs/22-appendix-redis.md %}) and put your aggregation state in Redis, since
 before that fix every correlation key contended on one lock.
 
@@ -232,9 +232,9 @@ The normalizer translates each source format into a canonical form. But what *is
 
 ### The solution
 
-A **Canonical Data Model** is a formally defined, shared schema that all services agree on. It's the lingua franca of the integration platform. Every message that flows between services conforms to this model — regardless of what the original source used.
+A **Canonical Data Model** is a formally defined, shared schema that all services agree on. It's the lingua franca of the integration platform. Every message that flows between services conforms to this model, regardless of what the original source used.
 
-In our shipping domain, the canonical model would be defined as Avro schemas in the Apicurio Registry — the registry is in the local stack for exactly this purpose, though the runnable examples keep the canonical model as the plain Java records in `examples/domain-model/` and move it over the wire as JSON:
+In our shipping domain, the canonical model would be defined as Avro schemas in the Apicurio Registry: the registry is in the local stack for exactly this purpose, though the runnable examples keep the canonical model as the plain Java records in `examples/domain-model/` and move it over the wire as JSON:
 
 ```json
 {
@@ -279,7 +279,7 @@ from("kafka:eip.orders.placed?brokers=localhost:9092"
 
 ### Benefits of a canonical data model
 
-1. **N→1 instead of N→N translations.** Without a canonical model, translating between N systems requires N×(N-1) translators. With a canonical model, each system needs one translator (to/from canonical) — that's 2N translators. For 5 systems: 20 vs 10 translators.
+1. **N→1 instead of N→N translations.** Without a canonical model, translating between N systems requires N×(N-1) translators. With a canonical model, each system needs one translator (to/from canonical), that's 2N translators. For 5 systems: 20 vs 10 translators.
 
 2. **Schema evolution is governed.** Apicurio's compatibility modes ensure that schema changes don't break consumers. Backward compatibility means new fields can be added with defaults, but existing fields can't be removed.
 
@@ -299,27 +299,27 @@ A canonical model adds a translation layer at every system boundary. If two serv
 
 **Normalizers that grow unbounded.** Each new source format adds a branch to the normalizer's router and a new translator. Eventually, the normalizer becomes a monolith. Consider splitting normalizers by source domain (one for partner integrations, one for internal apps) rather than one giant normalizer.
 
-**Canonical models that become kitchen sinks.** The canonical model should represent the *domain*, not every field that any source or consumer has ever needed. Resist the urge to add every partner-specific field to the canonical model — use enrichment or extension fields instead.
+**Canonical models that become kitchen sinks.** The canonical model should represent the *domain*, not every field that any source or consumer has ever needed. Resist the urge to add every partner-specific field to the canonical model; use enrichment or extension fields instead.
 
-**Over-aggregating.** Not every related message needs to be aggregated. If downstream consumers can handle individual events (with proper correlation), aggregation adds unnecessary latency and state management complexity. Only aggregate when the consumer genuinely needs the combined view.
+**Over-aggregating.** Not every related message needs to be aggregated. If downstream consumers can handle individual events (with proper correlation), aggregation adds unnecessary latency and state management complexity. Only aggregate when the consumer truly needs the combined view.
 
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 8: "Message Transformation"
-- [enterpriseintegrationpatterns.com — Aggregator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html)
-- [enterpriseintegrationpatterns.com — Normalizer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Normalizer.html)
-- [enterpriseintegrationpatterns.com — Canonical Data Model](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CanonicalDataModel.html)
-- [Apache Camel — Aggregate EIP](https://camel.apache.org/components/4.22.x/eips/aggregate-eip.html)
-- [Apicurio Registry — Schema Compatibility](https://www.apicur.io/registry/)
+- [enterpriseintegrationpatterns.com: Aggregator](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Aggregator.html)
+- [enterpriseintegrationpatterns.com: Normalizer](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Normalizer.html)
+- [enterpriseintegrationpatterns.com: Canonical Data Model](https://www.enterpriseintegrationpatterns.com/patterns/messaging/CanonicalDataModel.html)
+- [Apache Camel: Aggregate EIP](https://camel.apache.org/components/4.22.x/eips/aggregate-eip.html)
+- [Apicurio Registry: Schema Compatibility](https://www.apicur.io/registry/)
 
 ## What you learned
 
-- **Aggregator** collects related messages by a correlation key and combines them — use completion conditions (size, timeout, predicate) to control when aggregated results are emitted.
-- **Normalizer** detects incoming format and translates to a canonical form — a content-based router feeding format-specific translators.
-- **Canonical Data Model** establishes a shared schema (Avro + Apicurio) that all services conform to — reduces N×N translations to 2N and enables governed schema evolution.
+- **Aggregator** collects related messages by a correlation key and combines them: use completion conditions (size, timeout, predicate) to control when aggregated results are emitted.
+- **Normalizer** detects incoming format and translates to a canonical form: a content-based router feeding format-specific translators.
+- **Canonical Data Model** establishes a shared schema (Avro + Apicurio) that all services conform to; it reduces N×N translations to 2N and enables governed schema evolution.
 
-This completes Part 6 — Message Transformation (7 patterns across 2 chapters). Next: Part 7 — Messaging Endpoints, where we explore the patterns that connect application code to the messaging system.
+This completes Part 6, Message Transformation (7 patterns across 2 chapters). Next: Part 7, Messaging Endpoints, where we explore the patterns that connect application code to the messaging system.
 
 ---
 
-*Verification status: <span class="status status--verified">verified</span> — both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
