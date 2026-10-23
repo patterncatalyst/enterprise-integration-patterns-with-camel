@@ -312,6 +312,15 @@ Note the fluent form. `toD()` with no argument returns a builder, so `uri(...)` 
 
 **Dispatchers without a fallback.** If `toD("direct:handle-${body[event_type]}")` encounters an event type with no matching handler, the computed endpoint does not exist and the route throws `NoSuchEndpointException`. The runnable example avoids this the same way it closes the injection hole above: it checks `event_type` against an allow-list and sends anything unrecognised to `direct:handle-order_unknown` through an `otherwise` branch, so an unexpected value is logged rather than fatal.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/14-consumer-patterns/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the six consumer strategies pull from Kafka, Pulsar, and PostgreSQL: polling consumer and SQL polling consumer on demand, event-driven consumers pushed as messages arrive, competing consumers sharing partitions, and the message dispatcher routing by event type.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 9: "Messaging Endpoints"
@@ -330,7 +339,3 @@ Note the fluent form. `toD()` with no argument returns a builder, so `uri(...)` 
 - **Message Dispatcher** centralizes type-based routing from a single consumer to multiple handlers; use `toD()` for dynamic dispatch, but validate inputs.
 
 Next: producer-side patterns, transactional messaging, and durable subscribers.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>; both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 18 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean, its 5 Citrus tests pass, and the SQL Polling Consumer picks up a `PLACED` row from the stack's `eipdb` and marks it `PROCESSING` (2026-10-09).*

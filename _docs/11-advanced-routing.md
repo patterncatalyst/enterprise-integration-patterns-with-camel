@@ -402,6 +402,15 @@ For Kafka-based workloads, let Kafka handle the distribution through consumer gr
 
 **Load balancers with stale endpoint lists.** If you hardcode endpoints and an instance moves to a new IP, the load balancer sends traffic to a dead endpoint. Use service discovery (Kubernetes services, Consul, Eureka) to dynamically update the endpoint list.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/11-advanced-routing/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the built-in generators drive the Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, and Load Balancer routes with a continuous stream of test messages.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 7: "Message Routing"
@@ -423,7 +432,3 @@ For Kafka-based workloads, let Kafka handle the distribution through consumer gr
 - **Load Balancer** distributes messages across processing nodes: round-robin, failover, sticky, and more.
 
 This completes Part 5: Message Routing (12 patterns across 3 chapters). Next: Part 6: Message Transformation, where we explore how messages change shape as they flow through the system.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

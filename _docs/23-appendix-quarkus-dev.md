@@ -275,6 +275,10 @@ mvn package -Dnative -Dquarkus.container-image.build=true
 
 The native build produces a GraalVM native image: ~20ms startup, ~50MB memory. Ideal for Kubernetes deployments where fast scaling matters.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>, built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 2 continuous tests pass with Dev Services starting Kafka on a random port, and the packaged application boots on Docker Engine (2026-10-09). The interactive dev-mode console is described from use, not captured by an automated check.*
+```bash
+cd examples/23-quarkus-dev/quarkus && mvn quarkus:dev   # Dev Services starts Kafka automatically; no setup-stack.sh needed
+```
+
+A demo generator sends an order every five seconds; edit `PRIORITY_THRESHOLD` in `OrderPriorityRoute.java`, save, and watch the next generated order get classified against the new value with no restart.

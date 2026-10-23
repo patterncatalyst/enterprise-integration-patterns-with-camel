@@ -65,6 +65,6 @@ python3 scripts/generate_diagram.py  # imported as a module, see existing usage
 
 - Front matter: title, order, part, description, duration
 - `part` value must match a `_parts` file's `part_name`
-- Chapters end with a verification status footer (unverified until run in real environment)
-- Diagrams: `{% include excalidraw.html file="name" alt="..." caption="Figure N.x — ..." %}`
+- Hands-on chapters end with a `## Build, run, observe` section (the example's real run command). No reader-facing verification footer: per-chapter run records live in `_plans/verification-log.md` (plans collection is `output: false`).
+- Diagrams: `{% include excalidraw.html file="name" alt="..." caption="Figure N.x: ..." %}`
 - Quote YAML front matter values that contain colons

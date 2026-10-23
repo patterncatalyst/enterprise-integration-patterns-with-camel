@@ -195,7 +195,3 @@ A quick-reference glossary of terms used throughout this tutorial, organized by 
 **Payment service**: Processes payments. Participates in the saga (compensates with refunds on failure).
 
 **Shipping service**: Selects carriers, generates labels, and tracks shipments. The most integration-heavy service in the domain.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>, glossary reference chapter, no runnable example.*

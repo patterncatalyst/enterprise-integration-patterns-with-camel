@@ -430,6 +430,15 @@ logging.level.org.apache.camel=INFO
 
 The `kafka.brokers` property placeholder is shared: both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key. The Redis configuration differs: Quarkus uses `quarkus.redis.hosts` (full URL), while Spring Boot uses `spring.data.redis.host` and `spring.data.redis.port`.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/12-transformation/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the pipeline translate partner order format to canonical, enrich with product data looked up from Redis by SKU, then filter PII fields before the result reaches the analytics topic.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 8: "Message Transformation"
@@ -448,7 +457,3 @@ The `kafka.brokers` property placeholder is shared: both runtimes resolve `{% ra
 - **Content Filter** strips unwanted fields: use allowlists for security-sensitive outputs, blocklists for broad pass-through with specific exclusions.
 
 Next: structural transformation (Aggregator, Normalizer, and Canonical Data Model).
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

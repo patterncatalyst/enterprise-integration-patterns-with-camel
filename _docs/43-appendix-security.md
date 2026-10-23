@@ -140,7 +140,3 @@ If you are writing something new, the defaults are
 now good enough that the three decisions above are most of your remaining
 security surface at the framework level: a meaningful change from two
 releases ago.
-
----
-
-*Verification status: <span class="status status--unverified">unverified</span>: a prose chapter with no runnable example, written from the [4.21](https://camel.apache.org/manual/camel-4x-upgrade-guide-4_21.html) and [4.22](https://camel.apache.org/manual/camel-4x-upgrade-guide-4_22.html) upgrade guides. The one item here that is exercised by code is `allowedSchemes`, in `examples/14-consumer-patterns/` on both runtimes. The rest describes framework behaviour this tutorial does not have a test for; treat the specifics as a map to the upgrade guides rather than as independently confirmed.*

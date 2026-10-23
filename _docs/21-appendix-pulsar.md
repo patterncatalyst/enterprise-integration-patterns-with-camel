@@ -264,6 +264,11 @@ Key parameters for the `pulsar:` component:
 | `schemaType` | Schema type (`AVRO`, `JSON`, `PROTOBUF`, `BYTES`) | `BYTES` |
 | `batchingEnabled` | Enable message batching for producers | `true` |
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live Pulsar 5.0.0 containers on Docker Engine (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                                    # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/21-pulsar-deep-dive/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run)
+```
+
+Watch the Shared subscription round-robin orders across two consumer instances, the Key_Shared subscription keep every message for the same order on one consumer, and payment messages that exhaust their redelivery attempts land on the `eip.orders.payments-dlq` dead letter topic.

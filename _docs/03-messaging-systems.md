@@ -372,9 +372,3 @@ Watch the Camel logs to see the message flow through the pipeline: each `log()` 
 - **Message Endpoint**: the Camel component that connects application code to a channel.
 
 These six building blocks are the vocabulary for the chapters that follow. Next, the first building block in depth, **Messaging Channels**, covering point-to-point, publish-subscribe, dead letter channels, guaranteed delivery, and more.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: a conceptual chapter with no runnable example of its own; every Java snippet compiles against Camel 4.22.1 and the channels it names are the topics the examples actually use (2026-10-09).*
-
-*To confirm on re-verification: all Camel route examples compile and run with `camel run` against Camel 4.22; Kafka component header names (kafka.KEY, kafka.PARTITION, kafka.OFFSET) match actual Camel Kafka component behavior; Simple expression syntax for map access (`${body[field]}`) works as shown.*

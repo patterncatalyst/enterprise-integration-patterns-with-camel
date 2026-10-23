@@ -467,6 +467,15 @@ logging.level.org.apache.camel=INFO
 
 The `kafka.brokers` property placeholder is shared: both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/09-routing-fundamentals/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the content-based router, filter, splitter, and recipient list route a generated stream of orders by hazmat flag, destination country, order value, and item count.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 7: "Message Routing"
@@ -487,7 +496,3 @@ The `kafka.brokers` property placeholder is shared: both runtimes resolve `{% ra
 - **Splitter** (`split()`) breaks a composite message into parts for independent processing, essential for bulk operations and per-item routing.
 
 Next, we compose these primitives into multi-step routing patterns: the Routing Slip, Process Manager, and Scatter-Gather.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>; both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine (2026-10-09). The 4.22 splitter options added here were run against the live stack on 2026-09-15: `maxFailedRecords(5)` completes a 10-item batch with 3 bad items and aborts one with 8 bad items at the fifth failure, and `group(25)` splits 60 items into batches of 25, 25 and 10.*

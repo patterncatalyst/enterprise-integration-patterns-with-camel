@@ -660,11 +660,17 @@ The TUI fits specific scenarios better than other monitoring approaches:
 
 For production monitoring with alerting, dashboards, and historical data, you still need a proper observability stack (see Chapter 17 and Appendix I). The TUI is a complement, not a replacement: it excels at interactive, real-time inspection where the observability stack excels at aggregate, historical analysis.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh
+cd examples/40-camel-tui && camel run *.yaml   # terminal 1
+camel tui                                       # terminal 2
+```
+
+The TUI auto-discovers the running integration and renders a live dashboard of routes, exchange throughput, and the synthetic orders the data generator posts to the REST API every three seconds.
+
 ## References
 
 - [Camel TUI documentation](https://camel.apache.org/manual/camel-jbang.html#_tui)
 - [Camel CLI overview (Appendix U)]({% link _docs/39-appendix-camel-cli.md %})
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: the demo routes run clean on Camel CLI 4.22.1 against the stack on Docker Engine (2026-10-09). The TUI screens themselves are described from use, not captured by an automated check.*

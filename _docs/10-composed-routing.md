@@ -376,6 +376,15 @@ You can also set `stopOnException(false)` to continue aggregation even if one ca
 
 **Over-engineering with sagas.** Not every multi-step workflow needs a saga. If the steps are independent and failures don't require compensation, a simple routing slip or sequential pipeline is simpler and sufficient. Reserve sagas for workflows where partial completion requires explicit rollback.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/10-composed-routing/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the scatter-gather route multicast shipping rate requests to FedEx, UPS, and USPS in parallel and pick the lowest rate, while the routing slip route builds and executes a dynamic, order-specific processing pipeline.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 7: "Message Routing"
@@ -394,7 +403,3 @@ You can also set `stopOnException(false)` to continue aggregation even if one ca
 - These patterns compose the fundamentals from Chapter 09 into dynamic, adaptive workflows that handle the complexity of real integration scenarios.
 
 Next: Advanced Routing, covering Dynamic Router, Wire Tap, Resequencer, Composed Message Processor, and Load Balancer.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>, both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

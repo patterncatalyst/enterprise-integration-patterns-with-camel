@@ -455,8 +455,11 @@ from("kafka:eip.shipping.rate-requests?brokers=localhost:9092&groupId=carrier-sc
 
 5. **Enrichment before routing is a common prerequisite.** The credit bureau lookup happens before bank selection because the selection depends on enriched data. In the shipping domain, customs classification must happen before carrier selection for international shipments.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: `POST /api/loans` (Quarkus) and `/camel/api/loans` (Spring Boot) return 202 with a request id, and the lowest approved rate is published to `loan.results` (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                         # Kafka
+cd examples/loan-broker/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
 
-*The gateway path differs by runtime: `/api/loans` on Quarkus, `/camel/api/loans` on Spring Boot, whose camel-servlet mapping sits under `/camel`. The Spring Boot gateway also used to return an empty HTTP 500: `restConfiguration()` sets `bindingMode(json)`, so Camel already serialises the response, and the route marshalled it a second time. Quarkus tolerated that by double-encoding the body; camel-servlet did not. The redundant marshal is gone from both.*
+A demo timer submits a loan request every 8 seconds; watch the logs for credit enrichment, the three banks' quotes, and the aggregator selecting the lowest approved rate before it publishes to `loan.results`.

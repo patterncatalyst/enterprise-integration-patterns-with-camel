@@ -203,7 +203,11 @@ public class InventoryChecker {
 </dependency>
 ```
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: built against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1); its 3 integration tests pass against live containers on Docker Engine (2026-10-09).*
-Example `25-quarkus-flow` compiles and runs against the compose stack.*
+```bash
+./scripts/setup-stack.sh                         # Kafka
+cd examples/25-quarkus-flow && mvn quarkus:dev
+```
+
+Watch generated orders progress through the saga states RECEIVED, INVENTORY_RESERVED, PAYMENT_AUTHORIZED, and SHIPPED, with high-value orders failing at the inventory step and orders whose ID is divisible by 7 triggering a compensating inventory release.

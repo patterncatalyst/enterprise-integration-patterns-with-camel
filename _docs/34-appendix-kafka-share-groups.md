@@ -182,6 +182,11 @@ When share groups stabilize, they will be a significant addition to Kafka's mess
 
 For workloads that need queue semantics today, Pulsar's Shared subscription (Appendix C) provides a mature, production-ready alternative.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>; `share-groups-demo.sh` runs to completion against Kafka 4.3.1 in the compose stack on Docker Engine: nine orders split across the three consumers, accepted and rejected records do not reappear, released ones do (2026-10-09).*
+```bash
+./scripts/setup-stack.sh
+cd examples/34-kafka-share-groups && ./share-groups-demo.sh
+```
+
+The script drives `kafka-console-share-consumer.sh` and `kafka-share-groups.sh` directly (Camel has no share-group support as of 4.22), splitting nine orders across three workers on a three-partition topic and walking all three acknowledgment modes: accepted and rejected records do not reappear on a second pass, released ones do.

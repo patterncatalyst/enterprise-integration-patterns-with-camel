@@ -624,6 +624,15 @@ Appendix C showed how `mvn quarkus:dev` runs tests continuously as you code. Pre
 
 **Artifact rename in Quarkus 3.31+.** `quarkus-junit5` was renamed to `quarkus-junit` and `quarkus-junit5-mockito` to `quarkus-junit-mockito`. The old names still work (Maven redirects them) but produce deprecation warnings. Use the new names.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh
+cd examples/37-testing-strategies/quarkus && mvn verify
+```
+
+The Tier 2 suite starts real Kafka through Dev Services and runs `PaymentGatewayIT` and `KafkaIntegrationTest` against it; the Spring Boot variant under `examples/37-testing-strategies/spring-boot` runs the same tests with `mvn verify`.
+
 ## References
 
 - [Apache Camel: Testing](https://camel.apache.org/manual/testing.html)
@@ -641,7 +650,3 @@ Appendix C showed how `mvn quarkus:dev` runs tests continuously as you code. Pre
 - **Tier 3 (Newman)** provides external black-box API tests with shareable Postman collections: complements in-process tests for CI and QA workflows.
 - **AdviceWith** is the key to testable Camel routes: replace Kafka consumers with `direct:` endpoints, intercept producers with `mock:` endpoints, and mock CDI beans with `@InjectMock`.
 - **The shared CamelContext** is the biggest gotcha: apply advice once, reset mocks before each test, and use `@TestProfile` for isolation.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>, both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and pass 14 tests each: 10 unit, 4 integration (2026-10-09).*

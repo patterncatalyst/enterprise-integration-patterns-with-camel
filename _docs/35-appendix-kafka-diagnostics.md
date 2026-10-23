@@ -291,6 +291,11 @@ When something goes wrong, work through this checklist:
 
 Most Kafka issues in integration routes fall into three categories: **consumer lag** (consumer too slow), **rebalance storms** (consumers joining/leaving frequently), and **producer failures** (broker unavailable, buffer exhaustion). The diagnostic workflow above covers all three.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: `kafka-diagnostics.sh` runs all seven steps against the compose stack on Docker Engine with `09-routing-fundamentals` consuming: consumer groups `Stable`, no under-replicated partitions (2026-10-09).*
+```bash
+./scripts/setup-stack.sh
+cd examples/35-kafka-diagnostics && ./kafka-diagnostics.sh
+```
+
+Point it at another running example (such as `09-routing-fundamentals`) and watch it work through consumer group lag and state, broker log errors and warnings, topic replication health, and Camel route health checks in order, with `--group <name>` to focus on one consumer group and `--dump <pid>` to add a thread dump and heap summary.

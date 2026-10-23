@@ -797,6 +797,14 @@ End-to-end smoke tests        —  5% of test suite  — run nightly or pre-rele
 - **`camel export` generates CI-ready Maven projects**: the same tests run locally with `camel test run` and in CI with `mvn verify`.
 - **Citrus complements Camel-native testing, not replaces it**: use Camel-native tests for fast route logic verification, Citrus tests for end-to-end integration confidence.
 
+## Build, run, observe
+
+```bash
+cd examples/41-citrus-testing && camel test run test/order-validation.citrus.it.yaml
+```
+
+Citrus starts a real Kafka broker via Testcontainers, runs the order-validation route against it, and asserts the valid order and the three rejection cases each carry the right `rejectionReason` header on the real output topic.
+
 ## Further reading
 
 - [Citrus Framework documentation](https://citrusframework.org/citrus/reference/5.0.1/html/index.html)
@@ -805,7 +813,3 @@ End-to-end smoke tests        —  5% of test suite  — run nightly or pre-rele
 - [Testcontainers for Java](https://java.testcontainers.org/)
 - Appendix S: Testing Strategies for Camel Quarkus (Camel-native testing)
 - Appendix U: Camel CLI Deep Dive (CLI installation and commands)
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: with Camel CLI 4.22.1 and the `test` plugin on Docker Engine, both tests pass through `camel test run` (the Kafka test with its own broker, the valid order and three rejections with their `rejectionReason` header, and the HTTP test with 200 and 400 answers, extracted order id), and pass again in the project `camel export` generates once the four fixes above are applied (`mvn verify -DskipITs=false`) (2026-10-09).*

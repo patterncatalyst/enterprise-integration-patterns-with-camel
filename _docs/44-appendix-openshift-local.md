@@ -409,6 +409,15 @@ next start is quick.
 - **A cluster you can hand back**: evidence with a secret scrub, and a
   teardown that removes every operator, CRD and namespace before `crc stop`.
 
+## Build, run, observe
+
+```bash
+./openshift/install-infra.sh
+./openshift/build-images.sh && ./openshift/deploy.sh
+```
+
+The scripts provision AMQ Streams Kafka, build the Quarkus image in-cluster with S2I, and deploy the Helm chart behind an edge-TLS Route; `capture-evidence.sh` then records the order round-trip and the Redis enrichment under `restricted-v2`.
+
 ## References
 
 - [Red Hat OpenShift Local documentation](https://crc.dev/docs/introducing/)
@@ -416,7 +425,3 @@ next start is quick.
 - [Strimzi documentation](https://strimzi.io/documentation/) (AMQ Streams is Red Hat's build of Strimzi)
 - [Managing security context constraints](https://docs.okd.io/latest/authentication/managing-security-context-constraints.html)
 - [KEDA Apache Kafka scaler](https://keda.sh/docs/latest/scalers/apache-kafka/)
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: the full cycle ran on OpenShift Local 4.22.14: AMQ Streams `amqstreams.v3.2.1-14` Succeeded and Kafka Ready, the in-cluster build pushed `eip-k8s-deploy:v1` (built with Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) on `ubi10/openjdk-25:1.24-15`), the chart rolled out under `restricted-v2`, the platform tier installed (KEDA scaler Ready, Java agent injected, Grafana Route up), `capture-evidence.sh` passed with a clean secret scrub, and `teardown.sh` left CRC clean and stopped (2026-10-09). Evidence: `openshift/evidence/2026-10-09/`.*

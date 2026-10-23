@@ -1420,6 +1420,15 @@ The shipping domain example demonstrates the practical application: an AI agent 
 
 As AI agents become standard components in enterprise architectures, the integration layer becomes more important, not less. Every tool call and every system update an agent makes goes through an integration. Camel's LangChain4j components ensure that integration is built on the same battle-tested patterns and components that have connected enterprise systems for over fifteen years.
 
+## Build, run, observe
+
+```bash
+ollama pull qwen2.5:3b && ollama serve
+cd examples/42-ai-mcp/quarkus && mvn quarkus:dev
+```
+
+The classifier endpoint tags a natural-language order description by category, priority, and fulfillment type, and the assistant endpoint answers shipping questions by calling the order-lookup tool route against Ollama's `qwen2.5:3b` model.
+
 ## References
 
 - [Camel LangChain4j Chat component](https://camel.apache.org/components/4.22.x/langchain4j-chat-component.html)
@@ -1430,7 +1439,3 @@ As AI agents become standard components in enterprise architectures, the integra
 - [Camel MCP Server](https://camel.apache.org/manual/camel-jbang.html#_mcp)
 - [Model Context Protocol specification](https://modelcontextprotocol.io/)
 - [Wanaku MCP router](https://github.com/wanaku-ai/wanaku)
-
----
-
-*Verification status: <span class="status status--verified">verified</span>; both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against Ollama 0.40.2 with `qwen2.5:3b` on Docker Engine: the classifier returns JSON (lithium batteries `HAZARDOUS`, salmon `PERISHABLE`, glasses `FRAGILE`, t-shirts `STANDARD`); the assistant calls the `ai-tool` route for ORD-001, ORD-002, ORD-003 and ORD-999 (`Tool call — looking up order: …` for each) and answers from its data, with no route errors; and an external MCP client lists `order-status` and calls it, reaching the same route over streamable HTTP at `/mcp` on Quarkus and over SSE (`/sse`, `/mcp/message`) on Spring Boot (2026-10-09). This run found and fixed the classifier: its instructions went in a header the chat component never reads.*

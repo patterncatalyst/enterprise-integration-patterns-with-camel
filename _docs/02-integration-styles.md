@@ -403,9 +403,3 @@ The goal is not to use only messaging. Choose the right style for each interacti
 - **Messaging** decouples in time, space, and interface: the foundation for event-driven, loosely coupled architectures, and the style the chapters ahead build on.
 
 Next, we enter the world of messaging systems: the six building blocks (channels, messages, pipes and filters, routers, translators, and endpoints) that every messaging architecture is made of.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: every Java snippet in this chapter compiles against Camel 4.22.1, and the messaging style it recommends is the one exercised in the chapters ahead (2026-10-09). The file, shared-database and RPI routes are illustrative and have no runnable example of their own.*
-
-*To confirm on re-verification: all Java DSL routes compile against Camel 4.22 APIs; SQL component named parameter syntax is correct; Kafka component URI options are valid for camel-kafka 4.22; Resilience4j circuit breaker durations use the 4.22 string form (`.waitDurationInOpenState("10s")`) rather than the pre-4.22 integer seconds.*

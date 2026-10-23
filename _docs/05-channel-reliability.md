@@ -247,6 +247,15 @@ from("kafka:eip.orders.placed"
 
 **Retrying non-retryable errors.** A `NullPointerException` from a validation failure will never succeed on retry; it'll fail 3 times and dead-letter, wasting time and resources. Use the Invalid Message Channel for validation failures; reserve the DLC for transient errors.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                             # Kafka
+cd examples/05-reliability/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run)
+```
+
+The route consumes orders from `eip.orders.placed`, forwards most of them to `eip.orders.processed`, and fails every 5th order so you can watch it retry 3 times before the Dead Letter Channel routes it to `eip.orders.dlq`, where a monitor route logs the failure reason; inspect both topics in Kafka UI at `http://localhost:8090`.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 4: "Messaging Channels"
@@ -265,7 +274,3 @@ from("kafka:eip.orders.placed"
 - Manual offset commit (`autoCommitEnable=false`) is essential for at-least-once processing in Kafka.
 
 Next, we look at the infrastructure-level channel patterns: Channel Adapter, Messaging Bridge, and Message Bus.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 4 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

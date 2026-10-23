@@ -307,7 +307,3 @@ Virtual threads are lightweight by design and not individually tracked by JMX. M
 ### Thread dumps
 
 Virtual threads appear in `jcmd <pid> Thread.dump_to_file -format=json <file>` output. The JSON format groups virtual threads by their state (running, parked, pinned) and shows which carrier thread each running virtual thread is mounted on.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: conceptual reference chapter, no runnable example.*

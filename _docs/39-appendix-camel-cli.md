@@ -974,13 +974,18 @@ The entire lifecycle (from a blank YAML file to a production Kubernetes deployme
 - **`camel update` keeps routes current**: OpenRewrite recipes handle mechanical migration tasks when upgrading Camel versions.
 - **The CLI inspects any Camel application**: not just CLI-launched routes. Use `camel ps`, `camel get`, and `camel trace` against Quarkus and Spring Boot services with the management component enabled.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh
+cd examples/39-camel-cli && camel run *.yaml --port=8088
+```
+
+POST an order to `/api/orders` with `orderType: EXPRESS` and `camel trace` shows the exchange routed to `eip.orders.express` and the enricher publishing the order back out with the customer name and tier looked up from Redis.
+
 ## Further reading
 
 - [Camel CLI documentation](https://camel.apache.org/manual/camel-jbang.html)
 - [Camel YAML DSL reference](https://camel.apache.org/components/4.22.x/others/yaml-dsl.html)
 - [JBang](https://www.jbang.dev/): the Java runner that powers the CLI
 - [OpenRewrite Camel recipes](https://docs.openrewrite.org/recipes/apache/camel)
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: the routes run on Camel CLI 4.22.1 against the stack on Docker Engine: `POST /api/orders` with `orderType: EXPRESS` returns 200 and the enricher publishes `ORD-9001` with customer `Acme Freight`, tier `GOLD`, from Redis (2026-10-09).*

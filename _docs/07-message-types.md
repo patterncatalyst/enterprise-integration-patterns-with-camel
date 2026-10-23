@@ -228,6 +228,15 @@ Real systems often mix types. Our shipping domain is mostly events, but the chec
 
 **Missing event metadata.** Events without `event_id`, `event_time`, and `source` are harder to debug, deduplicate, and replay. Include these fields from the start: adding them later means migrating all consumers.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                                # Kafka
+cd examples/07-message-types/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Three timer-driven routes produce and consume a Command Message (`ProcessPayment`), a Document Message (a full order record), and an Event Message (`OrderPlaced` with event metadata) on separate Kafka topics; inspect each topic in Kafka UI at `http://localhost:8090` to see the command return a `PROCESSED` result, the document land with no implied action, and the event get logged with no reply.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 5: "Message Construction"
@@ -243,7 +252,3 @@ Real systems often mix types. Our shipping domain is mostly events, but the chec
 - The choice between types determines coupling, error handling, and how the system evolves as you add new services.
 
 Next, we look at the metadata that accompanies messages: request-reply, correlation identifiers, message sequences, expiration, and format indicators.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

@@ -304,6 +304,11 @@ This reduces rebalance impact from "all consumers paused" to "only affected part
 | Nightly batch export | High throughput | `fetch.min.bytes=65536`, `max.poll.records=1000`, `fetch.max.wait.ms=2000` |
 | Monitoring dashboard | Tail only | `auto.offset.reset=latest`, `autoCommitEnable=true` |
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine and process messages with no errors (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                         # Kafka
+cd examples/32-kafka-consumer-tuning/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
+
+Each of the three profiles (throughput, safety-first, static membership) has its own timer-driven producer, so watch the consumer logs for large auto-committed batches on the throughput consumer, single-record manual commits under `read_committed` isolation on the safety consumer, and the static member resuming its partitions without a rebalance after a restart.

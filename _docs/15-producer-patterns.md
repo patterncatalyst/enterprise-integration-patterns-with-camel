@@ -308,6 +308,15 @@ The service activator pattern keeps your business logic clean. `PaymentProcessor
 
 **Service activators with side effects in the bean.** If the bean sends an email as part of processing, and the route retries on failure, the email is sent multiple times. Keep beans pure (return a result, don't execute side effects) or make side effects idempotent.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/15-endpoints/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the JDBC-backed idempotent receiver deduplicate orders, the service activator invoke a CDI inventory bean, the Pulsar durable subscriber retain cursor state across restarts, and the transactional outbox write payment and event atomically before publishing to Kafka.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 9: "Messaging Endpoints"
@@ -326,7 +335,3 @@ The service activator pattern keeps your business logic clean. `PaymentProcessor
 - **Service Activator** connects plain business logic (CDI beans) to the messaging infrastructure, keeping business code free of messaging concerns.
 
 Next: endpoint lifecycle and management: Messaging Gateway, Channel Purger, and Selective Consumer.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean and their Citrus test passes (2026-10-09).*

@@ -192,6 +192,11 @@ there is nothing else holding the JVM open, and the application shuts down a
 few seconds after the routes start. Note the property name: `camel.main.`, not
 `camel.springboot.`; the latter is silently ignored.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against flagd v0.17.0 on Docker Engine, the fractional A/B split now asserted exactly (order ids 1–10 split 9 legacy / 1 new); both runtimes also run against the compose stack, the detour enriching while `enrichment-enabled` is on (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                         # Kafka plus flagd
+cd examples/26-feature-flags/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
+
+Watch the demo generator's orders in the log, then edit `examples/_infra/flagd/flags.json`, flip `enrichment-enabled` to off or change the fractional split, and see the next message take a different path with no rebuild or restart.

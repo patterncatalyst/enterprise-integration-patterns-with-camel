@@ -242,6 +242,11 @@ from("direct:publish-order")
 ```
 {% endraw %}
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>; both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: the batched, compressed, idempotent and synchronous producers and their verifiers all log traffic, with no errors (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                         # Kafka
+cd examples/33-kafka-producer-tuning/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
+
+Each of the four profiles (batched, compressed, idempotent, synchronous) sends on its own interval and is paired with a verifier consumer, so watch the logs for fewer, larger network requests under batching, reduced payload sizes under LZ4 compression, no duplicates on retry under idempotence, and blocking sends with error-handler output under the synchronous profile.

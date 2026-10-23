@@ -303,6 +303,15 @@ A canonical model adds a translation layer at every system boundary. If two serv
 
 **Over-aggregating.** Not every related message needs to be aggregated. If downstream consumers can handle individual events (with proper correlation), aggregation adds unnecessary latency and state management complexity. Only aggregate when the consumer truly needs the combined view.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                         # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/13-aggregator/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+Watch the in-memory and PostgreSQL-backed aggregators correlate order line items into completed orders, and the normalizer translate three partner-specific topic formats into one canonical model.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 8: "Message Transformation"
@@ -319,7 +328,3 @@ A canonical model adds a translation layer at every system boundary. If two serv
 - **Canonical Data Model** establishes a shared schema (Avro + Apicurio) that all services conform to; it reduces N×N translations to 2N and enables governed schema evolution.
 
 This completes Part 6, Message Transformation (7 patterns across 2 chapters). Next: Part 7, Messaging Endpoints, where we explore the patterns that connect application code to the messaging system.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 10 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

@@ -287,6 +287,15 @@ logging.level.org.apache.camel=INFO
 
 The `kafka.brokers` and `camel.component.pulsar.service-url` property placeholders are shared: both runtimes resolve `{% raw %}{{kafka.brokers}}{% endraw %}` from the same key. The Redis configuration differs: Quarkus uses `quarkus.redis.hosts` (full URL), while Spring Boot uses `spring.data.redis.host` and `spring.data.redis.port`.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                              # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/04-channel-types/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+The demo generators publish orders to Kafka and Pulsar every few seconds; watch a single Point-to-Point consumer group claim each order exactly once, three Pub/Sub consumer groups each receive every order independently, and the Datatype router sort orders by status into dedicated topics, all visible in Kafka UI at `http://localhost:8090`.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 4: "Messaging Channels"
@@ -304,7 +313,3 @@ The `kafka.brokers` and `camel.component.pulsar.service-url` property placeholde
 - Kafka achieves point-to-point with consumer groups and pub-sub with multiple groups on the same topic; Pulsar uses subscription types.
 
 Next, we tackle what happens when things go wrong: invalid messages, dead letters, and guaranteed delivery.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>; both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 16 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*

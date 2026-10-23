@@ -327,6 +327,15 @@ This is the messaging mapper in action: the annotations define the mapping betwe
 
 **Mapping that silently drops fields.** When using `@JsonIgnoreProperties(ignoreUnknown = true)`, new fields added by the producer are silently ignored. This is usually correct (forward compatibility), but log a warning if unexpected fields appear so you know the schema has evolved.
 
+## Build, run, observe
+
+```bash
+./scripts/setup-stack.sh                                   # Kafka, Pulsar, Redis, PostgreSQL
+cd examples/16-endpoint-management/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
+```
+
+The demo generator publishes an order to `eip.orders.placed` every 5 seconds; watch the selective consumer drop hazmat orders before they're deserialized, the channel purger discard stale messages while forwarding recent ones to `eip.orders.clean`, and the messaging gateway publish orders and inventory requests through `OrderMessagingGateway` methods with no Camel API exposed to the caller.
+
 ## References
 
 - Hohpe & Woolf, *Enterprise Integration Patterns*, Chapter 9: "Messaging Endpoints"
@@ -345,7 +354,3 @@ This is the messaging mapper in action: the annotations define the mapping betwe
 - **Messaging Mapper** converts between domain objects and messages: Camel's `unmarshal()` with typed classes and bean binding handle most cases.
 
 This completes Part 7: Messaging Endpoints (12 patterns across 3 chapters). Next: Part 8: System Management, where we explore the patterns that keep a running integration system observable and maintainable.
-
----
-
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 14 Citrus integration tests pass against live containers on Docker Engine; the YAML DSL routes run clean and their Citrus test passes (2026-10-09).*

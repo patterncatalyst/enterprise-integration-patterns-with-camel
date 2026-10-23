@@ -487,6 +487,11 @@ curl -sG localhost:3100/loki/api/v1/query_range \
 If traces are there but metrics and logs are not, you have the single-signal
 problem described in [getting all three signals](#getting-all-three-signals).
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 6 Citrus integration tests pass on Docker Engine; run against `setup-stack.sh --lgtm` with orders sent to `eip.orders.placed`, Tempo returns the routes' traces (10 from the Spring Boot run) and Mimir has `camel_exchanges_total` series (2026-10-09).*
+```bash
+./scripts/setup-stack.sh --lgtm                  # Kafka plus the LGTM stack (Grafana, Loki, Tempo, Mimir)
+cd examples/27-observability-stack/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
+
+Produce an order on `eip.orders.placed`, then search Tempo in Grafana for the `traced-order-pipeline` span tree and query the Prometheus endpoint for `camel_exchanges_total` to see the trace and the metric for the same request.

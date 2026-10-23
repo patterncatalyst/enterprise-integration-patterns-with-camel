@@ -182,6 +182,11 @@ Export as a `.xls` or `.csv` decision table and Drools compiles it into rules. B
 
 The `drools-engine` artifact provides the core KIE API without requiring the Drools Quarkus extension (which has version-coupling with the Quarkus build API). The `drools-xml-support` artifact provides `kmodule.xml` parsing, and `drools-mvel` provides the MVEL expression support used in DRL conditions.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants build against Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) and their 8 Citrus integration tests pass against live containers on Docker Engine (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                         # Kafka
+cd examples/24-drools-rules/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
+
+Produce a JSON order onto `eip.orders.placed` with kcat and watch the Drools rule unit route it to `standard`, `express`, `hazmat`, or `fraud-review` based on amount, destination country, and the hazmat flag.

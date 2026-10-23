@@ -448,8 +448,11 @@ The core lesson: **the patterns are the same regardless of domain.** A bond trad
 
 Two case studies, two different shapes of the same patterns: proof that EIP is a universal integration language.
 
----
+## Build, run, observe
 
-*Verification status: <span class="status status--verified">verified</span>: both runtime variants run on Camel 4.22.1 (Quarkus 3.40.1 / Spring Boot 4.1.1) against the stack on Docker Engine: all three feeds, the normalizer, distributor, three desks and the validator log traffic, with no errors (2026-10-09).*
+```bash
+./scripts/setup-stack.sh                         # Kafka
+cd examples/bond-trading/quarkus && mvn quarkus:dev     # or spring-boot/ (mvn spring-boot:run)
+```
 
-*The example's rejected trade orders used to be logged and dropped, which the README described as a Dead Letter Channel. It was neither pattern; the order vanished. Per the distinction this tutorial draws in [Chapter 5]({% link _docs/05-channel-reliability.md %}), a consumer that understands a message and rejects it on business grounds wants an **Invalid Message Channel**, so rejected orders now go to `bond.orders.invalid`. Verified by injecting a negative quantity and a negative limit price and seeing both arrive.*
+Demo timers generate market data every 2 seconds and trade orders every 10 seconds; watch the logs for prices flowing through the channel adapters, the normalizer, and the desk distributor, with rejected orders landing on `bond.orders.invalid`.
