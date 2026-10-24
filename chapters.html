@@ -1,0 +1,45 @@
+---
+layout: default
+title: Chapters
+description: "The full table of contents: every part, chapter, and appendix of the Enterprise Integration Patterns with Apache Camel tutorial, in reading order."
+permalink: /docs/00-index/
+---
+
+<section class="section">
+  <div class="container container-prose">
+    <span class="hero__eyebrow">Chapters</span>
+    <h1>The whole tutorial, in order.</h1>
+    <p class="hero__lead">
+      Every part, chapter, and appendix, linked. Read it top to bottom the first
+      time through; each pattern chapter also stands on its own. New here? Start
+      with the <a href="{{ '/docs/00-outline/' | relative_url }}">Outline</a>.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container container-prose">
+    {%- assign parts_sorted = site.parts | sort: "order" -%}
+    {%- for part in parts_sorted -%}
+      {%- assign part_chapters = site.docs | where: "part", part.part_name | sort: "order" -%}
+      {%- if part_chapters.size > 0 -%}
+      <h2 class="section-heading">
+        <span class="chip chip--accent">Part {{ part.order }}</span>
+        {{ part.title }}
+      </h2>
+      {%- if part.blurb -%}<p class="section-sub">{{ part.blurb }}</p>{%- endif -%}
+      <ol class="toc-list">
+        {%- for doc in part_chapters -%}
+        <li>
+          <a href="{{ doc.url | relative_url }}">
+            <span class="toc-list__num">{{ doc.order }}</span>
+            <span>{{ doc.title }}</span>
+          </a>
+          {%- if doc.description -%}<small>{{ doc.description }}</small>{%- endif -%}
+        </li>
+        {%- endfor -%}
+      </ol>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+</section>
