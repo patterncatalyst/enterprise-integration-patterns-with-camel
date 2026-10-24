@@ -6,6 +6,27 @@ description: "Request-reply, correlation identifiers, return addresses, message 
 duration: "45 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Implement Request-Reply conversations over asynchronous messaging using Camel's InOut exchange pattern
+- Decouple a replier from its callers with a Return Address carried on the request
+- Correlate a reply to its originating request with a Correlation Identifier
+- Split a large payload into a Message Sequence and reassemble the parts with an Aggregator
+- Expire stale messages with Message Expiration headers or Pulsar's native per-message TTL
+- Indicate message format with a Format Indicator so consumers choose the right unmarshaler
+
+## Why this matters
+
+A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations, without coupling sender and receiver.
+
+{% include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1: Request-Reply using separate channels and a Correlation Identifier to match replies." %}
+
+This chapter covers six patterns that address these questions. Together with the three message types from the previous chapter, they complete Message Construction: everything that goes *into* a message before it hits the wire.
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/08-message-metadata/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/08-message-metadata) with subdirectories for each runtime.
 >
 > Four of the six patterns are in there: **Correlation Identifier**
@@ -38,12 +59,6 @@ mvn spring-boot:run
 cd examples/08-message-metadata/yaml-dsl
 camel run *
 ```
-
-A message carries more than data. It carries context: *Who should reply? Where should the reply go? Which conversation does this belong to? Is this part 3 of 5? Has it expired?* These metadata patterns turn one-way message sends into structured, multi-step conversations, without coupling sender and receiver.
-
-{% include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1: Request-Reply using separate channels and a Correlation Identifier to match replies." %}
-
-This chapter covers six patterns that address these questions. Together with the three message types from the previous chapter, they complete Message Construction: everything that goes *into* a message before it hits the wire.
 
 ## Pattern: Request-Reply
 

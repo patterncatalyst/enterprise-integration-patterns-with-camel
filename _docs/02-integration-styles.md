@@ -6,6 +6,19 @@ description: "The four fundamental ways applications share data: file transfer, 
 duration: "45 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Compare file transfer, shared database, RPI, and messaging as integration styles
+- Implement a file-based export route with Camel's file component
+- Query a shared database table from a Camel route using the sql component
+- Call a remote service synchronously with a circuit breaker for fallback handling
+- Publish and consume asynchronous events over Kafka
+- Choose the right integration style for a given trade-off among coupling, timeliness, reliability, and complexity
+
+## Why this matters
+
 Before we dive into messaging patterns, we need to understand *why messaging exists at all*. Gregor Hohpe and Bobby Woolf open the EIP book with a deceptively simple question: how do you get two applications to share data? There are exactly four fundamental approaches, four **integration styles**, and each one trades off differently along the axes of coupling, timeliness, reliability, and complexity. These trade-offs matter: later chapters build on the choice of messaging as the primary integration style.
 
 This chapter walks through all four styles, shows how each one would solve a problem from our shipping domain, implements each in Apache Camel, and explains when you'd choose one over another.

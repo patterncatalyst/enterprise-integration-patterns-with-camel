@@ -6,6 +6,24 @@ description: "Messaging Gateway, Selective Consumer, Channel Purger, and Messagi
 duration: "35 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Hide messaging infrastructure behind a domain-specific Messaging Gateway interface
+- Filter messages at the header level with a Selective Consumer before paying the deserialization cost
+- Purge stale or malformed messages with offset resets, record deletion, or a purge route
+- Map domain objects to and from message formats with typed unmarshaling and Jackson annotations
+- Promote filter-worthy fields to Kafka headers to keep selective consumption cheap
+
+## Why this matters
+
+The previous two chapters covered how consumers receive and producers send messages. This chapter completes the Messaging Endpoints catalog with four patterns that manage the boundary layer itself: abstracting messaging behind a gateway, selectively consuming from shared channels, purging stale messages, and mapping between domain objects and messages.
+
+{% include excalidraw.html file="16-messaging-gateway" alt="Messaging Gateway pattern" caption="Figure 16.1: Messaging Gateway hides the messaging system from application code" %}
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/16-endpoint-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/16-endpoint-management) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,10 +45,6 @@ mvn spring-boot:run
 cd examples/16-endpoint-management/yaml-dsl
 camel run *
 ```
-
-The previous two chapters covered how consumers receive and producers send messages. This chapter completes the Messaging Endpoints catalog with four patterns that manage the boundary layer itself: abstracting messaging behind a gateway, selectively consuming from shared channels, purging stale messages, and mapping between domain objects and messages.
-
-{% include excalidraw.html file="16-messaging-gateway" alt="Messaging Gateway pattern" caption="Figure 16.1: Messaging Gateway hides the messaging system from application code" %}
 
 ## Pattern: Messaging Gateway
 

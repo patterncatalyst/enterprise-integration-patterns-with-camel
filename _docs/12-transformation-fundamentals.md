@@ -6,6 +6,26 @@ description: "Message Translator, Envelope Wrapper, Content Enricher, and Conten
 duration: "40 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Translate a message between formats and schemas using marshal/unmarshal, a processor, or JOLT
+- Wrap a payload in an event envelope on publish and unwrap it on consume
+- Enrich a message with data from an external source using `enrich()` or `pollEnrich()`
+- Cache enrichment lookups in Redis to avoid a database round trip on every message
+- Filter unwanted or sensitive fields from a message using an allowlist or a blocklist
+
+## Why this matters
+
+Messages rarely arrive in exactly the format the receiver needs. An external partner sends XML; your services expect JSON. Kafka events carry order IDs but not customer names, so you need to look up the name before sending a notification. An audit log needs the full order, but a summary report needs only the total and status. Messages need to be translated, enriched, stripped down, wrapped, and unwrapped as they flow between systems.
+
+{% include excalidraw.html file="12-transformation-flow" alt="Message transformation pipeline" caption="Figure 12.1: A transformation pipeline: translate, enrich from external data, filter out PII, produce canonical output." %}
+
+This chapter covers four patterns that change a message's content. The next chapter covers structural transformation: how to combine multiple messages into one (Aggregator), normalize different formats into a canonical form (Normalizer), and what to do when systems can't change (Anti-Corruption Layer).
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/12-transformation/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/12-transformation) with Quarkus and Spring Boot subdirectories.
 >
 > Three of the four patterns are in there: **Message Translator**
@@ -30,12 +50,6 @@ mvn quarkus:dev
 cd examples/12-transformation/spring-boot
 mvn spring-boot:run
 ```
-
-Messages rarely arrive in exactly the format the receiver needs. An external partner sends XML; your services expect JSON. Kafka events carry order IDs but not customer names, so you need to look up the name before sending a notification. An audit log needs the full order, but a summary report needs only the total and status. Messages need to be translated, enriched, stripped down, wrapped, and unwrapped as they flow between systems.
-
-{% include excalidraw.html file="12-transformation-flow" alt="Message transformation pipeline" caption="Figure 12.1: A transformation pipeline: translate, enrich from external data, filter out PII, produce canonical output." %}
-
-This chapter covers four patterns that change a message's content. The next chapter covers structural transformation: how to combine multiple messages into one (Aggregator), normalize different formats into a canonical form (Normalizer), and what to do when systems can't change (Anti-Corruption Layer).
 
 ## Pattern: Message Translator
 

@@ -6,6 +6,24 @@ description: "Durable Subscriber, Idempotent Receiver, Transactional Client, and
 duration: "40 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Persist subscription state with a Durable Subscriber so offline consumers miss nothing
+- Deduplicate at-least-once deliveries with an Idempotent Receiver backed by Redis or JDBC
+- Write business data and an outbox event in one transaction with a Transactional Client
+- Publish outbox events to Kafka asynchronously and reconcile at-least-once delivery
+- Connect CDI beans to messaging with a Service Activator that keeps business logic free of messaging concerns
+
+## Why this matters
+
+The previous chapter covered how consumers receive messages. This chapter covers the other side: how producers send messages durably, how consumers guarantee exactly-once processing, how transactions span messaging and database operations, and how messaging integrates with service-oriented application code.
+
+{% include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1: The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." %}
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/15-endpoints/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/15-endpoints) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,10 +45,6 @@ mvn spring-boot:run
 cd examples/15-endpoints/yaml-dsl
 camel run *
 ```
-
-The previous chapter covered how consumers receive messages. This chapter covers the other side: how producers send messages durably, how consumers guarantee exactly-once processing, how transactions span messaging and database operations, and how messaging integrates with service-oriented application code.
-
-{% include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1: The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." %}
 
 ## Pattern: Durable Subscriber
 

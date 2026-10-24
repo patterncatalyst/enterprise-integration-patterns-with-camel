@@ -6,6 +6,27 @@ description: "Content-Based Router, Message Filter, Recipient List, and Splitter
 duration: "45 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Route messages to different channels based on content using a content-based router (`choice()`)
+- Filter messages that fail a predicate with a single-branch router (`filter()`)
+- Fan out a message to multiple destinations at once with a recipient list (`recipientList()`)
+- Split a composite message into independent parts and route each one with a splitter (`split()`)
+- Bound partial failure in a split with `errorThreshold` and `maxFailedRecords`
+- Resume a split after a crash with watermark-based progress tracking
+
+## Why this matters
+
+Message Routing is where integration gets interesting. So far, messages flow in straight lines: from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
+
+{% include excalidraw.html file="09-routing-patterns" alt="Content-Based Router, Splitter, and Recipient List" caption="Figure 9.1: Three fundamental routing patterns: route by content, split into parts, fan out to a dynamic list." %}
+
+This chapter covers four foundational routing patterns that make these decisions. The next two chapters cover composed routers (routing slip, process manager) and advanced patterns (load balancer, dynamic router, resequencer).
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/09-routing-fundamentals/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/09-routing-fundamentals) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,12 +48,6 @@ mvn spring-boot:run
 cd examples/09-routing-fundamentals/yaml-dsl
 camel run *
 ```
-
-Message Routing is where integration gets interesting. So far, messages flow in straight lines: from producer to channel to consumer. But real systems have branches: this order goes to the express lane, that one to standard processing; international shipments route to customs, domestic ones skip it; high-value orders trigger fraud checks, low-value ones don't.
-
-{% include excalidraw.html file="09-routing-patterns" alt="Content-Based Router, Splitter, and Recipient List" caption="Figure 9.1: Three fundamental routing patterns: route by content, split into parts, fan out to a dynamic list." %}
-
-This chapter covers four foundational routing patterns that make these decisions. The next two chapters cover composed routers (routing slip, process manager) and advanced patterns (load balancer, dynamic router, resequencer).
 
 ## Pattern: Content-Based Router
 
