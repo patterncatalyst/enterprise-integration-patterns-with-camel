@@ -6,6 +6,27 @@ description: "Routing Slip, Process Manager, and Scatter-Gather: multi-step rout
 duration: "45 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Attach a dynamic sequence of processing steps to a message with a routing slip (`routingSlip()`)
+- Compute a routing slip in a testable bean method using the annotation-based approach
+- Coordinate a branching, multi-step workflow with compensation using the Saga EIP
+- Reverse a completed step when a later step fails by triggering saga compensation
+- Fan out a request to multiple recipients in parallel and aggregate the best response with scatter-gather (`multicast()`)
+- Bound a scatter-gather wait with a timeout to tolerate slow or unresponsive recipients
+
+## Why this matters
+
+The previous chapter covered the building blocks: content-based router, filter, recipient list, and splitter. Each makes a single routing decision. But real workflows involve *sequences* of decisions: this order needs to go through fraud check, *then* inventory reservation, *then* payment. But the specific sequence depends on the order type, the customer tier, and the product category. The sequence isn't hardcoded; it's determined at runtime.
+
+{% include excalidraw.html file="10-scatter-gather" alt="Scatter-Gather pattern" caption="Figure 10.1: Scatter-Gather fans out to multiple recipients and aggregates their replies." %}
+
+This chapter covers three patterns that compose routing steps into dynamic workflows.
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/10-composed-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/10-composed-routing) with Quarkus and Spring Boot subdirectories.
 >
 > It covers two of the three patterns here. The **Routing Slip** is
@@ -34,12 +55,6 @@ mvn quarkus:dev
 cd examples/10-composed-routing/spring-boot
 mvn spring-boot:run
 ```
-
-The previous chapter covered the building blocks: content-based router, filter, recipient list, and splitter. Each makes a single routing decision. But real workflows involve *sequences* of decisions: this order needs to go through fraud check, *then* inventory reservation, *then* payment. But the specific sequence depends on the order type, the customer tier, and the product category. The sequence isn't hardcoded; it's determined at runtime.
-
-{% include excalidraw.html file="10-scatter-gather" alt="Scatter-Gather pattern" caption="Figure 10.1: Scatter-Gather fans out to multiple recipients and aggregates their replies." %}
-
-This chapter covers three patterns that compose routing steps into dynamic workflows.
 
 ## Pattern: Routing Slip
 

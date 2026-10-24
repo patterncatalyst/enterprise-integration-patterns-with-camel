@@ -6,6 +6,25 @@ description: "Dynamic Router, Wire Tap, Resequencer, Composed Message Processor,
 duration: "40 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Compute a routing decision fresh at each step with a dynamic router (`dynamicRouter()`)
+- Terminate a dynamic router correctly by returning null once routing completes
+- Tap a copy of a message to an audit or analytics channel without blocking the main flow (`wireTap()`)
+- Reorder out-of-sequence messages by a sequence key using batch or stream resequencing
+- Combine a splitter and an aggregator to process and reassemble a composite message
+- Distribute messages across multiple processing nodes with round-robin, failover, or sticky load balancing
+
+## Why this matters
+
+The previous two chapters covered the most common routing patterns. This chapter rounds out the routing catalog with five patterns that address specific challenges: routing decisions that change at runtime, observability without disrupting the flow, reordering out-of-sequence messages, processing composite messages efficiently, and distributing load across multiple processing nodes.
+
+{% include excalidraw.html file="11-wire-tap" alt="Wire Tap pattern" caption="Figure 11.1: Wire Tap sends a copy of the message to a monitoring channel without affecting the main flow." %}
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/11-advanced-routing/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/11-advanced-routing) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,10 +46,6 @@ mvn spring-boot:run
 cd examples/11-advanced-routing/yaml-dsl
 camel run *
 ```
-
-The previous two chapters covered the most common routing patterns. This chapter rounds out the routing catalog with five patterns that address specific challenges: routing decisions that change at runtime, observability without disrupting the flow, reordering out-of-sequence messages, processing composite messages efficiently, and distributing load across multiple processing nodes.
-
-{% include excalidraw.html file="11-wire-tap" alt="Wire Tap pattern" caption="Figure 11.1: Wire Tap sends a copy of the message to a monitoring channel without affecting the main flow." %}
 
 ## Pattern: Dynamic Router
 

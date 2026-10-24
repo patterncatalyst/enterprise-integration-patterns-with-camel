@@ -6,6 +6,27 @@ description: "Control Bus, Message Store, Message History, and Wire Tap (for mon
 duration: "40 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Manage running Camel routes at runtime with the Control Bus (CLI, JMX/REST, Quarkus health checks)
+- Capture and audit messages with a Message Store for debugging and replay
+- Trace a message's path through routes with Message History and across services with OpenTelemetry
+- Instrument business routes with Wire Tap metrics without altering their logic
+- Read p50/p95/p99 latency percentiles from the Camel CLI without standing up a metrics pipeline
+- Avoid common observability pitfalls: unauthenticated control buses, PII-laden message stores, and high-cardinality metric tags
+
+## Why this matters
+
+A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
+
+{% include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1: The Control Bus manages routes at runtime and exports metrics to observability tools." %}
+
+System Management patterns address operational concerns: monitoring, debugging, testing, and managing a running integration system. This chapter covers four observability patterns. The next chapter covers management and testing patterns.
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/17-observability/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/17-observability) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,12 +48,6 @@ mvn spring-boot:run
 cd examples/17-observability/yaml-dsl
 camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 ```
-
-A messaging system that you can't observe is a messaging system you can't troubleshoot. When order 42 goes missing somewhere between inventory-service and payment-service, you need to answer: *Did the message arrive? Where did it go? What happened to it? How long did each step take?*
-
-{% include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1: The Control Bus manages routes at runtime and exports metrics to observability tools." %}
-
-System Management patterns address operational concerns: monitoring, debugging, testing, and managing a running integration system. This chapter covers four observability patterns. The next chapter covers management and testing patterns.
 
 ## Pattern: Control Bus
 

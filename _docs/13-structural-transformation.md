@@ -6,6 +6,25 @@ description: "Aggregator, Normalizer, and Canonical Data Model: patterns that re
 duration: "40 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Combine correlated messages into one with the Aggregator EIP and a correlation expression
+- Choose completion conditions (size, timeout, predicate) to control when an aggregation closes
+- Persist aggregation state with a JDBC-backed repository so it survives a restart
+- Normalize divergent source formats (JSON, XML, CSV) into one canonical shape
+- Define a canonical data model with Avro and Apicurio to cut N by N translators to 2N
+- Govern schema evolution and contract testing across a canonical model
+
+## Why this matters
+
+The previous chapter transformed individual messages: translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
+
+{% include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1: The Aggregator collects correlated messages and emits a single combined result." %}
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/13-aggregator/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/13-aggregator) with Quarkus and Spring Boot subdirectories.
 >
 > **Aggregator** is `order-aggregator`, with `persistent-order-aggregator`
@@ -30,10 +49,6 @@ mvn quarkus:dev
 cd examples/13-aggregator/spring-boot
 mvn spring-boot:run
 ```
-
-The previous chapter transformed individual messages: translating formats, enriching content, filtering fields. This chapter tackles structural transformation: combining multiple messages into one, normalizing different formats into a single canonical form, and establishing a shared data model across services.
-
-{% include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1: The Aggregator collects correlated messages and emits a single combined result." %}
 
 ## Pattern: Aggregator
 

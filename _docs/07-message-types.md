@@ -6,6 +6,26 @@ description: "Command, document, and event messages: the three semantic types th
 duration: "30 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Send a Command Message to direct a receiver to perform a specific, named action
+- Send a Document Message to transfer data without prescribing what the receiver does with it
+- Emit an Event Message that announces a past occurrence to any number of subscribers
+- Compare coupling, naming convention, and expected response across command, document, and event messages
+- Choose the right message type for orchestration, data transfer, or choreography
+
+## Why this matters
+
+So far, we've treated messages as generic packets of data. But messages carry intent: they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types (command, document, and event) shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
+
+{% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1: The three message types and their channel/consumer affinities." %}
+
+This chapter and the next cover Message Construction: what goes *inside* a message and what metadata accompanies it. We start here with the three message types, then move to metadata patterns (request-reply, correlation, sequencing, and expiration) in the next chapter.
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/07-message-types/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/07-message-types) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,12 +47,6 @@ mvn spring-boot:run
 cd examples/07-message-types/yaml-dsl
 camel run *
 ```
-
-So far, we've treated messages as generic packets of data. But messages carry intent: they tell the receiver to *do* something, *inform* it of data, or *notify* it that something happened. These three semantic types (command, document, and event) shape how the sender and receiver relate to each other. Choosing the right type determines your system's coupling, error handling, and evolution characteristics.
-
-{% include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1: The three message types and their channel/consumer affinities." %}
-
-This chapter and the next cover Message Construction: what goes *inside* a message and what metadata accompanies it. We start here with the three message types, then move to metadata patterns (request-reply, correlation, sequencing, and expiration) in the next chapter.
 
 ## Pattern: Command Message
 

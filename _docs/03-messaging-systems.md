@@ -6,9 +6,22 @@ description: "The six building blocks of any messaging architecture: channels, m
 duration: "40 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Identify the six building blocks of a messaging architecture: channels, messages, pipes and filters, routers, translators, and endpoints
+- Distinguish point-to-point from publish-subscribe channel semantics
+- Read and set message headers and bodies on a Camel Exchange
+- Compose a pipes-and-filters route from independent, reusable steps
+- Route a message to different channels with Camel's choice EIP
+- Translate a message's format with marshal/unmarshal and custom processors
+
+## Why this matters
+
 The previous chapter showed four ways to integrate applications and argued that messaging is the right default for loosely coupled systems. But "messaging" is a big idea: too big to implement as a single pattern. Hohpe and Woolf decompose it into six fundamental building blocks that every messaging architecture is made of. These six concepts are the vocabulary for everything that follows in this tutorial: every pattern in Parts 3 through 8 is a refinement, a specialization, or a composition of these building blocks.
 
-This chapter introduces all six, shows how each one appears in the shipping domain, and demonstrates how Apache Camel models them. By the end, you'll be able to look at any Camel route and identify the channels, messages, pipes, filters, routers, translators, and endpoints that compose it.
+This chapter introduces all six, shows how each one appears in the shipping domain, and demonstrates how Apache Camel models them.
 
 {% include excalidraw.html file="03-messaging-system-components" alt="Diagram showing the six messaging system building blocks and how they relate" caption="Figure 3.1: The six building blocks of a messaging system" %}
 

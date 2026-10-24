@@ -6,6 +6,25 @@ description: "Test Message, Detour, Smart Proxy, and Channel Adapter management:
 duration: "35 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Inject synthetic Test Messages on a schedule and verify pipeline output end to end
+- Validate routes in CI with the Camel test framework's mock endpoints and assertions
+- Bypass a processing step at runtime with a Detour controlled by a feature flag
+- Route payment calls to mock, sandbox, or production backends with a Smart Proxy
+- Manage channel adapters with circuit breakers, dead letter channels, and health metrics
+- Avoid pitfalls that let test messages trigger side effects, detours go forgotten, or mocks drift from the real contract
+
+## Why this matters
+
+The previous chapter covered observability: knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
+
+{% include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1: Test Message injection and Detour toggle" %}
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/18-testing-management/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/18-testing-management) with Quarkus and Spring Boot subdirectories.
 
 {% include codetabs.html langs="Quarkus|Spring Boot" %}
@@ -21,10 +40,6 @@ mvn quarkus:dev
 cd examples/18-testing-management/spring-boot
 mvn spring-boot:run
 ```
-
-The previous chapter covered observability: knowing what's happening in the system. This chapter covers the complementary concern: verifying the system works correctly, routing messages through alternate paths for debugging, and managing the adapters that connect to external systems.
-
-{% include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1: Test Message injection and Detour toggle" %}
 
 ## Pattern: Test Message
 

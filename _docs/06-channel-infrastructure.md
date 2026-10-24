@@ -6,6 +6,26 @@ description: "Connecting disparate systems: channel adapters, messaging bridges,
 duration: "30 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Bridge a non-messaging system (HTTP, file, SOAP) into a messaging channel with an inbound or outbound Channel Adapter
+- Connect two messaging systems, Kafka and Pulsar, with a Messaging Bridge while preserving delivery ordering
+- Configure shared Camel properties so a service joins a Message Bus without repeating broker and serializer settings
+- Enforce message bus conventions, such as topic naming and schema governance, with a registry rather than informal agreement
+- Combine channel adapters with Invalid Message Channel and Dead Letter Channel error handling
+
+## Why this matters
+
+The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world: how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.
+
+{% include excalidraw.html file="06-messaging-bridge" alt="Messaging Bridge connecting Kafka to Pulsar" caption="Figure 6.1: A Camel Messaging Bridge forwards events from Kafka to Pulsar for cross-system integration." %}
+
+These are the patterns that make messaging practical in heterogeneous environments, and they're where Camel's component library shines, because connecting disparate systems is exactly what Camel was built for.
+
+## Runnable example
+
 > **Runnable example:** The code from this chapter is in [`examples/06-channel-infra/`](https://github.com/patterncatalyst/enterprise-integration-patterns-with-camel/tree/main/examples/06-channel-infra) with subdirectories for each runtime.
 
 {% include codetabs.html langs="Quarkus|Spring Boot|YAML DSL" %}
@@ -27,12 +47,6 @@ mvn spring-boot:run
 cd examples/06-channel-infra/yaml-dsl
 camel run * --port=8082   # REST port is a CLI flag; 8080 is Pulsar's
 ```
-
-The previous two chapters covered what channels are and how they handle failures. This chapter covers how channels connect to the outside world: how a REST API feeds into a Kafka topic, how messages flow between Kafka and Pulsar, and how a Message Bus provides a shared infrastructure that multiple applications can plug into without point-to-point wiring.
-
-{% include excalidraw.html file="06-messaging-bridge" alt="Messaging Bridge connecting Kafka to Pulsar" caption="Figure 6.1: A Camel Messaging Bridge forwards events from Kafka to Pulsar for cross-system integration." %}
-
-These are the patterns that make messaging practical in heterogeneous environments, and they're where Camel's component library shines, because connecting disparate systems is exactly what Camel was built for.
 
 ## Pattern: Channel Adapter
 

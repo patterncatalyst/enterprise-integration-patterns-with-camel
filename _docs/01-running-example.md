@@ -6,9 +6,22 @@ description: "The shipping domain: orders, inventory, payments, shipments, and n
 duration: "25 minutes"
 ---
 
+## Learning objectives
+
+By the end of this chapter you can:
+
+- Describe the five shipping-domain services and their responsibilities
+- Trace the event-driven message flow from order placement through delivery
+- Map each event in the catalog to its producer, consumers, and Kafka topic
+- Identify how Kafka, Pulsar, Redis, PostgreSQL, and Apicurio each support the domain
+- Define the topic naming convention and event schema structure
+- Run a pattern example end to end using the Camel CLI
+
+## Why this matters
+
 Every pattern in this tutorial needs a problem to solve. Instead of inventing a new scenario for each chapter, we use a single **shipping domain**: five microservices that collaborate to move an order from placement through delivery. This gives you a consistent frame of reference: when you see a Content-Based Router in Part 5, it's routing the same `OrderPlaced` events you met here; when you see an Idempotent Receiver in Part 7, it's deduplicating the same payment confirmations.
 
-This chapter introduces the domain model, the services, the message flows between them, and the infrastructure that carries those messages. By the end, you'll understand the business problem well enough to recognize it instantly in every pattern example that follows.
+This chapter introduces the domain model, the services, the message flows between them, and the infrastructure that carries those messages.
 
 {% include excalidraw.html file="01-order-flow" alt="Diagram showing the five shipping domain services and the Kafka event flow between them" caption="Figure 1.1: The shipping domain order flow" %}
 
