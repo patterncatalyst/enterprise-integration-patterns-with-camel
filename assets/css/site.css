@@ -775,3 +775,12 @@ table :is(th, td) code {
 .codetabs-panel .highlight{ margin:0 !important; border-radius:0 !important; }
 .no-js .codetabs{ display:none; }
 
+
+/* Chapters table of contents (chapters.html → /docs/00-index/) */
+.toc-list { list-style: none; margin: 0 0 var(--space-7); padding: 0; }
+.toc-list > li { padding: var(--space-3) 0; border-bottom: 1px solid var(--border); }
+.toc-list > li:last-child { border-bottom: none; }
+.toc-list a { display: flex; gap: var(--space-3); align-items: baseline; font-weight: 600; text-decoration: none; }
+.toc-list a:hover { text-decoration: underline; }
+.toc-list__num { font-family: var(--font-mono); color: var(--accent); font-weight: 700; min-width: 2.4rem; flex: none; }
+.toc-list small { display: block; color: var(--ink-muted); font-weight: 400; margin-top: var(--space-1); }
