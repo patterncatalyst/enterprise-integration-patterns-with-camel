@@ -1,0 +1,86 @@
+---
+layout: default
+title: Diagrams
+description: "Every figure from the book on one page, with its editable Excalidraw source."
+permalink: /diagrams/
+---
+
+<style>
+  .diagram-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .diagram-gallery .excalidraw-embed { margin: 0; }
+  @media (max-width: 40rem) {
+    .diagram-gallery { grid-template-columns: 1fr; }
+  }
+</style>
+
+<section class="section">
+  <div class="container">
+    <span class="hero__eyebrow">Diagrams</span>
+    <h1>Every figure, on one page.</h1>
+    <p class="hero__lead">
+      The 48 diagrams from Enterprise Integration Patterns with Apache Camel, in reading order. Each one renders
+      inline here and ships a paired <code>.excalidraw</code> source you can
+      open on excalidraw.com and edit.
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="diagram-gallery">
+      {%- include excalidraw.html file="01-order-flow" alt="Diagram showing the five shipping domain services and the Kafka event flow between them" caption="Figure 1.1: The shipping domain order flow" -%}
+      {%- include excalidraw.html file="01-stack-architecture" alt="Diagram showing the local infrastructure stack: Kafka, Pulsar, Redis, PostgreSQL, Apicurio, and the LGTM observability overlay" caption="Figure 1.2: Local stack architecture" -%}
+      {%- include excalidraw.html file="02-integration-styles" alt="Diagram showing the four integration styles side by side: File Transfer, Shared Database, RPI, and Messaging" caption="Figure 2.1: The Four Integration Styles" -%}
+      {%- include excalidraw.html file="03-messaging-system-components" alt="Diagram showing the six messaging system building blocks and how they relate" caption="Figure 3.1: The six building blocks of a messaging system" -%}
+      {%- include excalidraw.html file="03-pipes-and-filters" alt="Pipes and Filters pattern" caption="Figure 3.1: Pipes and Filters, each filter transforms the message" -%}
+      {%- include excalidraw.html file="04-channel-types" alt="Point-to-Point vs Publish-Subscribe channel types" caption="Figure 4.1: Point-to-Point delivers to one consumer; Publish-Subscribe delivers to all consumer groups." -%}
+      {%- include excalidraw.html file="04-point-to-point" alt="Kafka topic with 3 partitions, each assigned to exactly one consumer in the inventory-service consumer group" caption="Figure 4.1: Point-to-point via Kafka consumer groups: each partition is assigned to exactly one consumer instance." -%}
+      {%- include excalidraw.html file="04-pub-sub" alt="Kafka topic fanning out to three independent consumer groups (inventory, notification, and analytics), each receiving all messages" caption="Figure 4.2: Publish-subscribe via multiple consumer groups: each group receives every message independently. Adding analytics-service requires no changes to the publisher or existing consumers." -%}
+      {%- include excalidraw.html file="04-pulsar-subscriptions" alt="Pulsar topic with three subscriptions: inventory (Shared with two consumers), notification (Exclusive), and analytics (Exclusive)" caption="Figure 4.3: Pulsar subscriptions: each subscription receives every message independently. The Shared subscription distributes work across multiple consumers; Exclusive subscriptions have one active consumer each." -%}
+      {%- include excalidraw.html file="05-reliability-patterns" alt="Dead Letter Channel and Guaranteed Delivery flow" caption="Figure 5.1: Guaranteed Delivery with Dead Letter Channel as the fallback for exhausted retries." -%}
+      {%- include excalidraw.html file="06-messaging-bridge" alt="Messaging Bridge connecting Kafka to Pulsar" caption="Figure 6.1: A Camel Messaging Bridge forwards events from Kafka to Pulsar for cross-system integration." -%}
+      {%- include excalidraw.html file="07-message-types" alt="Command, Event, and Document message types" caption="Figure 7.1: The three message types and their channel/consumer affinities." -%}
+      {%- include excalidraw.html file="08-request-reply" alt="Request-Reply pattern with Correlation Identifier" caption="Figure 8.1: Request-Reply using separate channels and a Correlation Identifier to match replies." -%}
+      {%- include excalidraw.html file="09-routing-patterns" alt="Content-Based Router, Splitter, and Recipient List" caption="Figure 9.1: Three fundamental routing patterns: route by content, split into parts, fan out to a dynamic list." -%}
+      {%- include excalidraw.html file="10-scatter-gather" alt="Scatter-Gather pattern" caption="Figure 10.1: Scatter-Gather fans out to multiple recipients and aggregates their replies." -%}
+      {%- include excalidraw.html file="11-wire-tap" alt="Wire Tap pattern" caption="Figure 11.1: Wire Tap sends a copy of the message to a monitoring channel without affecting the main flow." -%}
+      {%- include excalidraw.html file="12-transformation-flow" alt="Message transformation pipeline" caption="Figure 12.1: A transformation pipeline: translate, enrich from external data, filter out PII, produce canonical output." -%}
+      {%- include excalidraw.html file="13-aggregator" alt="Aggregator pattern" caption="Figure 13.1: The Aggregator collects correlated messages and emits a single combined result." -%}
+      {%- include excalidraw.html file="14-consumer-patterns" alt="Competing Consumers and Event-Driven Consumer" caption="Figure 14.1: Competing Consumers scale horizontally; Event-Driven Consumers react to message arrival." -%}
+      {%- include excalidraw.html file="14-consumer-scaling" alt="Two application instances each with two consumer threads, distributing 12 Kafka partitions evenly: 3 partitions per thread" caption="Figure 14.1: Competing consumer scaling: 2 instances × 2 threads = 4 consumers, each assigned 3 of 12 partitions." -%}
+      {%- include excalidraw.html file="15-outbox-pattern" alt="Outbox Pattern for transactional messaging" caption="Figure 15.1: The Outbox pattern ensures atomic writes to the database and eventual publication to Kafka." -%}
+      {%- include excalidraw.html file="16-messaging-gateway" alt="Messaging Gateway pattern" caption="Figure 16.1: Messaging Gateway hides the messaging system from application code" -%}
+      {%- include excalidraw.html file="17-control-bus" alt="Control Bus for route management" caption="Figure 17.1: The Control Bus manages routes at runtime and exports metrics to observability tools." -%}
+      {%- include excalidraw.html file="18-testing-patterns" alt="Test Message and Detour patterns" caption="Figure 18.1: Test Message injection and Detour toggle" -%}
+      {%- include excalidraw.html file="20-kafka-architecture" alt="Kafka cluster architecture" caption="Figure K.1: Kafka cluster with KRaft, partitions, and consumer groups" -%}
+      {%- include excalidraw.html file="20-consumer-rebalancing" alt="Three rebalancing scenarios: initial 2-consumer assignment, after Consumer C joins (3-way split), and after Consumer B crashes (2-way redistribution)" caption="Figure B.1: Consumer group rebalancing: partitions are redistributed when consumers join or leave the group." -%}
+      {%- include excalidraw.html file="21-pulsar-architecture" alt="Pulsar cluster architecture" caption="Figure L.1: Pulsar cluster with stateless brokers and BookKeeper storage" -%}
+      {%- include excalidraw.html file="22-appendix-redis" alt="Redis four integration roles: caching, idempotent store, pub/sub, and distributed locking" caption="Figure D.1: Redis serves four distinct roles in integration: cache-aside enrichment, idempotent message deduplication, pub/sub notifications, and distributed locking." -%}
+      {%- include excalidraw.html file="23-promotion-workflow" alt="JBang to Quarkus promotion workflow" caption="Figure N.1: From JBang prototype to native Quarkus binary" -%}
+      {%- include excalidraw.html file="24-appendix-drools" alt="Drools rule-based content router: Kafka consumer to rule engine to routing destinations" caption="Figure F.1: A Drools Rule Unit evaluates orders against DRL rules and decision tables, setting a routing decision that Camel's toD() uses to dispatch to the correct handler." -%}
+      {%- include excalidraw.html file="25-appendix-quarkus-flow" alt="Quarkus Flow order fulfillment workflow with state transitions and Camel integration" caption="Figure G.1: The order fulfillment workflow as a Serverless Workflow state machine: operation states call CDI beans that invoke Camel routes for external system integration." -%}
+      {%- include excalidraw.html file="26-feature-flags" alt="flagd architecture" caption="Figure Q.1: flagd evaluation with OpenFeature SDK" -%}
+      {%- include excalidraw.html file="27-appendix-observability" alt="LGTM observability stack: Camel services to OTel Collector to Loki, Tempo, Mimir, and Grafana" caption="Figure I.1: The LGTM observability pipeline: Camel services emit traces, metrics, and logs via OpenTelemetry to the OTel Collector, which fans out to Loki, Tempo, and Mimir for Grafana visualization." -%}
+      {%- include excalidraw.html file="27-trace-tree" alt="Distributed trace showing spans across order-service and inventory-service, linked via Kafka header propagation" caption="Figure I.1: Distributed trace: the produce span in order-service and the consume span in inventory-service are linked under the same trace ID via Kafka header propagation." -%}
+      {%- include excalidraw.html file="28-loan-broker" alt="Loan Broker Scatter-Gather architecture" caption="Figure J.1: The Loan Broker: gateway, enricher, recipient list, bank services, and aggregator." -%}
+      {%- include excalidraw.html file="29-bond-trading" alt="Bond Trading market data distribution" caption="Figure K.1: Bond Trading: multiple feeds normalized, filtered per desk, traded, and audited." -%}
+      {%- include excalidraw.html file="31-virtual-threads" alt="Platform threads vs virtual threads: 1:1 OS mapping vs M:N scheduling with carrier pool" caption="Figure M.1: Platform threads map 1:1 to OS threads; virtual threads share a small carrier pool and park on I/O" -%}
+      {%- include excalidraw.html file="32-consumer-lifecycle" alt="Kafka consumer lifecycle showing fetch, poll, and commit operations between broker and consumer" caption="Figure N.1: The consumer lifecycle: fetch batches from the broker, poll and process records, then commit offsets. Each step has configuration knobs that trade throughput against latency and safety." -%}
+      {%- include excalidraw.html file="33-producer-pipeline" alt="Kafka producer pipeline showing buffering, batching, compression, and broker acknowledgment" caption="Figure O.1: The producer pipeline: records are buffered in the RecordAccumulator, batched by partition, optionally compressed, then sent to the broker. The broker acknowledgment flows back through a callback to the application." -%}
+      {%- include excalidraw.html file="34-share-groups" alt="Comparison of traditional consumer groups with partition-bound assignment versus share groups with round-robin distribution" caption="Figure P.1: Consumer groups (left) assign each partition to exactly one consumer; Consumer D is idle. Share groups (right) distribute messages round-robin across all consumers regardless of partition count." -%}
+      {%- include excalidraw.html file="36-connect-pipeline" alt="Data pipeline showing PostgreSQL flowing through Debezium source connector, Kafka, Camel route processing, and JDBC sink connector to analytics database" caption="Figure R.1: A shipping domain pipeline: Debezium captures CDC events from PostgreSQL, Camel routes apply EIP logic (validate, enrich, route), and a JDBC sink connector writes processed orders to the analytics database. Each component manages its own offsets." -%}
+      {%- include excalidraw.html file="37-appendix-testing-strategies" alt="Testing pyramid with three tiers: unit tests at the base, integration tests in the middle, Newman at the top" caption="Figure S.1: The testing pyramid for Camel Quarkus: unit tests are fast and many, integration tests verify real infrastructure, Newman tests validate external API contracts." -%}
+      {%- include excalidraw.html file="38-kubernetes-deploy" alt="minikube cluster with Camel application pods, Strimzi Kafka, and Redis" caption="Figure T.1: Kubernetes deployment architecture: the Camel application consumes orders from Kafka, enriches via Redis, and publishes to an enriched orders topic." -%}
+      {%- include excalidraw.html file="39-camel-cli-workflow" alt="Camel CLI prototype-to-production workflow" caption="Figure U.1: The Camel CLI lifecycle: prototype with camel run, inspect with camel trace, export to a production Maven project." -%}
+      {%- include excalidraw.html file="40-camel-tui-dashboard" alt="Camel TUI dashboard layout" caption="Figure V.1: The Camel TUI dashboard layout: tab bar, main content panel, and status bar." -%}
+      {%- include excalidraw.html file="41-citrus-testing" alt="Citrus test execution flow" caption="Figure W.1: Citrus test lifecycle: start infrastructure via Testcontainers, launch the Camel route, send test messages, and verify results on output topics." -%}
+      {%- include excalidraw.html file="42-ai-mcp-architecture" alt="Camel AI/MCP architecture" caption="Figure X.1: Camel AI integration architecture: routes produce to LangChain4j agents, which call back to Camel route tools and external MCP servers." -%}
+      {%- include excalidraw.html file="44-openshift-local" alt="OpenShift Local project eip: a binary S2I build produces the eip-k8s-deploy image, an edge-TLS Route fronts the Camel application, which talks to AMQ Streams Kafka and Redis; KEDA and OpenTelemetry are opt-in" caption="Figure Z.1: The Appendix T pipeline on OpenShift Local: Maven packages on the host, the cluster builds and stores the image, a Route terminates TLS, and the operator-managed Kafka and Redis run in the same project." -%}
+    </div>
+  </div>
+</section>
