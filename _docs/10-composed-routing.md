@@ -32,8 +32,8 @@ This chapter covers three patterns that compose routing steps into dynamic workf
 > It covers two of the three patterns here. The **Routing Slip** is
 > `order-routing-slip`, with its steps as `validate-order`,
 > `customs-classification` and `hazmat-compliance`; **Scatter-Gather** is
-> `carrier-scatter-gather`, fanning out to `quote-fedex`, `quote-ups` and
-> `quote-usps`. The chapter names those steps `slip-step-*` and `carrier-*` to
+> `carrier-scatter-gather`, fanning out to `quote-fastline`, `quote-parcelco` and
+> `quote-postco`. The chapter names those steps `slip-step-*` and `carrier-*` to
 > keep the prose readable: same routes, different labels.
 >
 > The **Process Manager** section is prose only. The saga below is not in the
@@ -294,7 +294,7 @@ semantics.
 
 ### The problem
 
-When a customer requests a shipping estimate, the shipping-service needs quotes from multiple carriers: FedEx, UPS, DHL, USPS. It sends the request to all carriers simultaneously (scatter), waits for responses (gather), and returns the best price to the customer.
+When a customer requests a shipping estimate, the shipping-service needs quotes from multiple carriers: FASTLINE, PARCELCO, AIRCO, POSTCO. It sends the request to all carriers simultaneously (scatter), waits for responses (gather), and returns the best price to the customer.
 
 This is different from a recipient list because the sender needs the *results back*; it's not fire-and-forget. And it's different from sequential processing because calling carriers one at a time would be too slow.
 
@@ -304,7 +304,7 @@ A **Scatter-Gather** sends the same request to multiple recipients (scatter) and
 
 ### How Camel models it
 
-Camel's `multicast()` with an `aggregationStrategy` is the natural implementation. The snippet below adds DHL as a fourth carrier and calls the carriers over HTTP; the runnable example quotes three carriers off a Kafka rate-request topic, but the pattern and the timeout are the same:
+Camel's `multicast()` with an `aggregationStrategy` is the natural implementation. The snippet below adds AIRCO as a fourth carrier and calls the carriers over HTTP; the runnable example quotes three carriers off a Kafka rate-request topic, but the pattern and the timeout are the same:
 
 ```java
 from("direct:get-shipping-estimates")
@@ -313,38 +313,38 @@ from("direct:get-shipping-estimates")
     .multicast(new LowestPriceAggregation())
         .parallelProcessing()
         .timeout(5000)
-        .to("direct:quote-fedex", "direct:quote-ups", "direct:quote-dhl", "direct:quote-usps")
+        .to("direct:quote-fastline", "direct:quote-parcelco", "direct:quote-airco", "direct:quote-postco")
     .end()
     .log("Best shipping estimate: ${body[carrier]} at $${body[price]}");
 
 // Each carrier endpoint
-from("direct:quote-fedex")
-    .routeId("carrier-fedex")
-    .setHeader("carrier", constant("FedEx"))
-    .to("http://fedex-api.example.com/rate?connectTimeout=5000")
+from("direct:quote-fastline")
+    .routeId("carrier-fastline")
+    .setHeader("carrier", constant("FASTLINE"))
+    .to("http://fastline-api.example.com/rate?connectTimeout=5000")
     .unmarshal().json(Map.class)
-    .log("FedEx quote: $${body[price]}");
+    .log("FASTLINE quote: $${body[price]}");
 
-from("direct:quote-ups")
-    .routeId("carrier-ups")
-    .setHeader("carrier", constant("UPS"))
-    .to("http://ups-api.example.com/rate?connectTimeout=5000")
+from("direct:quote-parcelco")
+    .routeId("carrier-parcelco")
+    .setHeader("carrier", constant("PARCELCO"))
+    .to("http://parcelco-api.example.com/rate?connectTimeout=5000")
     .unmarshal().json(Map.class)
-    .log("UPS quote: $${body[price]}");
+    .log("PARCELCO quote: $${body[price]}");
 
-from("direct:quote-dhl")
-    .routeId("carrier-dhl")
-    .setHeader("carrier", constant("DHL"))
-    .to("http://dhl-api.example.com/rate?connectTimeout=5000")
+from("direct:quote-airco")
+    .routeId("carrier-airco")
+    .setHeader("carrier", constant("AIRCO"))
+    .to("http://airco-api.example.com/rate?connectTimeout=5000")
     .unmarshal().json(Map.class)
-    .log("DHL quote: $${body[price]}");
+    .log("AIRCO quote: $${body[price]}");
 
-from("direct:quote-usps")
-    .routeId("carrier-usps")
-    .setHeader("carrier", constant("USPS"))
-    .to("http://usps-api.example.com/rate?connectTimeout=5000")
+from("direct:quote-postco")
+    .routeId("carrier-postco")
+    .setHeader("carrier", constant("POSTCO"))
+    .to("http://postco-api.example.com/rate?connectTimeout=5000")
     .unmarshal().json(Map.class)
-    .log("USPS quote: $${body[price]}");
+    .log("POSTCO quote: $${body[price]}");
 ```
 
 ### The aggregation strategy
@@ -377,7 +377,7 @@ Other common aggregation strategies:
 
 ### Handling partial results
 
-The `timeout(5000)` ensures the scatter-gather doesn't wait forever if a carrier is slow. If DHL doesn't respond within 5 seconds, the aggregation proceeds with the 3 responses it has. This is critical for user-facing flows: a customer waiting for a shipping estimate can't wait 60 seconds for a slow carrier.
+The `timeout(5000)` ensures the scatter-gather doesn't wait forever if a carrier is slow. If AIRCO doesn't respond within 5 seconds, the aggregation proceeds with the 3 responses it has. This is critical for user-facing flows: a customer waiting for a shipping estimate can't wait 60 seconds for a slow carrier.
 
 You can also set `stopOnException(false)` to continue aggregation even if one carrier throws an error (the failed carrier is excluded from the comparison).
 
@@ -398,7 +398,7 @@ You can also set `stopOnException(false)` to continue aggregation even if one ca
 cd examples/10-composed-routing/quarkus && mvn quarkus:dev   # or spring-boot/ (mvn spring-boot:run), or yaml-dsl/ (camel run *)
 ```
 
-Watch the scatter-gather route multicast shipping rate requests to FedEx, UPS, and USPS in parallel and pick the lowest rate, while the routing slip route builds and executes a dynamic, order-specific processing pipeline.
+Watch the scatter-gather route multicast shipping rate requests to FASTLINE, PARCELCO, and POSTCO in parallel and pick the lowest rate, while the routing slip route builds and executes a dynamic, order-specific processing pipeline.
 
 ## References
 
