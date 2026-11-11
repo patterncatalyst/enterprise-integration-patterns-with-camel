@@ -784,3 +784,9 @@ table :is(th, td) code {
 .toc-list a:hover { text-decoration: underline; }
 .toc-list__num { font-family: var(--font-mono); color: var(--accent); font-weight: 700; min-width: 2.4rem; flex: none; }
 .toc-list small { display: block; color: var(--ink-muted); font-weight: 400; margin-top: var(--space-1); }
+
+/* Bibliography: explicit column widths (colgroup) keep long titles and focus text readable */
+table.bib { table-layout: fixed; width: 100%; }
+table.bib td small { display: block; margin-top: .5rem; color: var(--ink-muted, #6a6e73); line-height: 1.45; }
+table.bib--books td:last-child { white-space: nowrap; }
+table.bib :is(th, td) code { white-space: normal; overflow-wrap: anywhere; }
