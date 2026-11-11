@@ -13,22 +13,30 @@ works, not sources: no text or code from any of them is reproduced here.
 
 ## Books
 
-| Title | Author(s) | Publisher | Year | Focus |
-|---|---|---|---|---|
-| [*Enterprise Integration Patterns: Designing, Building, and Deploying Messaging Solutions*](https://www.enterpriseintegrationpatterns.com/) | Gregor Hohpe, Bobby Woolf | Addison-Wesley | 2003 | The 65 messaging patterns, their intent, and the pattern language this site implements |
+<table class="bib bib--books">
+  <colgroup><col style="width:62%"><col style="width:24%"><col style="width:14%"></colgroup>
+  <thead><tr><th>Title</th><th>Author(s)</th><th>Year</th></tr></thead>
+  <tbody>
+    <tr><td><a href="https://www.enterpriseintegrationpatterns.com/" rel="noopener"><em>Enterprise Integration Patterns: Designing, Building, and Deploying Messaging Solutions</em></a><br><small>Addison-Wesley. The 65 messaging patterns, their intent, and the pattern language this site implements</small></td><td>Gregor Hohpe, Bobby Woolf</td><td>2003</td></tr>
+  </tbody>
+</table>
 
 ## Primary documentation
 
-| Source | Link | Used for |
-|---|---|---|
-| Apache Camel | [camel.apache.org/docs](https://camel.apache.org/docs/) | The EIP DSL, components, and the routing/transformation engine |
-| Camel Quarkus | [camel.apache.org/camel-quarkus](https://camel.apache.org/camel-quarkus/) | The Quarkus (Java DSL) runtime |
-| Camel on Spring Boot | [camel.apache.org/camel-spring-boot](https://camel.apache.org/camel-spring-boot/) | The Spring Boot (Java DSL) runtime |
-| Camel YAML DSL | [camel.apache.org/components/latest/others/yaml-dsl](https://camel.apache.org/components/latest/others/yaml-dsl.html) | The YAML DSL runtime and `camel` CLI |
-| Enterprise Integration Patterns site | [enterpriseintegrationpatterns.com](https://www.enterpriseintegrationpatterns.com/) | Hohpe and Woolf's per-pattern reference pages |
-| Apache Kafka | [kafka.apache.org/documentation](https://kafka.apache.org/documentation/) | The primary message broker (KRaft) |
-| Apache Pulsar | [pulsar.apache.org/docs](https://pulsar.apache.org/docs/) | The alternate broker in the Pulsar appendix |
-| Quarkus | [quarkus.io/guides](https://quarkus.io/guides/) | The Quarkus runtime, Dev Services, and native build |
+<table class="bib">
+  <colgroup><col style="width:38%"><col style="width:62%"></colgroup>
+  <thead><tr><th>Source</th><th>Used for</th></tr></thead>
+  <tbody>
+    <tr><td><a href="https://camel.apache.org/docs/" rel="noopener">Apache Camel</a></td><td>The EIP DSL, components, and the routing/transformation engine</td></tr>
+    <tr><td><a href="https://camel.apache.org/camel-quarkus/" rel="noopener">Camel Quarkus</a></td><td>The Quarkus (Java DSL) runtime</td></tr>
+    <tr><td><a href="https://camel.apache.org/camel-spring-boot/" rel="noopener">Camel on Spring Boot</a></td><td>The Spring Boot (Java DSL) runtime</td></tr>
+    <tr><td><a href="https://camel.apache.org/components/latest/others/yaml-dsl.html" rel="noopener">Camel YAML DSL</a></td><td>The YAML DSL runtime and <code>camel</code> CLI</td></tr>
+    <tr><td><a href="https://www.enterpriseintegrationpatterns.com/" rel="noopener">Enterprise Integration Patterns site</a></td><td>Hohpe and Woolf's per-pattern reference pages</td></tr>
+    <tr><td><a href="https://kafka.apache.org/documentation/" rel="noopener">Apache Kafka</a></td><td>The primary message broker (KRaft)</td></tr>
+    <tr><td><a href="https://pulsar.apache.org/docs/" rel="noopener">Apache Pulsar</a></td><td>The alternate broker in the Pulsar appendix</td></tr>
+    <tr><td><a href="https://quarkus.io/guides/" rel="noopener">Quarkus</a></td><td>The Quarkus runtime, Dev Services, and native build</td></tr>
+  </tbody>
+</table>
 
 These titles inform this site's coverage and rigor only. Nothing in these chapters
 or the runnable examples copies text or code from them.
