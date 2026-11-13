@@ -979,7 +979,7 @@ divider("05", "Routing Patterns\nin Code", "Content-based router, splitter, aggr
   const s = S();
   addDiagramSlide(s, "ROUTING PATTERNS", "Scatter-Gather — Fan Out and Collect", "10-scatter-gather",
     "Figure 5.9 — Scatter-gather: broadcast request → collect responses → select best");
-  addNotes(s, "Scatter-gather is a compound pattern that combines recipient list (or multicast) with aggregator. The scatter phase sends the same request to multiple providers — think of requesting shipping rates from multiple carriers. The gather phase collects all responses and selects the best one. In our shipping domain, the scatter-gather pattern is used to get the best shipping rate: we send a rate request to FedEx, UPS, and USPS simultaneously, collect all three responses, and pick the cheapest. The diagram shows the fan-out broadcast on the left, the multiple responses converging in the middle, and the aggregated result on the right. This is one of the most powerful compound patterns in the EIP catalog, and it appears prominently in the Loan Broker case study.");
+  addNotes(s, "Scatter-gather is a compound pattern that combines recipient list (or multicast) with aggregator. The scatter phase sends the same request to multiple providers — think of requesting shipping rates from multiple carriers. The gather phase collects all responses and selects the best one. In our shipping domain, the scatter-gather pattern is used to get the best shipping rate: we send a rate request to FASTLINE, PARCELCO, and POSTCO simultaneously, collect all three responses, and pick the cheapest. The diagram shows the fan-out broadcast on the left, the multiple responses converging in the middle, and the aggregated result on the right. This is one of the most powerful compound patterns in the EIP catalog, and it appears prominently in the Loan Broker case study.");
 }
 
 // Slide 50: Scatter-Gather — code
@@ -992,9 +992,9 @@ divider("05", "Routing Patterns\nin Code", "Content-based router, splitter, aggr
     '    .multicast(new BestRateStrategy())',
     '        .parallelProcessing()',
     '        .timeout(5000)',
-    '        .to("direct:fedex-rate",',
-    '            "direct:ups-rate",',
-    '            "direct:usps-rate")',
+    '        .to("direct:fastline-rate",',
+    '            "direct:parcelco-rate",',
+    '            "direct:postco-rate")',
     '    .end()',
     '    .log("Best rate: ${body.carrier} @ $${body.rate}");',
     '',

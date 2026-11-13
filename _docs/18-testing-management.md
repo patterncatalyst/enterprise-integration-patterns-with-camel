@@ -272,7 +272,7 @@ When you run `camel run` with JBang (which starts in dev mode by default), the m
 
 ### The problem
 
-The shipping domain has channel adapters connecting to external systems: carrier APIs (FedEx, UPS, DHL), the partner order system, the accounting CSV drop, the legacy CRM SOAP service. Each adapter might fail independently: the FedEx API might be down while UPS is fine. You need to manage these adapters: monitor their health, retry on failure, and gracefully degrade when external systems are unavailable.
+The shipping domain has channel adapters connecting to external systems: carrier APIs (FASTLINE, PARCELCO, AIRCO), the partner order system, the accounting CSV drop, the legacy CRM SOAP service. Each adapter might fail independently: the FASTLINE API might be down while PARCELCO is fine. You need to manage these adapters: monitor their health, retry on failure, and gracefully degrade when external systems are unavailable.
 
 ### The solution
 

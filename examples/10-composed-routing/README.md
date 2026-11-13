@@ -2,7 +2,7 @@
 
 Demonstrates how individual routing patterns compose into larger message flows, combining scatter-gather for parallel rate comparison with routing slips for dynamic sequential processing. Both **Quarkus** and **Spring Boot** runtimes are provided — the Camel route logic is identical; only class annotations and configuration differ.
 
-- **Scatter-Gather** — multicasts shipping rate requests to FedEx, UPS, USPS in parallel with a 5s timeout; BestRateStrategy aggregation selects the lowest rate
+- **Scatter-Gather** — multicasts shipping rate requests to FASTLINE, PARCELCO, POSTCO in parallel with a 5s timeout; BestRateStrategy aggregation selects the lowest rate
 - **Routing Slip** — dynamically constructs a comma-separated processing pipeline based on order properties, then executes via `.routingSlip(header("orderSlip"))`
 
 ## Running
@@ -30,7 +30,7 @@ Requires Kafka from the compose stack.
 
 ## What to observe
 
-1. Rate requests arriving on `eip.shipping.rate-requests` and being multicast to three carrier quote routes (`quote-fedex`, `quote-ups`, `quote-usps`)
+1. Rate requests arriving on `eip.shipping.rate-requests` and being multicast to three carrier quote routes (`quote-fastline`, `quote-parcelco`, `quote-postco`)
 2. Each carrier simulating pricing with weight-based formulas and returning a quote
 3. `BestRateStrategy` aggregation selecting the lowest rate after all three respond (or 5s timeout)
 4. Best rate result published to `eip.shipping.best-rate`
