@@ -9,6 +9,8 @@ actions:
   - camel:
       jbang:
         run:
+          args:
+            - "--skip-plugins"
           integration:
             name: "order-validation"
             file: "../order-validation-route.camel.yaml"
