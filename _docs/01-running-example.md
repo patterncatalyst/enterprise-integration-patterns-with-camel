@@ -88,7 +88,7 @@ Schedules carriers and tracks deliveries. It acts on `PaymentProcessed` events; 
 |-------|------|---------|
 | `id` | `SERIAL` | Auto-generated primary key |
 | `order_id` | `INTEGER` | Which order this shipment fulfills |
-| `carrier` | `VARCHAR(64)` | Carrier name (FedEx, UPS, DHL, etc.) |
+| `carrier` | `VARCHAR(64)` | Carrier name (FASTLINE, PARCELCO, AIRCO, etc.) |
 | `tracking_number` | `VARCHAR(128)` | Carrier-assigned tracking ID |
 | `status` | `VARCHAR(20)` | `PENDING`, `SCHEDULED`, `IN_TRANSIT`, `DELIVERED` |
 | `created_at` | `TIMESTAMP` | When the shipment was created |

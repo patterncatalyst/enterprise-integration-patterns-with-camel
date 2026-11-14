@@ -8,6 +8,7 @@ actions:
           args:
             - "--port"
             - "8088"
+            - "--skip-plugins"
           integration:
             name: "order-http"
             file: "../order-http-route.camel.yaml"

@@ -281,9 +281,9 @@ g.emit("ex-10-composed-routing", 800, 270,
     nodes=[
         topic(30, 50, ["eip.shipping", ".rate-requests"]),
         node(200, 35, ["Scatter-Gather", "multicast (5s timeout)"], "info", w=160, h=55),
-        node(400, 30, ["FedEx"], "muted", w=80, h=30),
-        node(400, 65, ["UPS"], "muted", w=80, h=30),
-        node(400, 100, ["USPS"], "muted", w=80, h=30),
+        node(400, 30, ["FASTLINE"], "muted", w=80, h=30),
+        node(400, 65, ["PARCELCO"], "muted", w=80, h=30),
+        node(400, 100, ["POSTCO"], "muted", w=80, h=30),
         node(510, 45, ["BestRateStrategy", "lowest rate"], "info", w=140, h=50),
         topic(680, 55, ["eip.shipping", ".best-rate"], "accent"),
 

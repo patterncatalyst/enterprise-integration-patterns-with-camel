@@ -389,7 +389,7 @@ public class OrderLookupToolRoute extends RouteBuilder {
             .log("Tool call — looking up order: ${header.orderId}")
             .choice()
                 .when(simple("${header.orderId} == 'ORD-001'"))
-                    .setBody(constant("{\"orderId\":\"ORD-001\",\"status\":\"SHIPPED\",\"carrier\":\"FedEx\",\"eta\":\"2026-07-20\"}"))
+                    .setBody(constant("{\"orderId\":\"ORD-001\",\"status\":\"SHIPPED\",\"carrier\":\"FASTLINE\",\"eta\":\"2026-07-20\"}"))
                 .when(simple("${header.orderId} == 'ORD-002'"))
                     .setBody(constant("{\"orderId\":\"ORD-002\",\"status\":\"PROCESSING\",\"warehouse\":\"West Coast Hub\"}"))
                 .when(simple("${header.orderId} == 'ORD-003'"))
@@ -436,7 +436,7 @@ public class OrderLookupToolRoute extends RouteBuilder {
             .log("Tool call — looking up order: ${header.orderId}")
             .choice()
                 .when(simple("${header.orderId} == 'ORD-001'"))
-                    .setBody(constant("{\"orderId\":\"ORD-001\",\"status\":\"SHIPPED\",\"carrier\":\"FedEx\",\"eta\":\"2026-07-20\"}"))
+                    .setBody(constant("{\"orderId\":\"ORD-001\",\"status\":\"SHIPPED\",\"carrier\":\"FASTLINE\",\"eta\":\"2026-07-20\"}"))
                 .when(simple("${header.orderId} == 'ORD-002'"))
                     .setBody(constant("{\"orderId\":\"ORD-002\",\"status\":\"PROCESSING\",\"warehouse\":\"West Coast Hub\"}"))
                 .when(simple("${header.orderId} == 'ORD-003'"))
@@ -745,7 +745,7 @@ curl -X POST http://localhost:8088/api/assistant/chat \
 Expected response:
 
 ```
-Order ORD-001 has been shipped via FedEx with an estimated arrival date of July 20, 2026.
+Order ORD-001 has been shipped via FASTLINE with an estimated arrival date of July 20, 2026.
 ```
 
 The agent composed a human-readable answer from the structured JSON returned by the tool. This is the power of combining LLM reasoning with Camel's integration capabilities -- the agent decides what to do, and Camel routes handle the how.
@@ -1347,13 +1347,13 @@ The assistant route:
 2. Sets the prompt header with the system instructions and user query
 3. Sends to `langchain4j-agent:assistant?agent=#assistantAgent&tags=shipping`
 4. The agent recognizes it needs order data and calls the `OrderLookupToolRoute`
-5. The tool returns `{"orderId":"ORD-001","status":"SHIPPED","carrier":"FedEx","eta":"2026-07-20"}`
+5. The tool returns `{"orderId":"ORD-001","status":"SHIPPED","carrier":"FASTLINE","eta":"2026-07-20"}`
 6. The agent formulates a natural-language response
 
 A response (worded differently each run):
 
 ```
-The status of order ORD-001 is SHIPPED. It's being transported by FedEx with an estimated arrival time of 2026-07-20.
+The status of order ORD-001 is SHIPPED. It's being transported by FASTLINE with an estimated arrival time of 2026-07-20.
 ```
 
 The application log shows the tool call that produced it: `Tool call — looking up order: ORD-001`.

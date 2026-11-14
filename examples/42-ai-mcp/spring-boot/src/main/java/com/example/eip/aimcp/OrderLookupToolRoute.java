@@ -31,7 +31,7 @@ public class OrderLookupToolRoute extends RouteBuilder {
             .log("Tool call — looking up order: ${header.orderId}")
             .choice()
                 .when(simple("${header.orderId} == 'ORD-001'"))
-                    .setBody(constant("{\"orderId\":\"ORD-001\",\"status\":\"SHIPPED\",\"carrier\":\"FedEx\",\"eta\":\"2026-07-20\"}"))
+                    .setBody(constant("{\"orderId\":\"ORD-001\",\"status\":\"SHIPPED\",\"carrier\":\"FASTLINE\",\"eta\":\"2026-07-20\"}"))
                 .when(simple("${header.orderId} == 'ORD-002'"))
                     .setBody(constant("{\"orderId\":\"ORD-002\",\"status\":\"PROCESSING\",\"warehouse\":\"West Coast Hub\"}"))
                 .when(simple("${header.orderId} == 'ORD-003'"))

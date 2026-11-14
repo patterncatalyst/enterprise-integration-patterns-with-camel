@@ -170,6 +170,8 @@ actions:
   - camel:
       jbang:
         run:
+          args:
+            - "--skip-plugins"
           integration:
             name: "order-validation"
             file: "../order-validation-route.camel.yaml"
@@ -391,6 +393,8 @@ actions:
   - camel:
       jbang:
         run:
+          args:
+            - "--skip-plugins"
           integration:
             name: "order-validation"
             file: "../order-validation-route.camel.yaml"
@@ -542,6 +546,7 @@ actions:
           args:
             - "--port"
             - "8088"
+            - "--skip-plugins"
           integration:
             name: "order-http"
             file: "../order-http-route.camel.yaml"

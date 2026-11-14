@@ -409,7 +409,7 @@ The Loan Broker maps directly to shipping scenarios:
 | Customer submits loan request | Customer places order |
 | Credit bureau enrichment | Address validation + customs classification |
 | Bank eligibility rules | Carrier eligibility (weight, dimensions, hazmat, destination) |
-| Fan out to qualifying banks | Fan out to qualifying carriers (FedEx, UPS, USPS, DHL) |
+| Fan out to qualifying banks | Fan out to qualifying carriers (FASTLINE, PARCELCO, POSTCO, AIRCO) |
 | Bank quotes | Carrier rate quotes |
 | Aggregate best rate | Select cheapest / fastest / best-value carrier |
 | Timeout (not all banks reply) | Timeout (slow carrier APIs) |
@@ -428,10 +428,10 @@ from("kafka:eip.shipping.rate-requests?brokers=localhost:9092&groupId=carrier-sc
         boolean hazmat = Boolean.TRUE.equals(shipment.get("contains_hazmat"));
         String country = (String) shipment.get("destination_country");
 
-        eligible.add("carrier-usps");
-        if (weight <= 70) eligible.add("carrier-fedex");
-        if (!hazmat) eligible.add("carrier-ups");
-        if ("US".equals(country) || "CA".equals(country)) eligible.add("carrier-dhl");
+        eligible.add("carrier-postco");
+        if (weight <= 70) eligible.add("carrier-fastline");
+        if (!hazmat) eligible.add("carrier-parcelco");
+        if ("US".equals(country) || "CA".equals(country)) eligible.add("carrier-airco");
 
         exchange.getIn().setHeader("eligibleCarriers",
             eligible.stream()

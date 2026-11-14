@@ -18,56 +18,56 @@ public class ScatterGatherRoute extends RouteBuilder {
             .multicast(new BestRateStrategy())
                 .parallelProcessing()
                 .timeout(5000)
-                .to("direct:quote-fedex", "direct:quote-ups", "direct:quote-usps")
+                .to("direct:quote-fastline", "direct:quote-parcelco", "direct:quote-postco")
             .end()
             .log("Best rate: ${body[carrier]} at $${body[rate]}")
             .marshal().json()
             .to("kafka:eip.shipping.best-rate?brokers={{kafka.brokers}}");
 
-        from("direct:quote-fedex")
-            .routeId("quote-fedex")
+        from("direct:quote-fastline")
+            .routeId("quote-fastline")
             .process(exchange -> {
                 var order = exchange.getIn().getBody(Map.class);
                 double weight = ((Number) order.get("weight_kg")).doubleValue();
                 double rate = 12.99 + (weight * 1.50);
                 exchange.getIn().setBody(Map.of(
-                    "carrier", "FedEx",
+                    "carrier", "FASTLINE",
                     "rate", rate,
                     "delivery_days", 3,
                     "order_id", order.get("order_id")
                 ));
             })
-            .log("FedEx quoted $${body[rate]}");
+            .log("FASTLINE quoted $${body[rate]}");
 
-        from("direct:quote-ups")
-            .routeId("quote-ups")
+        from("direct:quote-parcelco")
+            .routeId("quote-parcelco")
             .process(exchange -> {
                 var order = exchange.getIn().getBody(Map.class);
                 double weight = ((Number) order.get("weight_kg")).doubleValue();
                 double rate = 10.50 + (weight * 1.75);
                 exchange.getIn().setBody(Map.of(
-                    "carrier", "UPS",
+                    "carrier", "PARCELCO",
                     "rate", rate,
                     "delivery_days", 4,
                     "order_id", order.get("order_id")
                 ));
             })
-            .log("UPS quoted $${body[rate]}");
+            .log("PARCELCO quoted $${body[rate]}");
 
-        from("direct:quote-usps")
-            .routeId("quote-usps")
+        from("direct:quote-postco")
+            .routeId("quote-postco")
             .process(exchange -> {
                 var order = exchange.getIn().getBody(Map.class);
                 double weight = ((Number) order.get("weight_kg")).doubleValue();
                 double rate = 8.00 + (weight * 2.00);
                 exchange.getIn().setBody(Map.of(
-                    "carrier", "USPS",
+                    "carrier", "POSTCO",
                     "rate", rate,
                     "delivery_days", 5,
                     "order_id", order.get("order_id")
                 ));
             })
-            .log("USPS quoted $${body[rate]}");
+            .log("POSTCO quoted $${body[rate]}");
     }
 
     static class BestRateStrategy implements AggregationStrategy {

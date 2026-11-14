@@ -180,7 +180,7 @@ A quick-reference glossary of terms used throughout this tutorial, organized by 
 
 ## Shipping domain
 
-**Carrier**: A shipping provider (FedEx, UPS, USPS, DHL). Each carrier has its own API, rate structure, and service constraints.
+**Carrier**: A shipping provider (FASTLINE, PARCELCO, POSTCO, AIRCO). Each carrier has its own API, rate structure, and service constraints.
 
 **Customs classification**: Categorizing shipped goods by HS (Harmonized System) code for international shipments. Determines tariffs and regulatory requirements.
 
